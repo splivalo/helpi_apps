@@ -1,0 +1,103 @@
+# Helpi App — Progress
+
+> Merged Flutter app (Customer + Student) — zamjenjuje `helpi_senior` + `helpi_student`
+
+## Status: UI Prototype Complete (Frontend Only)
+
+**Datum:** 15.03.2026.  
+**Analyze:** 0 errors, 0 warnings  
+**Fajlovi:** 55 .dart files
+
+---
+
+## Checklist
+
+### Core Layer (10/10) — 100%
+
+- [x] colors.dart — AppColors (coral, teal, neutrals)
+- [x] pricing.dart — AppPricing (hourlyRate, sundayRate)
+- [x] theme.dart — HelpiTheme (Material 3 + color aliases)
+- [x] token_storage.dart — FlutterSecureStorage (JWT, userId, userType)
+- [x] api_endpoints.dart — svi API putevi (merged)
+- [x] api_client.dart — Dio wrapper s JWT interceptorom
+- [x] auth_service.dart — login, logout, register, forgot/reset password
+- [x] app_strings.dart — i18n HR+EN (~1000+ ključeva, merged)
+- [x] locale_notifier.dart — ValueNotifier<Locale>
+- [x] formatters.dart — AppFormatters
+
+### Shared Widgets (11/11) — 100%
+
+- [x] helpi_form_fields.dart
+- [x] helpi_switch.dart
+- [x] info_card.dart
+- [x] selectable_chip.dart
+- [x] service_chips_wrap.dart
+- [x] star_rating.dart
+- [x] summary_row.dart
+- [x] review_inline_card.dart
+- [x] tab_bar_selector.dart
+- [x] job_status_badge.dart
+- [x] status_chip.dart
+
+### Data Models (5/5) — 100%
+
+- [x] order_model.dart — OrderModel, OrdersNotifier, JobModel, ReviewModel (Customer)
+- [x] job_model.dart — Job, JobStatus, ServiceType, MockJobs (Student)
+- [x] review_model.dart — ReviewModel (Student)
+- [x] availability_model.dart — DayAvailability, AvailabilityNotifier
+- [x] faculty.dart — 31 fakultetа (Zagreb)
+
+### Feature Screens (14/14) — 100%
+
+- [x] login_screen.dart — zajednički login + registracija s role pickerom
+- [x] order_screen.dart — nova narudžba (Customer)
+- [x] order_flow_screen.dart — kreiranje narudžbe (Customer)
+- [x] orders_screen.dart — lista narudžbi, 3 taba (Customer)
+- [x] order_detail_screen.dart — detalji narudžbe + recenzije (Customer)
+- [x] schedule_screen.dart — tjedni raspored (Student)
+- [x] job_detail_screen.dart — detalji posla + review/decline (Student)
+- [x] senior_chat_list_screen.dart — chat (Customer)
+- [x] student_chat_screen.dart — chat (Student)
+- [x] senior_profile_screen.dart — profil (Customer)
+- [x] student_profile_screen.dart — profil + dostupnost (Student)
+- [x] statistics_screen.dart — statistika (Student)
+- [x] registration_data_screen.dart — registracija podataka (Student)
+- [x] onboarding_screen.dart — postavljanje dostupnosti (Student)
+
+### Navigation & App Shell (4/4) — 100%
+
+- [x] app.dart — root widget, role-based routing
+- [x] senior_shell.dart — 4 taba (Naruči, Narudžbe, Poruke, Profil)
+- [x] student_shell.dart — 4 taba (Raspored, Poruke, Statistika, Profil)
+- [x] main.dart — entry point
+
+### Student-Specific Widgets (7/7) — 100%
+
+- [x] availability_day_row.dart
+- [x] faculty_picker.dart
+- [x] helpi_card.dart
+- [x] job_status_badge.dart (student verzija)
+- [x] review_card.dart
+- [x] star_rating.dart (student verzija)
+- [x] time_slot_picker.dart
+
+### Student Utils (3/3) — 100%
+
+- [x] job_helpers.dart
+- [x] formatters.dart (student verzija)
+- [x] availability_helpers.dart
+
+---
+
+## Ukupno: 55/55 fajlova — 100% frontend UI
+
+## Još nije spojeno na backend (Next Steps)
+
+- [ ] Pravi API pozivi umjesto mock podataka
+- [ ] Customer registracija → POST /api/auth/register/customer
+- [ ] Student registracija → POST /api/auth/register/student
+- [ ] Login → POST /api/auth/login (radi, ali treba backend pokrenut)
+- [ ] GET /api/orders za Customer orders screen
+- [ ] Student job list s API-ja
+- [ ] Push notifikacije (Firebase FCM)
+- [ ] Real-time chat (SignalR)
