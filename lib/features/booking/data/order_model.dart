@@ -330,6 +330,17 @@ class OrdersNotifier extends ChangeNotifier {
 
   int _nextId = 1;
 
+  /// Zamijeni sve narudžbe API podacima (DataLoader poziva ovo).
+  void replaceAll(List<OrderModel> apiOrders) {
+    _orders
+      ..clear()
+      ..addAll(apiOrders);
+    if (apiOrders.isNotEmpty) {
+      _nextId = apiOrders.map((o) => o.id).reduce((a, b) => a > b ? a : b) + 1;
+    }
+    notifyListeners();
+  }
+
   void addProcessingOrder(OrderModel order) {
     order.status = OrderStatus.processing;
     _orders.insert(0, order);

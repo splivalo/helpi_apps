@@ -15,10 +15,12 @@ class SeniorShell extends StatefulWidget {
     super.key,
     required this.localeNotifier,
     required this.onLogout,
+    required this.ordersNotifier,
   });
 
   final LocaleNotifier localeNotifier;
   final VoidCallback onLogout;
+  final OrdersNotifier ordersNotifier;
 
   @override
   State<SeniorShell> createState() => _SeniorShellState();
@@ -26,7 +28,6 @@ class SeniorShell extends StatefulWidget {
 
 class _SeniorShellState extends State<SeniorShell> {
   int _currentIndex = 0;
-  final OrdersNotifier _ordersNotifier = OrdersNotifier();
 
   late final List<Widget> _screens;
 
@@ -34,20 +35,14 @@ class _SeniorShellState extends State<SeniorShell> {
   void initState() {
     super.initState();
     _screens = <Widget>[
-      OrderScreen(ordersNotifier: _ordersNotifier),
-      OrdersScreen(ordersNotifier: _ordersNotifier),
+      OrderScreen(ordersNotifier: widget.ordersNotifier),
+      OrdersScreen(ordersNotifier: widget.ordersNotifier),
       const ChatScreen(),
       ProfileScreen(
         localeNotifier: widget.localeNotifier,
         onLogout: widget.onLogout,
       ),
     ];
-  }
-
-  @override
-  void dispose() {
-    _ordersNotifier.dispose();
-    super.dispose();
   }
 
   @override

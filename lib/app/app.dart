@@ -7,7 +7,9 @@ import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/l10n/locale_notifier.dart';
 import 'package:helpi_app/core/services/auth_service.dart';
+import 'package:helpi_app/core/services/data_loader.dart';
 import 'package:helpi_app/features/auth/presentation/login_screen.dart';
+import 'package:helpi_app/features/booking/data/order_model.dart';
 import 'package:helpi_app/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:helpi_app/features/onboarding/presentation/registration_data_screen.dart';
 import 'package:helpi_app/features/schedule/data/availability_model.dart';
@@ -24,6 +26,7 @@ class _HelpiAppState extends State<HelpiApp> {
   final _localeNotifier = LocaleNotifier();
   final _authService = AuthService();
   final _availabilityNotifier = AvailabilityNotifier();
+  final _ordersNotifier = OrdersNotifier();
 
   bool _isLoggedIn = false;
   String? _userType;
@@ -41,16 +44,25 @@ class _HelpiAppState extends State<HelpiApp> {
   }
 
   Future<void> _checkExistingSession() async {
-    final loggedIn = await _authService.isLoggedIn();
-    if (!loggedIn) return;
+    try {
+      final loggedIn = await _authService.isLoggedIn();
+      if (!loggedIn) return;
 
-    final userType = await _authService.getCurrentUserType();
-    if (!mounted) return;
+      final userType = await _authService.getCurrentUserType();
+      if (!mounted) return;
 
-    setState(() {
-      _isLoggedIn = true;
-      _userType = userType;
-    });
+      setState(() {
+        _isLoggedIn = true;
+        _userType = userType;
+      });
+
+      // Učitaj podatke u pozadini
+      DataLoader.loadAll(
+        ordersNotifier: userType == 'Customer' ? _ordersNotifier : null,
+      );
+    } catch (_) {
+      // Nikad ne blokiraj startup
+    }
   }
 
   // ── Login: API pozvan, token + userType spremljeni ──
@@ -62,6 +74,11 @@ class _HelpiAppState extends State<HelpiApp> {
       _isLoggedIn = true;
       _userType = userType;
     });
+
+    // Učitaj podatke u pozadini
+    DataLoader.loadAll(
+      ordersNotifier: userType == 'Customer' ? _ordersNotifier : null,
+    );
   }
 
   // ── Register: profil dovršen u LoginScreen (Customer flow) ──
@@ -87,6 +104,7 @@ class _HelpiAppState extends State<HelpiApp> {
   Future<void> _handleLogout() async {
     await _authService.logout();
     _availabilityNotifier.reset();
+    DataLoader.reset();
     if (!mounted) return;
 
     setState(() {
@@ -183,6 +201,7 @@ class _HelpiAppState extends State<HelpiApp> {
     return SeniorShell(
       localeNotifier: _localeNotifier,
       onLogout: _handleLogout,
+      ordersNotifier: _ordersNotifier,
     );
   }
 }
