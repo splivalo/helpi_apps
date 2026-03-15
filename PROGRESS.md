@@ -91,6 +91,13 @@
 
 ## Ukupno: 55/55 fajlova — 100% frontend UI
 
+### Verzija (2026-03-15)
+
+- [x] App version → 2.0.0 (pubspec.yaml: 2.0.0+1)
+- [x] AppStrings `appVersion` → "Helpi v2.0.0" (HR + EN)
+
+---
+
 ## Još nije spojeno na backend (Next Steps)
 
 - [ ] Pravi API pozivi umjesto mock podataka
