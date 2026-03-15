@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:helpi_app/core/constants/colors.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/l10n/locale_notifier.dart';
+import 'package:helpi_app/core/services/auth_service.dart';
 import 'package:helpi_app/shared/widgets/helpi_form_fields.dart';
 
 /// Profil ekran — pristupni podaci, naručitelj, senior, kartice, uvjeti.
@@ -260,7 +262,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    // TODO: otvori uvjete korištenja
+                    launchUrl(
+                      Uri.parse('https://helpi.social/pravila-privatnosti/'),
+                      mode: LaunchMode.externalApplication,
+                    );
                   },
                   child: RichText(
                     text: TextSpan(
@@ -357,6 +362,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
             label: Text(AppStrings.logout),
             style: AppColors.coralOutlinedStyle,
           ),
+          const SizedBox(height: 16),
+
+          // ── IZBRIŠI RAČUN ───────────────────────────
+          TextButton(
+            onPressed: () => _showDeleteAccountDialog(context),
+            style: TextButton.styleFrom(
+              foregroundColor: theme.colorScheme.error,
+            ),
+            child: Text(
+              AppStrings.deleteAccount,
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
           const SizedBox(height: 32),
 
           // ── Verzija ─────────────────────────────────
@@ -370,5 +388,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _showDeleteAccountDialog(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(AppStrings.deleteAccountConfirmTitle),
+        content: Text(AppStrings.deleteAccountConfirmContent),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(AppStrings.deleteAccountNo),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            child: Text(AppStrings.deleteAccountYes),
+          ),
+        ],
+      ),
+    );
+    if (!context.mounted) return;
+    if (confirmed != true) return;
+
+    final result = await AuthService().deleteAccount();
+    if (!context.mounted) return;
+
+    if (result.success) {
+      widget.onLogout();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.message ?? AppStrings.deleteAccountError),
+        ),
+      );
+    }
   }
 }

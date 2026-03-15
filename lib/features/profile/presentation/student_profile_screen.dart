@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/l10n/locale_notifier.dart';
+import 'package:helpi_app/core/network/api_client.dart';
+import 'package:helpi_app/core/network/api_endpoints.dart';
+import 'package:helpi_app/core/services/auth_service.dart';
 import 'package:helpi_app/features/schedule/data/availability_model.dart';
 import 'package:helpi_app/shared/models/faculty.dart';
 import 'package:helpi_app/features/schedule/utils/availability_helpers.dart';
@@ -36,7 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _lastNameCtrl = TextEditingController(text: 'Horvat');
   final _phoneCtrl = TextEditingController(text: '+385 91 555 1234');
   final _addressCtrl = TextEditingController(text: 'Savska 25, Zagreb');
-  Faculty? _selectedFaculty = Faculty.byAcronym('EFZG');
+  Faculty? _selectedFaculty;
   final _studentIdCardCtrl = TextEditingController(text: '0036512345');
   String _gender = 'F';
   DateTime _dob = DateTime(2002, 5, 10);
@@ -45,9 +49,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late String _selectedLang = AppStrings.currentLocale.toUpperCase();
   bool _isEditing = false;
   bool _agreedToTerms = true;
+  List<Faculty> _faculties = [];
 
   // â”€â”€ Dostupnost â€” Äita/piÅ¡e iz dijeljenog notifiera â”€â”€â”€â”€â”€
   List<DayAvailability> get _availability => widget.availabilityNotifier.value;
+  final _apiClient = ApiClient();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFaculties();
+  }
+
+  Future<void> _loadFaculties() async {
+    try {
+      final response = await _apiClient.get(ApiEndpoints.faculties);
+      if (!mounted) return;
+      final list = response.data as List<dynamic>;
+      setState(() {
+        _faculties = Faculty.fromJsonList(list, lang: AppStrings.currentLocale);
+      });
+    } catch (_) {
+      // Faculties remain empty
+    }
+  }
 
   @override
   void dispose() {
@@ -164,7 +189,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Expanded(
                 child: GestureDetector(
                   onTap: () {
-                    // TODO: otvori uvjete koriÅ¡tenja
+                    launchUrl(
+                      Uri.parse('https://helpi.social/pravila-privatnosti/'),
+                      mode: LaunchMode.externalApplication,
+                    );
                   },
                   child: RichText(
                     text: TextSpan(
@@ -267,6 +295,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
             label: Text(AppStrings.logout),
             style: HelpiTheme.coralOutlinedStyle,
           ),
+          const SizedBox(height: 16),
+
+          // ── IZBRIŠI RAČUN ───────────────────────────
+          TextButton(
+            onPressed: () => _showDeleteAccountDialog(context),
+            style: TextButton.styleFrom(
+              foregroundColor: theme.colorScheme.error,
+            ),
+            child: Text(
+              AppStrings.deleteAccount,
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
           const SizedBox(height: 32),
 
           // â”€â”€ Verzija â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -282,7 +323,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  Future<void> _showDeleteAccountDialog(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(AppStrings.deleteAccountConfirmTitle),
+        content: Text(AppStrings.deleteAccountConfirmContent),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(AppStrings.deleteAccountNo),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            child: Text(AppStrings.deleteAccountYes),
+          ),
+        ],
+      ),
+    );
+    if (!context.mounted) return;
+    if (confirmed != true) return;
+
+    final result = await AuthService().deleteAccount();
+    if (!context.mounted) return;
+
+    if (result.success) {
+      widget.onLogout();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.message ?? AppStrings.deleteAccountError),
+        ),
+      );
+    }
+  }
 
   Widget _sectionHeader(String title) {
     final theme = Theme.of(context);
@@ -442,6 +519,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ? () async {
               final picked = await showFacultyPicker(
                 context: context,
+                faculties: _faculties,
                 current: _selectedFaculty,
               );
               if (picked != null && context.mounted) {
@@ -471,7 +549,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         child: hasFaculty
             ? Text(
-                _selectedFaculty!.acronym,
+                _selectedFaculty!.name,
                 style: TextStyle(
                   color: _isEditing
                       ? theme.colorScheme.onSurface

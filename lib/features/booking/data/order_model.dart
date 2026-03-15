@@ -317,6 +317,14 @@ class OrdersNotifier extends ChangeNotifier {
   List<OrderModel> get cancelled =>
       _orders.where((o) => o.status == OrderStatus.cancelled).toList();
 
+  List<OrderModel> get inactive => _orders
+      .where(
+        (o) =>
+            o.status == OrderStatus.completed ||
+            o.status == OrderStatus.cancelled,
+      )
+      .toList();
+
   List<OrderModel> get archived =>
       _orders.where((o) => o.status == OrderStatus.archived).toList();
 

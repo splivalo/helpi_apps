@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/core/network/api_client.dart';
+import 'package:helpi_app/core/network/api_endpoints.dart';
+import 'package:helpi_app/core/services/auth_service.dart';
 import 'package:helpi_app/shared/models/faculty.dart';
+import 'package:helpi_app/shared/models/selected_address_info.dart';
+import 'package:helpi_app/shared/widgets/mc_address_field.dart';
 import 'package:helpi_app/features/schedule/utils/formatters.dart';
 import 'package:helpi_app/features/schedule/widgets/faculty_picker.dart';
 
@@ -11,10 +16,14 @@ import 'package:helpi_app/features/schedule/widgets/faculty_picker.dart';
 class RegistrationDataScreen extends StatefulWidget {
   const RegistrationDataScreen({
     super.key,
+    required this.email,
+    required this.password,
     required this.onComplete,
     this.onBack,
   });
 
+  final String email;
+  final String password;
   final VoidCallback onComplete;
   final VoidCallback? onBack;
 
@@ -23,6 +32,8 @@ class RegistrationDataScreen extends StatefulWidget {
 }
 
 class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
+  final _authService = AuthService();
+  final _apiClient = ApiClient();
   final _firstNameCtrl = TextEditingController();
   final _lastNameCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
@@ -32,6 +43,10 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
   String _gender = 'M';
   DateTime? _dob;
   Faculty? _selectedFaculty;
+  SelectedAddressInfo? _selectedAddress;
+  bool _isLoading = false;
+  String? _errorMessage;
+  List<Faculty> _faculties = [];
 
   @override
   void initState() {
@@ -39,8 +54,21 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
     _firstNameCtrl.addListener(_onFieldChanged);
     _lastNameCtrl.addListener(_onFieldChanged);
     _phoneCtrl.addListener(_onFieldChanged);
-    _addressCtrl.addListener(_onFieldChanged);
     _studentIdCardCtrl.addListener(_onFieldChanged);
+    _loadFaculties();
+  }
+
+  Future<void> _loadFaculties() async {
+    try {
+      final response = await _apiClient.get(ApiEndpoints.faculties);
+      if (!mounted) return;
+      final list = response.data as List<dynamic>;
+      setState(() {
+        _faculties = Faculty.fromJsonList(list, lang: AppStrings.currentLocale);
+      });
+    } catch (_) {
+      // Faculties will remain empty — picker shows nothing
+    }
   }
 
   void _onFieldChanged() => setState(() {});
@@ -59,7 +87,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
       _firstNameCtrl.text.trim().isNotEmpty &&
       _lastNameCtrl.text.trim().isNotEmpty &&
       _phoneCtrl.text.trim().isNotEmpty &&
-      _addressCtrl.text.trim().isNotEmpty &&
+      _selectedAddress != null &&
       _selectedFaculty != null &&
       _studentIdCardCtrl.text.trim().isNotEmpty &&
       _dob != null;
@@ -138,10 +166,11 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
                     const SizedBox(height: 12),
 
                     // ── Adresa ──
-                    _buildField(
-                      label: AppStrings.address,
+                    McAddressField(
                       controller: _addressCtrl,
-                      theme: theme,
+                      onAddressSelected: (info) {
+                        setState(() => _selectedAddress = info);
+                      },
                     ),
                     const SizedBox(height: 12),
 
@@ -159,12 +188,35 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
                     ),
                     const SizedBox(height: 32),
 
+                    // ── Error message ──
+                    if (_errorMessage != null) ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade50,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.red.shade200),
+                        ),
+                        child: Text(
+                          _errorMessage!,
+                          style: TextStyle(
+                            color: Colors.red.shade700,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+
                     // ── CTA button ──
                     SizedBox(
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
-                        onPressed: _canProceed ? widget.onComplete : null,
+                        onPressed: (_canProceed && !_isLoading)
+                            ? _handleRegister
+                            : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: HelpiTheme.coral,
                           foregroundColor: Colors.white,
@@ -179,7 +231,16 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        child: Text(AppStrings.registrationDataNext),
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(AppStrings.registrationDataNext),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -191,6 +252,57 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
         ),
       ),
     );
+  }
+
+  // ── Registration logic ───────────────────────────────────
+
+  Future<void> _handleRegister() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final fullName =
+        '${_firstNameCtrl.text.trim()} ${_lastNameCtrl.text.trim()}';
+
+    final result = await _authService.registerStudent(
+      email: widget.email,
+      password: widget.password,
+      fullName: fullName,
+      phone: _phoneCtrl.text.trim(),
+      gender: _gender,
+      dateOfBirth: _dob!,
+      fullAddress: _selectedAddress!.fullAddress,
+      cityId: 2,
+      googlePlaceId: _selectedAddress!.placeId,
+      lat: _selectedAddress!.lat,
+      lng: _selectedAddress!.lng,
+      studentNumber: _studentIdCardCtrl.text.trim(),
+      facultyId: _selectedFaculty!.id,
+    );
+
+    if (!context.mounted) return;
+
+    if (!result.success) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = result.message;
+      });
+      return;
+    }
+
+    // Auto-login after successful registration
+    final loginResult = await _authService.login(widget.email, widget.password);
+
+    if (!context.mounted) return;
+
+    setState(() => _isLoading = false);
+
+    if (loginResult.success) {
+      widget.onComplete();
+    } else {
+      setState(() => _errorMessage = loginResult.message);
+    }
   }
 
   // ── Helpers ──────────────────────────────────────────
@@ -301,6 +413,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
       onTap: () async {
         final picked = await showFacultyPicker(
           context: context,
+          faculties: _faculties,
           current: _selectedFaculty,
         );
         if (picked != null && context.mounted) {
@@ -323,7 +436,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
         ),
         child: hasFaculty
             ? Text(
-                _selectedFaculty!.acronym,
+                _selectedFaculty!.name,
                 style: TextStyle(
                   color: theme.colorScheme.onSurface,
                   fontSize: 16,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:helpi_app/app/senior_shell.dart';
 import 'package:helpi_app/app/student_shell.dart';
@@ -30,6 +31,8 @@ class _HelpiAppState extends State<HelpiApp> {
   // Student-only flow state:
   bool _needsRegistrationData = false;
   bool _needsOnboarding = false;
+  String? _pendingStudentEmail;
+  String? _pendingStudentPassword;
 
   @override
   void initState() {
@@ -70,11 +73,13 @@ class _HelpiAppState extends State<HelpiApp> {
   }
 
   // ── Register: Student odabrao ulogu, ide na RegistrationData ──
-  void _handleStudentRegisterSuccess() {
+  void _handleStudentRegisterSuccess(String email, String password) {
     setState(() {
       _isLoggedIn = true;
       _userType = 'Student';
       _needsRegistrationData = true;
+      _pendingStudentEmail = email;
+      _pendingStudentPassword = password;
     });
   }
 
@@ -89,6 +94,8 @@ class _HelpiAppState extends State<HelpiApp> {
       _userType = null;
       _needsRegistrationData = false;
       _needsOnboarding = false;
+      _pendingStudentEmail = null;
+      _pendingStudentPassword = null;
     });
   }
 
@@ -103,6 +110,13 @@ class _HelpiAppState extends State<HelpiApp> {
           title: 'Helpi',
           debugShowCheckedModeBanner: false,
           theme: HelpiTheme.light,
+          locale: locale,
+          supportedLocales: const [Locale('hr'), Locale('en')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
           home: _buildHome(),
         );
       },
@@ -124,10 +138,14 @@ class _HelpiAppState extends State<HelpiApp> {
     if (_userType == 'Student') {
       if (_needsRegistrationData) {
         return RegistrationDataScreen(
+          email: _pendingStudentEmail ?? '',
+          password: _pendingStudentPassword ?? '',
           onComplete: () {
             setState(() {
               _needsRegistrationData = false;
               _needsOnboarding = true;
+              _pendingStudentEmail = null;
+              _pendingStudentPassword = null;
             });
           },
           onBack: () {
@@ -135,6 +153,8 @@ class _HelpiAppState extends State<HelpiApp> {
               _isLoggedIn = false;
               _userType = null;
               _needsRegistrationData = false;
+              _pendingStudentEmail = null;
+              _pendingStudentPassword = null;
             });
           },
         );

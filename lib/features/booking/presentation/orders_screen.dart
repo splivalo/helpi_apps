@@ -10,7 +10,7 @@ import 'package:helpi_app/shared/widgets/status_chip.dart';
 import 'package:helpi_app/shared/widgets/summary_row.dart';
 import 'package:helpi_app/shared/widgets/tab_bar_selector.dart';
 
-/// Ekran s listom narudžbi — 3 taba: U obradi, Aktivne, Završene.
+/// Ekran s listom narudžbi — 3 taba: U obradi, Aktivne, Neaktivne.
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key, required this.ordersNotifier});
 
@@ -46,8 +46,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
     final tabs = [
       AppStrings.ordersProcessing,
       AppStrings.ordersActive,
-      AppStrings.ordersCompleted,
-      AppStrings.ordersCancelled,
+      AppStrings.ordersInactive,
     ];
 
     return Scaffold(
@@ -71,8 +70,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
               children: [
                 _buildList(notifier.processing, _ActionType.cancel),
                 _buildList(notifier.active, _ActionType.cancel),
-                _buildList(notifier.completed, _ActionType.repeat),
-                _buildList(notifier.cancelled, _ActionType.none),
+                _buildList(notifier.inactive, _ActionType.none),
               ],
             ),
           ),
@@ -215,4 +213,4 @@ class _OrdersScreenState extends State<OrdersScreen> {
   }
 }
 
-enum _ActionType { cancel, repeat, none }
+enum _ActionType { cancel, none }

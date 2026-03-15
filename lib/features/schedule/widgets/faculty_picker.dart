@@ -8,6 +8,7 @@ import 'package:helpi_app/shared/models/faculty.dart';
 /// Returns the selected [Faculty] or `null` if dismissed.
 Future<Faculty?> showFacultyPicker({
   required BuildContext context,
+  required List<Faculty> faculties,
   Faculty? current,
 }) {
   return showModalBottomSheet<Faculty>(
@@ -16,13 +17,14 @@ Future<Faculty?> showFacultyPicker({
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
-    builder: (_) => _FacultyPickerSheet(current: current),
+    builder: (_) => _FacultyPickerSheet(faculties: faculties, current: current),
   );
 }
 
 class _FacultyPickerSheet extends StatefulWidget {
-  const _FacultyPickerSheet({this.current});
+  const _FacultyPickerSheet({required this.faculties, this.current});
 
+  final List<Faculty> faculties;
   final Faculty? current;
 
   @override
@@ -31,11 +33,12 @@ class _FacultyPickerSheet extends StatefulWidget {
 
 class _FacultyPickerSheetState extends State<_FacultyPickerSheet> {
   final _searchCtrl = TextEditingController();
-  List<Faculty> _filtered = Faculty.all;
+  late List<Faculty> _filtered;
 
   @override
   void initState() {
     super.initState();
+    _filtered = widget.faculties;
     _searchCtrl.addListener(_onSearch);
   }
 
@@ -43,11 +46,10 @@ class _FacultyPickerSheetState extends State<_FacultyPickerSheet> {
     final q = _searchCtrl.text.trim().toLowerCase();
     setState(() {
       if (q.isEmpty) {
-        _filtered = Faculty.all;
+        _filtered = widget.faculties;
       } else {
-        _filtered = Faculty.all.where((f) {
-          return f.acronym.toLowerCase().contains(q) ||
-              f.fullName.toLowerCase().contains(q);
+        _filtered = widget.faculties.where((f) {
+          return f.name.toLowerCase().contains(q);
         }).toList();
       }
     });
@@ -131,8 +133,7 @@ class _FacultyPickerSheetState extends State<_FacultyPickerSheet> {
                             const Divider(height: 1, indent: 16, endIndent: 16),
                         itemBuilder: (ctx, i) {
                           final f = _filtered[i];
-                          final isSelected =
-                              widget.current?.acronym == f.acronym;
+                          final isSelected = widget.current?.id == f.id;
 
                           return ListTile(
                             dense: true,
@@ -140,17 +141,10 @@ class _FacultyPickerSheetState extends State<_FacultyPickerSheet> {
                             selectedTileColor: HelpiTheme.teal.withAlpha(20),
                             selectedColor: HelpiTheme.teal,
                             title: Text(
-                              f.acronym,
+                              f.name,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 15,
-                              ),
-                            ),
-                            subtitle: Text(
-                              f.fullName,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: HelpiTheme.textSecondary,
                               ),
                             ),
                             trailing: isSelected

@@ -114,6 +114,11 @@ class AppStrings {
       'forgotPassword': 'Zaboravljena lozinka?',
       'loggingIn': 'Prijava u tijeku...',
       'loginError': 'Greška pri prijavi',
+      'registrationError': 'Greška pri registraciji',
+      'emailAlreadyExists': 'Korisnik s ovom e-mail adresom već postoji',
+      'registrationSuccess': 'Registracija uspješna! Možete se prijaviti.',
+      'fillAllFields': 'Molimo ispunite sva obavezna polja',
+      'registering': 'Registracija u tijeku...',
       'invalidCredentials': 'Neispravni podaci za prijavu',
       'forgotPasswordTitle': 'Zaboravljena lozinka',
       'forgotPasswordSubtitle': 'Unesite email adresu za slanje koda',
@@ -139,6 +144,7 @@ class AppStrings {
       'lastName': 'Prezime',
       'phone': 'Broj telefona',
       'address': 'Adresa',
+      'addressHint': 'Počnite tipkati adresu za pretragu',
       'regProfileTitle': 'Popunite profil',
       'regProfileSubtitle': 'Trebamo vaše podatke za nastavak',
       'completeRegistration': 'Završi registraciju',
@@ -255,6 +261,7 @@ class AppStrings {
       'ordersActive': 'Aktivne',
       'ordersCompleted': 'Završene',
       'ordersCancelled': 'Otkazane',
+      'ordersInactive': 'Neaktivne',
       'orderProcessing': 'U obradi',
       'orderActive': 'Aktivna',
       'orderCompleted': 'Završena',
@@ -284,6 +291,14 @@ class AppStrings {
       'yourReviews': 'Vaše ocjene',
       'noStudentsYet': 'Još nema dodijeljenih studenata',
       'logout': 'Odjava',
+      'deleteAccount': 'Izbriši račun',
+      'deleteAccountConfirmTitle': 'Izbriši račun',
+      'deleteAccountConfirmContent':
+          'Jeste li sigurni da želite izbrisati svoj račun? Ova akcija se ne može poništiti.',
+      'deleteAccountNo': 'Ne',
+      'deleteAccountYes': 'Da',
+      'deleteAccountSuccess': 'Račun je uspješno izbrisan.',
+      'deleteAccountError': 'Greška pri brisanju računa.',
       'loginTitle': 'Dobrodošli u Helpi',
       'loginSubtitle': 'Prijavite se ili kreirajte račun',
       'loginEmail': 'Email adresa',
@@ -538,6 +553,11 @@ class AppStrings {
       'forgotPassword': 'Forgot password?',
       'loggingIn': 'Signing in...',
       'loginError': 'Login error',
+      'registrationError': 'Registration error',
+      'emailAlreadyExists': 'A user with this email address already exists',
+      'registrationSuccess': 'Registration successful! You can now sign in.',
+      'fillAllFields': 'Please fill in all required fields',
+      'registering': 'Registering...',
       'invalidCredentials': 'Invalid credentials',
       'forgotPasswordTitle': 'Forgot password',
       'forgotPasswordSubtitle': 'Enter your email to receive a reset code',
@@ -563,6 +583,7 @@ class AppStrings {
       'lastName': 'Last name',
       'phone': 'Phone number',
       'address': 'Address',
+      'addressHint': 'Start typing an address to search',
       'regProfileTitle': 'Complete your profile',
       'regProfileSubtitle': 'We need your details to continue',
       'completeRegistration': 'Complete registration',
@@ -679,6 +700,7 @@ class AppStrings {
       'ordersActive': 'Active',
       'ordersCompleted': 'Completed',
       'ordersCancelled': 'Cancelled',
+      'ordersInactive': 'Inactive',
       'orderProcessing': 'Processing',
       'orderActive': 'Active',
       'orderCompleted': 'Completed',
@@ -708,6 +730,14 @@ class AppStrings {
       'yourReviews': 'Your reviews',
       'noStudentsYet': 'No students assigned yet',
       'logout': 'Log out',
+      'deleteAccount': 'Delete Account',
+      'deleteAccountConfirmTitle': 'Delete Account',
+      'deleteAccountConfirmContent':
+          'Are you sure you want to delete your account? This action cannot be undone.',
+      'deleteAccountNo': 'No',
+      'deleteAccountYes': 'Yes',
+      'deleteAccountSuccess': 'Account successfully deleted.',
+      'deleteAccountError': 'Error deleting account.',
       'loginTitle': 'Welcome to Helpi',
       'loginSubtitle': 'Sign in or create an account',
       'loginEmail': 'Email address',
@@ -984,6 +1014,11 @@ class AppStrings {
   static String get forgotPassword => _t('forgotPassword');
   static String get loggingIn => _t('loggingIn');
   static String get loginError => _t('loginError');
+  static String get registrationError => _t('registrationError');
+  static String get emailAlreadyExists => _t('emailAlreadyExists');
+  static String get registrationSuccess => _t('registrationSuccess');
+  static String get fillAllFields => _t('fillAllFields');
+  static String get registering => _t('registering');
   static String get invalidCredentials => _t('invalidCredentials');
   static String get forgotPasswordTitle => _t('forgotPasswordTitle');
   static String get forgotPasswordSubtitle => _t('forgotPasswordSubtitle');
@@ -1009,6 +1044,7 @@ class AppStrings {
   static String get lastName => _t('lastName');
   static String get phone => _t('phone');
   static String get address => _t('address');
+  static String get addressHint => _t('addressHint');
   static String get regProfileTitle => _t('regProfileTitle');
   static String get regProfileSubtitle => _t('regProfileSubtitle');
   static String get completeRegistration => _t('completeRegistration');
@@ -1124,6 +1160,7 @@ class AppStrings {
   static String get ordersActive => _t('ordersActive');
   static String get ordersCompleted => _t('ordersCompleted');
   static String get ordersCancelled => _t('ordersCancelled');
+  static String get ordersInactive => _t('ordersInactive');
   static String get orderProcessing => _t('orderProcessing');
   static String get orderActive => _t('orderActive');
   static String get orderCompleted => _t('orderCompleted');
@@ -1154,6 +1191,15 @@ class AppStrings {
   static String get yourReviews => _t('yourReviews');
   static String get noStudentsYet => _t('noStudentsYet');
   static String get logout => _t('logout');
+  static String get deleteAccount => _t('deleteAccount');
+  static String get deleteAccountConfirmTitle =>
+      _t('deleteAccountConfirmTitle');
+  static String get deleteAccountConfirmContent =>
+      _t('deleteAccountConfirmContent');
+  static String get deleteAccountNo => _t('deleteAccountNo');
+  static String get deleteAccountYes => _t('deleteAccountYes');
+  static String get deleteAccountSuccess => _t('deleteAccountSuccess');
+  static String get deleteAccountError => _t('deleteAccountError');
   static String get loginTitle => _t('loginTitle');
   static String get loginSubtitle => _t('loginSubtitle');
   static String get loginEmail => _t('loginEmail');

@@ -1,59 +1,29 @@
-/// Predefined Zagreb University faculties.
+/// Faculty model — loaded from backend API.
 class Faculty {
-  const Faculty({required this.acronym, required this.fullName});
+  const Faculty({required this.id, required this.name});
 
-  final String acronym;
-  final String fullName;
+  final int id;
+  final String name;
 
-  static const List<Faculty> all = [
-    Faculty(acronym: 'AF', fullName: 'Arhitektonski fakultet'),
-    Faculty(acronym: 'AGR', fullName: 'Agronomski fakultet'),
-    Faculty(acronym: 'ERF', fullName: 'Edukacijsko-rehabilitacijski fakultet'),
-    Faculty(acronym: 'EFZG', fullName: 'Ekonomski fakultet'),
-    Faculty(acronym: 'FER', fullName: 'Fakultet elektrotehnike i računarstva'),
-    Faculty(
-      acronym: 'FFRZ',
-      fullName: 'Fakultet filozofije i religijskih znanosti',
-    ),
-    Faculty(acronym: 'FHS', fullName: 'Fakultet hrvatskih studija'),
-    Faculty(
-      acronym: 'FKIT',
-      fullName: 'Fakultet kemijskog inženjerstva i tehnologije',
-    ),
-    Faculty(acronym: 'FOI', fullName: 'Fakultet organizacije i informatike'),
-    Faculty(acronym: 'FPZG', fullName: 'Fakultet političkih znanosti'),
-    Faculty(acronym: 'FPZ', fullName: 'Fakultet prometnih znanosti'),
-    Faculty(acronym: 'FSB', fullName: 'Fakultet strojarstva i brodogradnje'),
-    Faculty(
-      acronym: 'FŠDT',
-      fullName: 'Fakultet šumarstva i drvne tehnologije',
-    ),
-    Faculty(acronym: 'FBF', fullName: 'Farmaceutsko-biokemijski fakultet'),
-    Faculty(acronym: 'FFZG', fullName: 'Filozofski fakultet'),
-    Faculty(acronym: 'GEOF', fullName: 'Geodetski fakultet'),
-    Faculty(acronym: 'GEOTEH', fullName: 'Geotehnički fakultet'),
-    Faculty(acronym: 'GF', fullName: 'Građevinski fakultet'),
-    Faculty(acronym: 'GRF', fullName: 'Grafički fakultet'),
-    Faculty(acronym: 'KBF', fullName: 'Katolički bogoslovni fakultet'),
-    Faculty(acronym: 'KIF', fullName: 'Kineziološki fakultet'),
-    Faculty(acronym: 'MEF', fullName: 'Medicinski fakultet'),
-    Faculty(acronym: 'MET', fullName: 'Metalurški fakultet'),
-    Faculty(acronym: 'PRAVO', fullName: 'Pravni fakultet'),
-    Faculty(acronym: 'PBF', fullName: 'Prehrambeno-biotehnološki fakultet'),
-    Faculty(acronym: 'PMF', fullName: 'Prirodoslovno-matematički fakultet'),
-    Faculty(acronym: 'RGN', fullName: 'Rudarsko-geološko-naftni fakultet'),
-    Faculty(acronym: 'SFZG', fullName: 'Stomatološki fakultet'),
-    Faculty(acronym: 'TTF', fullName: 'Tekstilno–tehnološki fakultet'),
-    Faculty(acronym: 'UFZG', fullName: 'Učiteljski fakultet'),
-    Faculty(acronym: 'VEF', fullName: 'Veterinarski fakultet'),
-  ];
+  /// Parse a single faculty from the backend JSON response.
+  /// Backend format: { "id": 1, "translations": { "hr": { "name": "..." }, "en": { "name": "..." } } }
+  factory Faculty.fromJson(Map<String, dynamic> json, {String lang = 'hr'}) {
+    final id = json['id'] as int;
+    final translations = json['translations'] as Map<String, dynamic>? ?? {};
+    final langMap = translations[lang] as Map<String, dynamic>?;
+    final fallbackMap = translations['en'] as Map<String, dynamic>?;
+    final name =
+        (langMap?['name'] as String?) ??
+        (fallbackMap?['name'] as String?) ??
+        'Faculty $id';
+    return Faculty(id: id, name: name);
+  }
 
-  /// Lookup by acronym. Returns null if not found.
-  static Faculty? byAcronym(String acronym) {
-    final upper = acronym.toUpperCase();
-    for (final f in all) {
-      if (f.acronym.toUpperCase() == upper) return f;
-    }
-    return null;
+  /// Parse list of faculties from API response.
+  static List<Faculty> fromJsonList(List<dynamic> list, {String lang = 'hr'}) {
+    return list
+        .map((e) => Faculty.fromJson(e as Map<String, dynamic>, lang: lang))
+        .toList()
+      ..sort((a, b) => a.name.compareTo(b.name));
   }
 }

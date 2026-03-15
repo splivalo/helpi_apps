@@ -636,10 +636,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               widget.ordersNotifier.cancelJob(order.id, jobIndex);
               Navigator.pop(ctx);
             },
-            child: Text(
-              AppStrings.cancelJobLabel,
-              style: const TextStyle(color: AppColors.coral),
-            ),
+            style: TextButton.styleFrom(foregroundColor: AppColors.coral),
+            child: Text(AppStrings.cancelJobLabel),
           ),
         ],
       ),

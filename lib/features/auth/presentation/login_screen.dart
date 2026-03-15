@@ -1,13 +1,17 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:helpi_app/core/constants/colors.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/l10n/locale_notifier.dart';
 import 'package:helpi_app/core/services/auth_service.dart';
+import 'package:helpi_app/shared/models/selected_address_info.dart';
 import 'package:helpi_app/shared/widgets/helpi_form_fields.dart';
 import 'package:helpi_app/shared/widgets/helpi_switch.dart';
+import 'package:helpi_app/shared/widgets/mc_address_field.dart';
 
 /// Login / Register ekran — UI prototype, bez prave autentikacije.
 class LoginScreen extends StatefulWidget {
@@ -26,7 +30,7 @@ class LoginScreen extends StatefulWidget {
   final VoidCallback onRegisterSuccess;
 
   /// Callback kad Student odabere ulogu i upiše email/pass.
-  final VoidCallback onStudentRegisterSuccess;
+  final void Function(String email, String password) onStudentRegisterSuccess;
 
   final LocaleNotifier localeNotifier;
 
@@ -64,6 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
   DateTime? _senDob;
 
   bool _orderingForOther = false;
+  SelectedAddressInfo? _selectedAddress;
 
   @override
   void dispose() {
@@ -84,6 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: LayoutBuilder(
@@ -223,9 +229,10 @@ class _LoginScreenState extends State<LoginScreen> {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () => _showForgotPasswordDialog(context),
+              style: TextButton.styleFrom(foregroundColor: AppColors.teal),
               child: Text(
                 AppStrings.forgotPassword,
-                style: TextStyle(color: AppColors.teal, fontSize: 14),
+                style: const TextStyle(fontSize: 14),
               ),
             ),
           ),
@@ -256,9 +263,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: ElevatedButton(
             onPressed: _isLoading
                 ? null
-                : (_isRegisterMode
-                      ? () => setState(() => _registerStep = 1)
-                      : _handleLogin),
+                : (_isRegisterMode ? _handleRegisterNext : _handleLogin),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.coral,
               foregroundColor: Colors.white,
@@ -300,16 +305,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 setState(() {
                   _isRegisterMode = !_isRegisterMode;
                   _registerStep = 0;
+                  _errorMessage = null;
                 });
               },
+              style: TextButton.styleFrom(foregroundColor: AppColors.coral),
               child: Text(
                 _isRegisterMode
                     ? AppStrings.loginButton
                     : AppStrings.registerButton,
-                style: const TextStyle(
-                  color: AppColors.coral,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: const TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
           ],
@@ -400,7 +404,10 @@ class _LoginScreenState extends State<LoginScreen> {
           iconColor: AppColors.teal,
           title: AppStrings.roleStudentTitle,
           description: AppStrings.roleStudentDesc,
-          onTap: widget.onStudentRegisterSuccess,
+          onTap: () => widget.onStudentRegisterSuccess(
+            _emailCtrl.text.trim(),
+            _passwordCtrl.text,
+          ),
         ),
         const SizedBox(height: 32),
       ],
@@ -473,7 +480,12 @@ class _LoginScreenState extends State<LoginScreen> {
           keyboardType: TextInputType.phone,
         ),
         const SizedBox(height: 12),
-        HelpiTextField(label: AppStrings.address, controller: _senAddressCtrl),
+        McAddressField(
+          controller: _senAddressCtrl,
+          onAddressSelected: (info) {
+            setState(() => _selectedAddress = info);
+          },
+        ),
         const SizedBox(height: 16),
 
         // ── "Naručujem za drugog" toggle ──
@@ -532,12 +544,30 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
         const SizedBox(height: 32),
 
+        // ── Error message ──
+        if (_errorMessage != null) ...[
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.red.shade50,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.red.shade200),
+            ),
+            child: Text(
+              _errorMessage!,
+              style: TextStyle(color: Colors.red.shade700, fontSize: 14),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+
         // ── CTA: Završi registraciju ──
         SizedBox(
           width: double.infinity,
           height: 52,
           child: ElevatedButton(
-            onPressed: widget.onRegisterSuccess,
+            onPressed: _isLoading ? null : _handleCustomerRegister,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.coral,
               foregroundColor: Colors.white,
@@ -550,7 +580,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 fontWeight: FontWeight.w700,
               ),
             ),
-            child: Text(AppStrings.completeRegistration),
+            child: _isLoading
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : Text(AppStrings.completeRegistration),
           ),
         ),
         const SizedBox(height: 12),
@@ -571,6 +610,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     fontWeight: FontWeight.w600,
                     color: AppColors.teal,
                   ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () {
+                      launchUrl(
+                        Uri.parse('https://helpi.social/pravila-privatnosti/'),
+                        mode: LaunchMode.externalApplication,
+                      );
+                    },
                 ),
               ],
             ),
@@ -584,6 +630,38 @@ class _LoginScreenState extends State<LoginScreen> {
   // ══════════════════════════════════════════════
   // HELPERS (matching profile_screen.dart style)
   // ══════════════════════════════════════════════
+
+  Future<void> _handleRegisterNext() async {
+    final email = _emailCtrl.text.trim();
+    final password = _passwordCtrl.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      setState(() => _errorMessage = AppStrings.fillAllFields);
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final exists = await _authService.checkEmailExists(email);
+
+    if (!mounted) return;
+
+    if (exists) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = AppStrings.emailAlreadyExists;
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = false;
+      _registerStep = 1;
+    });
+  }
 
   Future<void> _handleLogin() async {
     final email = _emailCtrl.text.trim();
@@ -609,6 +687,71 @@ class _LoginScreenState extends State<LoginScreen> {
       widget.onLoginSuccess();
     } else {
       setState(() => _errorMessage = result.message);
+    }
+  }
+
+  Future<void> _handleCustomerRegister() async {
+    final email = _emailCtrl.text.trim();
+    final password = _passwordCtrl.text;
+    final firstName = _ordFirstNameCtrl.text.trim();
+    final lastName = _ordLastNameCtrl.text.trim();
+    final phone = _ordPhoneCtrl.text.trim();
+
+    if (email.isEmpty ||
+        password.isEmpty ||
+        firstName.isEmpty ||
+        lastName.isEmpty ||
+        phone.isEmpty ||
+        _selectedAddress == null ||
+        _ordDob == null) {
+      setState(() => _errorMessage = AppStrings.fillAllFields);
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    final result = await _authService.registerCustomer(
+      email: email,
+      password: password,
+      fullName: '$firstName $lastName',
+      phone: phone,
+      gender: _ordGender,
+      dateOfBirth: _ordDob!,
+      fullAddress: _selectedAddress!.fullAddress,
+      cityId: 2,
+      googlePlaceId: _selectedAddress!.placeId,
+      lat: _selectedAddress!.lat,
+      lng: _selectedAddress!.lng,
+      orderingForOther: _orderingForOther,
+      seniorFullName: _orderingForOther
+          ? '${_senFirstNameCtrl.text.trim()} ${_senLastNameCtrl.text.trim()}'
+          : null,
+      seniorPhone: _orderingForOther ? _senPhoneCtrl.text.trim() : null,
+      seniorGender: _orderingForOther ? _senGender : null,
+      seniorDob: _orderingForOther ? _senDob : null,
+      seniorAddress: _orderingForOther ? _senAddressCtrl.text.trim() : null,
+    );
+
+    if (!mounted) return;
+
+    if (result.success) {
+      // Auto-login after successful registration
+      final loginResult = await _authService.login(email, password);
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      if (loginResult.success) {
+        widget.onRegisterSuccess();
+      } else {
+        setState(() => _errorMessage = loginResult.message);
+      }
+    } else {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = result.message;
+      });
     }
   }
 

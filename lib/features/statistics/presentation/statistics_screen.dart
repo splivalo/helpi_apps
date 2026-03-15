@@ -4,10 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/features/schedule/data/job_model.dart';
-import 'package:helpi_app/features/schedule/data/review_model.dart';
 import 'package:helpi_app/features/schedule/utils/formatters.dart';
 import 'package:helpi_app/features/schedule/widgets/helpi_card.dart';
-import 'package:helpi_app/features/schedule/widgets/review_card.dart';
 import 'package:helpi_app/features/schedule/widgets/star_rating.dart';
 
 /// Statistika ekran â€” tjedni/mjeseÄni pregled sati + prosjeÄna ocjena.
@@ -101,14 +99,6 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     return sum / reviewed.length;
   }
 
-  List<_ReviewEntry> _allReviews() {
-    final reviewed = _completedJobs.where((j) => j.review != null).toList()
-      ..sort((a, b) => b.date.compareTo(a.date));
-    return reviewed
-        .map((j) => _ReviewEntry(seniorName: j.seniorName, review: j.review!))
-        .toList();
-  }
-
   // Format helpers
 
   String _fmtDate(DateTime d) => Formatters.formatDateCompact(d);
@@ -194,8 +184,6 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           _buildMonthlySection(theme),
           const SizedBox(height: 24),
           _buildRatingSection(theme),
-          const SizedBox(height: 24),
-          _buildReviewsSection(theme),
           const SizedBox(height: 16),
         ],
       ),
@@ -236,7 +224,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                 splashRadius: 20,
               ),
               Text(
-                '${_fmtDate(_currentWeekStart)} â€“ ${_fmtDateFull(weekEnd)}',
+                '${_fmtDate(_currentWeekStart)} – ${_fmtDateFull(weekEnd)}',
                 style: theme.textTheme.bodyMedium,
               ),
               IconButton(
@@ -523,7 +511,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           StarRating(rating: avg.round(), size: 36),
           const SizedBox(height: 8),
           Text(
-            avg > 0 ? avg.toStringAsFixed(1) : 'â€“',
+            avg > 0 ? avg.toStringAsFixed(1) : '–',
             style: theme.textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
               color: HelpiTheme.teal,
@@ -531,117 +519,6 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  // Reviews section
-
-  static const _previewCount = 3;
-
-  Widget _buildReviewsSection(ThemeData theme) {
-    final allReviews = _allReviews();
-    final preview = allReviews.take(_previewCount).toList();
-    final hasMore = allReviews.length > _previewCount;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppStrings.statsRecentReviews,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 12),
-        if (allReviews.isEmpty)
-          HelpiCard(
-            padding: const EdgeInsets.all(24),
-            child: Center(
-              child: Text(
-                AppStrings.statsNoReviews,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: HelpiTheme.textSecondary,
-                ),
-              ),
-            ),
-          )
-        else ...[
-          ...preview.map(
-            (r) => ReviewCard(seniorName: r.seniorName, review: r.review),
-          ),
-          if (hasMore)
-            Center(
-              child: TextButton(
-                onPressed: () => _showAllReviews(context, allReviews),
-                child: Text(
-                  AppStrings.statsShowAllReviews,
-                  style: const TextStyle(
-                    color: HelpiTheme.teal,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-        ],
-      ],
-    );
-  }
-
-  void _showAllReviews(BuildContext context, List<_ReviewEntry> reviews) {
-    final theme = Theme.of(context);
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: HelpiTheme.offWhite,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.85,
-          minChildSize: 0.5,
-          maxChildSize: 0.95,
-          expand: false,
-          builder: (ctx, scrollController) {
-            return Column(
-              children: [
-                const SizedBox(height: 8),
-                Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    AppStrings.statsAllReviews,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: SafeArea(
-                    top: false,
-                    child: ListView.builder(
-                      controller: scrollController,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: reviews.length,
-                      itemBuilder: (ctx, i) => ReviewCard(
-                        seniorName: reviews[i].seniorName,
-                        review: reviews[i].review,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
     );
   }
 }
@@ -654,11 +531,4 @@ class _WeekRange {
   final DateTime from;
   final DateTime to;
   final double hours;
-}
-
-class _ReviewEntry {
-  const _ReviewEntry({required this.seniorName, required this.review});
-
-  final String seniorName;
-  final ReviewModel review;
 }
