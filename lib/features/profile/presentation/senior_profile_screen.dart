@@ -4,7 +4,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:helpi_app/core/constants/colors.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/l10n/locale_notifier.dart';
+import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/core/services/auth_service.dart';
+import 'package:helpi_app/core/network/token_storage.dart';
 import 'package:helpi_app/shared/widgets/helpi_form_fields.dart';
 
 /// Profil ekran — pristupni podaci, naručitelj, senior, kartice, uvjeti.
@@ -24,30 +26,90 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   // ── Pristupni podaci ──────────────────────────
-  final _emailCtrl = TextEditingController(text: 'marija.novak@email.com');
+  final _emailCtrl = TextEditingController();
 
   // ── Naručitelj ────────────────────────────────
-  final _ordFirstNameCtrl = TextEditingController(text: 'Ivan');
-  final _ordLastNameCtrl = TextEditingController(text: 'Novak');
-  final _ordPhoneCtrl = TextEditingController(text: '+385 91 234 5678');
+  final _ordFirstNameCtrl = TextEditingController();
+  final _ordLastNameCtrl = TextEditingController();
+  final _ordPhoneCtrl = TextEditingController();
   String _ordGender = 'M';
-  DateTime _ordDob = DateTime(1985, 3, 15);
+  DateTime _ordDob = DateTime(1985, 1, 1);
 
   // ── Senior / korisnik ─────────────────────────
-  final _senFirstNameCtrl = TextEditingController(text: 'Marija');
-  final _senLastNameCtrl = TextEditingController(text: 'Novak');
-  final _senPhoneCtrl = TextEditingController(text: '+385 91 987 6543');
-  final _senAddressCtrl = TextEditingController(text: 'Ilica 42, Zagreb');
+  final _senFirstNameCtrl = TextEditingController();
+  final _senLastNameCtrl = TextEditingController();
+  final _senPhoneCtrl = TextEditingController();
+  final _senAddressCtrl = TextEditingController();
   String _senGender = 'F';
-  DateTime _senDob = DateTime(1948, 7, 22);
+  DateTime _senDob = DateTime(1950, 1, 1);
 
   // ── Ostalo ────────────────────────────────────
   late String _selectedLang = AppStrings.currentLocale.toUpperCase();
   bool _isEditing = false;
   bool _agreedToTerms = true;
+  bool _isLoading = true;
 
   // Mock kartice
   final List<String> _cards = ['**** 4821', '**** 9037'];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final userId = await TokenStorage().getUserId();
+    if (userId == null || !mounted) return;
+
+    final api = AppApiService();
+    final result = await api.getCustomerProfile(userId);
+    if (!mounted) return;
+
+    if (result.success && result.data != null) {
+      final data = result.data!;
+      final contact = data['contact'] as Map<String, dynamic>? ?? {};
+      final seniors = data['seniors'] as List<dynamic>? ?? [];
+
+      // Naručitelj (customer contact)
+      _emailCtrl.text = contact['email'] as String? ?? '';
+      final fullName = contact['fullName'] as String? ?? '';
+      final nameParts = fullName.split(' ');
+      _ordFirstNameCtrl.text = nameParts.isNotEmpty ? nameParts.first : '';
+      _ordLastNameCtrl.text =
+          nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+      _ordPhoneCtrl.text = contact['phone'] as String? ?? '';
+      final genderVal = contact['gender'];
+      _ordGender = (genderVal == 0 || genderVal == 'Male') ? 'M' : 'F';
+      final dobStr = contact['dateOfBirth'] as String?;
+      if (dobStr != null) {
+        _ordDob = DateTime.tryParse(dobStr) ?? _ordDob;
+      }
+
+      // Senior (prvi iz liste)
+      if (seniors.isNotEmpty) {
+        final senior = seniors[0] as Map<String, dynamic>;
+        final senContact = senior['contact'] as Map<String, dynamic>? ?? {};
+        final senFullName = senContact['fullName'] as String? ?? '';
+        final senNameParts = senFullName.split(' ');
+        _senFirstNameCtrl.text =
+            senNameParts.isNotEmpty ? senNameParts.first : '';
+        _senLastNameCtrl.text =
+            senNameParts.length > 1 ? senNameParts.sublist(1).join(' ') : '';
+        _senPhoneCtrl.text = senContact['phone'] as String? ?? '';
+        _senAddressCtrl.text = senContact['fullAddress'] as String? ?? '';
+        final senGenderVal = senContact['gender'];
+        _senGender =
+            (senGenderVal == 0 || senGenderVal == 'Male') ? 'M' : 'F';
+        final senDobStr = senContact['dateOfBirth'] as String?;
+        if (senDobStr != null) {
+          _senDob = DateTime.tryParse(senDobStr) ?? _senDob;
+        }
+      }
+    }
+
+    setState(() => _isLoading = false);
+  }
 
   @override
   void dispose() {
@@ -68,7 +130,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(AppStrings.profile)),
-      body: ListView(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
         padding: const EdgeInsets.all(16),
         children: [
           // ── PRISTUPNI PODACI ────────────────────────

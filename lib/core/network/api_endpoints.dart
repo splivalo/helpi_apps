@@ -19,8 +19,7 @@ class ApiEndpoints {
 
   // Orders
   static const String orders = '/api/orders';
-  static String ordersBySenior(int seniorId) =>
-      '/api/orders/senior/$seniorId';
+  static String ordersBySenior(int seniorId) => '/api/orders/senior/$seniorId';
   static String orderById(int id) => '/api/orders/$id';
   static String orderCancel(int id) => '/api/orders/$id/cancel';
 

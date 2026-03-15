@@ -10,13 +10,9 @@ import 'package:helpi_app/features/schedule/data/review_model.dart'
 
 /// Wrapper za API rezultat — uspjeh ili greška.
 class ApiResult<T> {
-  ApiResult.success(this.data)
-      : _success = true,
-        error = null;
+  ApiResult.success(this.data) : _success = true, error = null;
 
-  ApiResult.failure(this.error)
-      : _success = false,
-        data = null;
+  ApiResult.failure(this.error) : _success = false, data = null;
 
   final bool _success;
   bool get success => _success;
@@ -35,11 +31,11 @@ class AppApiService {
   /// Dohvati narudžbe za seniora po [seniorId].
   Future<ApiResult<List<OrderModel>>> getOrdersBySenior(int seniorId) async {
     try {
-      final response =
-          await _client.get(ApiEndpoints.ordersBySenior(seniorId));
+      final response = await _client.get(ApiEndpoints.ordersBySenior(seniorId));
       final list = response.data as List<dynamic>;
-      final orders =
-          list.map((e) => _mapOrder(e as Map<String, dynamic>)).toList();
+      final orders = list
+          .map((e) => _mapOrder(e as Map<String, dynamic>))
+          .toList();
       return ApiResult.success(orders);
     } catch (e) {
       debugPrint('[AppApiService] getOrdersBySenior error: $e');
@@ -49,10 +45,10 @@ class AppApiService {
 
   /// Kreiraj novu narudžbu.
   Future<ApiResult<OrderModel>> createOrder(
-      Map<String, dynamic> orderData) async {
+    Map<String, dynamic> orderData,
+  ) async {
     try {
-      final response =
-          await _client.post(ApiEndpoints.orders, data: orderData);
+      final response = await _client.post(ApiEndpoints.orders, data: orderData);
       final order = _mapOrder(response.data as Map<String, dynamic>);
       return ApiResult.success(order);
     } catch (e) {
@@ -62,8 +58,7 @@ class AppApiService {
   }
 
   /// Otkaži narudžbu.
-  Future<ApiResult<bool>> cancelOrder(int orderId,
-      {String? reason}) async {
+  Future<ApiResult<bool>> cancelOrder(int orderId, {String? reason}) async {
     try {
       await _client.post(
         ApiEndpoints.orderCancel(orderId),
@@ -77,17 +72,51 @@ class AppApiService {
   }
 
   // ──────────────────────────────────────────────
+  // PROFILE
+  // ──────────────────────────────────────────────
+
+  /// Dohvati profil kupca (Customer) — sadrži Contact + Seniors[].
+  Future<ApiResult<Map<String, dynamic>>> getCustomerProfile(
+    int customerId,
+  ) async {
+    try {
+      final response = await _client.get(
+        ApiEndpoints.customerById(customerId),
+      );
+      return ApiResult.success(response.data as Map<String, dynamic>);
+    } catch (e) {
+      debugPrint('[AppApiService] getCustomerProfile error: $e');
+      return ApiResult.failure(e.toString());
+    }
+  }
+
+  /// Dohvati profil studenta.
+  Future<ApiResult<Map<String, dynamic>>> getStudentProfile(
+    int studentId,
+  ) async {
+    try {
+      final response = await _client.get(
+        ApiEndpoints.studentById(studentId),
+      );
+      return ApiResult.success(response.data as Map<String, dynamic>);
+    } catch (e) {
+      debugPrint('[AppApiService] getStudentProfile error: $e');
+      return ApiResult.failure(e.toString());
+    }
+  }
+
+  // ──────────────────────────────────────────────
   // STUDENT: Sessions / Jobs
   // ──────────────────────────────────────────────
 
   /// Dohvati sve sesije za studenta.
   Future<ApiResult<List<Job>>> getSessionsByStudent(int studentId) async {
     try {
-      final response =
-          await _client.get(ApiEndpoints.sessionsByStudent(studentId));
+      final response = await _client.get(
+        ApiEndpoints.sessionsByStudent(studentId),
+      );
       final list = response.data as List<dynamic>;
-      final jobs =
-          list.map((e) => _mapJob(e as Map<String, dynamic>)).toList();
+      final jobs = list.map((e) => _mapJob(e as Map<String, dynamic>)).toList();
       return ApiResult.success(jobs);
     } catch (e) {
       debugPrint('[AppApiService] getSessionsByStudent error: $e');
@@ -97,13 +126,14 @@ class AppApiService {
 
   /// Dohvati nadolazeće sesije za studenta.
   Future<ApiResult<List<Job>>> getUpcomingSessionsByStudent(
-      int studentId) async {
+    int studentId,
+  ) async {
     try {
-      final response = await _client
-          .get(ApiEndpoints.sessionsUpcomingByStudent(studentId));
+      final response = await _client.get(
+        ApiEndpoints.sessionsUpcomingByStudent(studentId),
+      );
       final list = response.data as List<dynamic>;
-      final jobs =
-          list.map((e) => _mapJob(e as Map<String, dynamic>)).toList();
+      final jobs = list.map((e) => _mapJob(e as Map<String, dynamic>)).toList();
       return ApiResult.success(jobs);
     } catch (e) {
       debugPrint('[AppApiService] getUpcomingSessionsByStudent error: $e');
@@ -117,10 +147,12 @@ class AppApiService {
 
   /// Dohvati recenzije za seniora.
   Future<ApiResult<List<schedule_review.ReviewModel>>> getReviewsBySenior(
-      int seniorId) async {
+    int seniorId,
+  ) async {
     try {
-      final response =
-          await _client.get(ApiEndpoints.reviewsBySenior(seniorId));
+      final response = await _client.get(
+        ApiEndpoints.reviewsBySenior(seniorId),
+      );
       final list = response.data as List<dynamic>;
       final reviews = list
           .map((e) => _mapReview(e as Map<String, dynamic>))
@@ -134,10 +166,11 @@ class AppApiService {
 
   /// Dohvati pending recenzije za seniora.
   Future<ApiResult<List<schedule_review.ReviewModel>>>
-      getPendingReviewsBySenior(int seniorId) async {
+  getPendingReviewsBySenior(int seniorId) async {
     try {
-      final response =
-          await _client.get(ApiEndpoints.pendingReviewsBySenior(seniorId));
+      final response = await _client.get(
+        ApiEndpoints.pendingReviewsBySenior(seniorId),
+      );
       final list = response.data as List<dynamic>;
       final reviews = list
           .map((e) => _mapReview(e as Map<String, dynamic>))
@@ -171,8 +204,7 @@ class AppApiService {
 
     // Izvuci imena servisa iz translations
     final serviceNames = services.map((s) {
-      final translations =
-          s['translations'] as Map<String, dynamic>? ?? {};
+      final translations = s['translations'] as Map<String, dynamic>? ?? {};
       final hr = translations['hr'] as Map<String, dynamic>?;
       return (hr?['name'] as String?) ?? 'Usluga';
     }).toList();
@@ -195,8 +227,9 @@ class AppApiService {
 
     final isRecurring = json['isRecurring'] as bool? ?? false;
     final startDate = _parseDate(json['startDate']);
-    final endDate =
-        json['endDate'] != null ? _parseDate(json['endDate']) : null;
+    final endDate = json['endDate'] != null
+        ? _parseDate(json['endDate'])
+        : null;
 
     // Frequency string
     String frequency;
@@ -210,16 +243,16 @@ class AppApiService {
     }
 
     // First schedule za time/weekday/duration
-    final firstSchedule =
-        schedules.isNotEmpty ? schedules[0] as Map<String, dynamic> : null;
+    final firstSchedule = schedules.isNotEmpty
+        ? schedules[0] as Map<String, dynamic>
+        : null;
     final firstStart = firstSchedule != null
         ? _parseTimeOnly(firstSchedule['startTime'])
         : const TimeOfDay(hour: 0, minute: 0);
     final firstEnd = firstSchedule != null
         ? _parseTimeOnly(firstSchedule['endTime'])
         : const TimeOfDay(hour: 0, minute: 0);
-    final firstWeekday =
-        (firstSchedule?['dayOfWeek'] as num?)?.toInt() ?? 1;
+    final firstWeekday = (firstSchedule?['dayOfWeek'] as num?)?.toInt() ?? 1;
     final firstDurHours = _durationHours(firstStart, firstEnd);
 
     return OrderModel(

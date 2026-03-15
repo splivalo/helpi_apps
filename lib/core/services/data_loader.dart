@@ -60,9 +60,7 @@ class DataLoader {
           '[DataLoader] senior orders loaded: ${ordersResult.data!.length}',
         );
       } else {
-        debugPrint(
-          '[DataLoader] senior orders failed: ${ordersResult.error}',
-        );
+        debugPrint('[DataLoader] senior orders failed: ${ordersResult.error}');
         allOk = false;
       }
     } else if (userType == 'Student') {

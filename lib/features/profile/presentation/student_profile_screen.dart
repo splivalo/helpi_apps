@@ -6,6 +6,8 @@ import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/l10n/locale_notifier.dart';
 import 'package:helpi_app/core/network/api_client.dart';
 import 'package:helpi_app/core/network/api_endpoints.dart';
+import 'package:helpi_app/core/network/token_storage.dart';
+import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/core/services/auth_service.dart';
 import 'package:helpi_app/features/schedule/data/availability_model.dart';
 import 'package:helpi_app/shared/models/faculty.dart';
@@ -33,22 +35,23 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   // â”€â”€ Pristupni podaci â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  final _emailCtrl = TextEditingController(text: 'ana.student@email.com');
+  final _emailCtrl = TextEditingController();
 
   // â”€â”€ Osobni podaci studenta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  final _firstNameCtrl = TextEditingController(text: 'Ana');
-  final _lastNameCtrl = TextEditingController(text: 'Horvat');
-  final _phoneCtrl = TextEditingController(text: '+385 91 555 1234');
-  final _addressCtrl = TextEditingController(text: 'Savska 25, Zagreb');
+  final _firstNameCtrl = TextEditingController();
+  final _lastNameCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController();
+  final _addressCtrl = TextEditingController();
   Faculty? _selectedFaculty;
-  final _studentIdCardCtrl = TextEditingController(text: '0036512345');
+  final _studentIdCardCtrl = TextEditingController();
   String _gender = 'F';
-  DateTime _dob = DateTime(2002, 5, 10);
+  DateTime _dob = DateTime(2002, 1, 1);
 
   // â”€â”€ Ostalo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   late String _selectedLang = AppStrings.currentLocale.toUpperCase();
   bool _isEditing = false;
   bool _agreedToTerms = true;
+  bool _isLoading = true;
   List<Faculty> _faculties = [];
 
   // â”€â”€ Dostupnost â€” Äita/piÅ¡e iz dijeljenog notifiera â”€â”€â”€â”€â”€
@@ -58,7 +61,52 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _loadFaculties();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final userId = await TokenStorage().getUserId();
+    await Future.wait([
+      _loadFaculties(),
+      if (userId != null) _loadStudentData(userId),
+    ]);
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+  }
+
+  Future<void> _loadStudentData(int userId) async {
+    final api = AppApiService();
+    final result = await api.getStudentProfile(userId);
+    if (!mounted) return;
+
+    if (result.success && result.data != null) {
+      final data = result.data!;
+      final contact = data['contact'] as Map<String, dynamic>? ?? {};
+
+      _emailCtrl.text = contact['email'] as String? ?? '';
+      final fullName = contact['fullName'] as String? ?? '';
+      final nameParts = fullName.split(' ');
+      _firstNameCtrl.text = nameParts.isNotEmpty ? nameParts.first : '';
+      _lastNameCtrl.text =
+          nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+      _phoneCtrl.text = contact['phone'] as String? ?? '';
+      _addressCtrl.text = contact['fullAddress'] as String? ?? '';
+      _studentIdCardCtrl.text = data['studentNumber'] as String? ?? '';
+      final genderVal = contact['gender'];
+      _gender = (genderVal == 0 || genderVal == 'Male') ? 'M' : 'F';
+      final dobStr = contact['dateOfBirth'] as String?;
+      if (dobStr != null) {
+        _dob = DateTime.tryParse(dobStr) ?? _dob;
+      }
+
+      final facultyId = (data['facultyId'] as num?)?.toInt();
+      if (facultyId != null && _faculties.isNotEmpty) {
+        final match = _faculties.where((f) => f.id == facultyId);
+        if (match.isNotEmpty) {
+          _selectedFaculty = match.first;
+        }
+      }
+    }
   }
 
   Future<void> _loadFaculties() async {
@@ -106,7 +154,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(AppStrings.profile)),
-      body: ListView(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
         padding: const EdgeInsets.all(16),
         children: [
           // â”€â”€ PRISTUPNI PODACI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
