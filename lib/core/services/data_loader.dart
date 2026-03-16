@@ -52,15 +52,41 @@ class DataLoader {
     var allOk = true;
 
     if (userType == 'Customer' && ordersNotifier != null) {
-      // Senior: load orders
-      final ordersResult = await api.getOrdersBySenior(userId);
-      if (ordersResult.success && ordersResult.data != null) {
-        ordersNotifier.replaceAll(ordersResult.data!);
-        debugPrint(
-          '[DataLoader] senior orders loaded: ${ordersResult.data!.length}',
-        );
+      // Senior: fetch customer profile to get seniorId, then load orders
+      int? seniorId = await storage.getSeniorId();
+
+      if (seniorId == null) {
+        // First load — fetch profile to discover seniorId
+        final profileResult = await api.getCustomerProfile(userId);
+        if (profileResult.success && profileResult.data != null) {
+          final seniors =
+              profileResult.data!['seniors'] as List<dynamic>? ?? [];
+          if (seniors.isNotEmpty) {
+            final first = seniors[0] as Map<String, dynamic>;
+            seniorId = (first['id'] as num?)?.toInt();
+            if (seniorId != null) {
+              await storage.saveSeniorId(seniorId);
+              debugPrint('[DataLoader] seniorId resolved: $seniorId');
+            }
+          }
+        }
+      }
+
+      if (seniorId != null) {
+        final ordersResult = await api.getOrdersBySenior(seniorId);
+        if (ordersResult.success && ordersResult.data != null) {
+          ordersNotifier.replaceAll(ordersResult.data!);
+          debugPrint(
+            '[DataLoader] senior orders loaded: ${ordersResult.data!.length}',
+          );
+        } else {
+          debugPrint(
+            '[DataLoader] senior orders failed: ${ordersResult.error}',
+          );
+          allOk = false;
+        }
       } else {
-        debugPrint('[DataLoader] senior orders failed: ${ordersResult.error}');
+        debugPrint('[DataLoader] no seniorId found — skipping orders');
         allOk = false;
       }
     } else if (userType == 'Student') {

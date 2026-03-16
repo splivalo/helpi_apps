@@ -176,8 +176,9 @@ class OrdersNotifier extends ChangeNotifier {
 
   void addOrder(OrderModel order) {
     order.status = OrderStatus.active;
-    final studentName =
-        order.students.isNotEmpty ? order.students.first.name : 'Student';
+    final studentName = order.students.isNotEmpty
+        ? order.students.first.name
+        : 'Student';
     if (order.students.isEmpty) {
       order.students.add(
         StudentAssignment(name: studentName, fromDate: order.date),

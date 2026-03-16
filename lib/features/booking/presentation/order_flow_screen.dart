@@ -1437,28 +1437,28 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     );
   }
 
+  // ── Service chip key → backend ServiceId ──
+  static const _serviceKeyToId = <String, int>{
+    'companionship': 1, // Razgovor i slušanje (Category 1)
+    'walking': 4, // Šetnje u parku (Category 1)
+    'shopping': 11, // Kupovina namirnica (Category 2)
+    'house_help': 21, // Čišćenje kuće (Category 3)
+    'escort': 31, // Posjeti liječniku (Category 4)
+    'other': 41, // Savjetovanje (Category 5)
+  };
+
   // ── Submit order ─────────────────────────────────
-  void _submitOrder() {
+  Future<void> _submitOrder() async {
     final bool isOneTime = _bookingMode == _BookingMode.oneTime;
 
     DateTime date;
-    String time = '';
-    String duration = '';
     DateTime? endDate;
-    List<OrderDayEntry> dayEntries = [];
 
     if (isOneTime) {
       date = _oneTimeDate ?? DateTime.now();
-      time = _oneTimeFromHour != null
-          ? '${_oneTimeFromHour.toString().padLeft(2, '0')}:${(_oneTimeFromMinute ?? 0).toString().padLeft(2, '0')}'
-          : '-';
-      duration = _oneTimeDuration != null
-          ? _durationLabel(_oneTimeDuration!)
-          : '-';
     } else {
       // First occurrence date
       if (_startDate != null && _dayEntries.isNotEmpty) {
-        // Find the earliest first occurrence across all days
         DateTime? earliest;
         for (final entry in _dayEntries) {
           final occ = AppFormatters.firstOccurrence(entry.day, _startDate!);
@@ -1474,48 +1474,90 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
       if (_hasEndDate && _endDate != null) {
         endDate = _endDate;
       }
-
-      // Build structured day entries
-      dayEntries = _dayEntries.map((entry) {
-        final timeStr = entry.fromHour != null
-            ? '${entry.fromHour.toString().padLeft(2, '0')}:${(entry.fromMinute ?? 0).toString().padLeft(2, '0')}'
-            : '-';
-        final durStr = entry.duration != null
-            ? _durationLabel(entry.duration!)
-            : '-';
-        return OrderDayEntry(
-          dayName: AppFormatters.dayFullName(entry.day),
-          time: timeStr,
-          duration: durStr,
-          weekday: entry.day,
-          durationHours: entry.duration ?? 0,
-        );
-      }).toList();
     }
 
-    final order = OrderModel(
-      id: widget.ordersNotifier.nextId,
-      services: _selectedServices
-          .map((key) => _serviceChips[key]?.call() ?? key)
-          .toList(),
-      date: date,
-      frequency: _bookingModeLabel(),
-      notes: _notesController.text.trim(),
-      serviceNote: _serviceNoteController.text.trim(),
-      promoCode: _appliedPromoCode ?? '',
-      paymentMethodId: _cards.isNotEmpty
-          ? (_cards[_selectedCardIndex]['id']?.toString() ?? '')
-          : '',
-      isOneTime: isOneTime,
-      time: time,
-      duration: duration,
-      dayEntries: dayEntries,
-      endDate: endDate,
-      weekday: isOneTime ? (_oneTimeDate?.weekday ?? 1) : 1,
-      durationHours: isOneTime ? (_oneTimeDuration ?? 0) : 0,
-    );
+    // ── Build API payload ──
+    final storage = TokenStorage();
+    final seniorId = await storage.getSeniorId();
 
-    widget.ordersNotifier.addOrder(order);
+    if (seniorId == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppStrings.orderCreateError)));
+      return;
+    }
+
+    // Services → backend ServiceIds
+    final services = _selectedServices
+        .map((key) => _serviceKeyToId[key])
+        .where((id) => id != null)
+        .map((id) => {'serviceId': id})
+        .toList();
+
+    // Schedules
+    final schedules = <Map<String, dynamic>>[];
+    if (isOneTime) {
+      final fromH = _oneTimeFromHour ?? 9;
+      final fromM = _oneTimeFromMinute ?? 0;
+      final dur = _oneTimeDuration ?? 1;
+      schedules.add({
+        'dayOfWeek': date.weekday, // 1=Mon … 7=Sun
+        'startTime':
+            '${fromH.toString().padLeft(2, '0')}:${fromM.toString().padLeft(2, '0')}:00',
+        'endTime':
+            '${(fromH + dur).toString().padLeft(2, '0')}:${fromM.toString().padLeft(2, '0')}:00',
+      });
+    } else {
+      for (final entry in _dayEntries) {
+        final fromH = entry.fromHour ?? 9;
+        final fromM = entry.fromMinute ?? 0;
+        final dur = entry.duration ?? 1;
+        schedules.add({
+          'dayOfWeek': entry.day,
+          'startTime':
+              '${fromH.toString().padLeft(2, '0')}:${fromM.toString().padLeft(2, '0')}:00',
+          'endTime':
+              '${(fromH + dur).toString().padLeft(2, '0')}:${fromM.toString().padLeft(2, '0')}:00',
+        });
+      }
+    }
+
+    // DateOnly format for backend
+    String fmtDate(DateTime d) =>
+        '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+    // EndDate: recurring without explicit end → +1 year
+    final apiEndDate =
+        endDate ?? (isOneTime ? date : date.add(const Duration(days: 365)));
+
+    final payload = <String, dynamic>{
+      'seniorId': seniorId,
+      'isRecurring': !isOneTime,
+      'startDate': fmtDate(date),
+      'endDate': fmtDate(apiEndDate),
+      'notes': _notesController.text.trim(),
+      'services': services,
+      'schedules': schedules,
+      if (!isOneTime) 'recurrencePattern': 0, // 0 = Weekly
+      if (_cards.isNotEmpty)
+        'paymentMethodId': (_cards[_selectedCardIndex]['id'] as num?)?.toInt(),
+    };
+
+    // ── Call API ──
+    final api = AppApiService();
+    final result = await api.createOrder(payload);
+
+    if (!mounted) return;
+
+    if (result.success && result.data != null) {
+      widget.ordersNotifier.addProcessingOrder(result.data!);
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.error ?? AppStrings.orderCreateError)),
+      );
+    }
   }
 
   String _bookingModeLabel() {
@@ -1553,10 +1595,8 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                 if (_currentStep < 2) {
                   setState(() => _currentStep++);
                 } else {
-                  // Final submit — create order and go back
+                  // Final submit — send to API and go back
                   _submitOrder();
-                  if (!context.mounted) return;
-                  Navigator.pop(context);
                 }
               }
             : null,

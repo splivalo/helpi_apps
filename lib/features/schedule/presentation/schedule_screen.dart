@@ -48,8 +48,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       _jobs = List.of(MockJobs.all);
     }
     _datesWithJobs = {
-      for (final j in _jobs)
-        DateTime(j.date.year, j.date.month, j.date.day),
+      for (final j in _jobs) DateTime(j.date.year, j.date.month, j.date.day),
     };
     setState(() => _isLoading = false);
   }

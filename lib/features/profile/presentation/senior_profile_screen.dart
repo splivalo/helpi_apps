@@ -267,14 +267,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   )
                 else
-                  ..._cards.map(
-                    (card) {
-                      final brand = card['brand'] as String? ?? '';
-                      final last4 = card['last4'] as String? ?? '****';
-                      final display = brand.isNotEmpty
-                          ? '$brand **** $last4'
-                          : '**** $last4';
-                      return Padding(
+                  ..._cards.map((card) {
+                    final brand = card['brand'] as String? ?? '';
+                    final last4 = card['last4'] as String? ?? '****';
+                    final display = brand.isNotEmpty
+                        ? '$brand **** $last4'
+                        : '**** $last4';
+                    return Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: InputDecorator(
                         decoration: InputDecoration(
@@ -318,8 +317,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                     );
-                    },
-                  ),
+                  }),
                 if (_isEditing) ...[
                   const SizedBox(height: 8),
                   OutlinedButton.icon(

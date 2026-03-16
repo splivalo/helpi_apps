@@ -209,9 +209,7 @@ class AppApiService {
         ApiEndpoints.paymentMethodsByUser(userId),
       );
       final list = response.data as List<dynamic>;
-      final methods = list
-          .map((e) => e as Map<String, dynamic>)
-          .toList();
+      final methods = list.map((e) => e as Map<String, dynamic>).toList();
       return ApiResult.success(methods);
     } catch (e) {
       debugPrint('[AppApiService] getPaymentMethods error: $e');

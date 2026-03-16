@@ -94,6 +94,7 @@ class AppStrings {
       // ── Općenito ──────────────────────────────
       'loading': 'Učitavanje...',
       'error': 'Greška',
+      'orderCreateError': 'Greška pri kreiranju narudžbe',
       'retry': 'Pokušaj ponovo',
       'cancel': 'Odustani',
       'confirm': 'Potvrdi',
@@ -533,6 +534,7 @@ class AppStrings {
       // ── Općenito ──────────────────────────────
       'loading': 'Loading...',
       'error': 'Error',
+      'orderCreateError': 'Error creating order',
       'retry': 'Try again',
       'cancel': 'Cancel',
       'confirm': 'Confirm',
@@ -994,6 +996,7 @@ class AppStrings {
   // ── Općenito ──────────────────────────────────
   static String get loading => _t('loading');
   static String get error => _t('error');
+  static String get orderCreateError => _t('orderCreateError');
   static String get retry => _t('retry');
   static String get cancel => _t('cancel');
   static String get confirm => _t('confirm');

@@ -10,6 +10,7 @@ class TokenStorage {
   static const _keyToken = 'access_token';
   static const _keyUserId = 'user_id';
   static const _keyUserType = 'user_type';
+  static const _keySeniorId = 'senior_id';
 
   // ── Token ──
   Future<void> saveToken(String token) =>
@@ -33,6 +34,15 @@ class TokenStorage {
       _storage.write(key: _keyUserType, value: userType);
 
   Future<String?> getUserType() => _storage.read(key: _keyUserType);
+
+  // ── Senior ID ──
+  Future<void> saveSeniorId(int seniorId) =>
+      _storage.write(key: _keySeniorId, value: seniorId.toString());
+
+  Future<int?> getSeniorId() async {
+    final value = await _storage.read(key: _keySeniorId);
+    return value != null ? int.tryParse(value) : null;
+  }
 
   // ── Clear ──
   Future<void> clearAll() => _storage.deleteAll();
