@@ -84,8 +84,10 @@ class AppApiService {
       final response = await _client.get(ApiEndpoints.customerById(customerId));
       return ApiResult.success(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
-      debugPrint('[AppApiService] getCustomerProfile error: '
-        'status=${e.response?.statusCode}');
+      debugPrint(
+        '[AppApiService] getCustomerProfile error: '
+        'status=${e.response?.statusCode}',
+      );
       return ApiResult.failure('HTTP ${e.response?.statusCode}: ${e.message}');
     } catch (e) {
       debugPrint('[AppApiService] getCustomerProfile error: $e');
@@ -190,6 +192,29 @@ class AppApiService {
       return ApiResult.success(true);
     } catch (e) {
       debugPrint('[AppApiService] submitReview error: $e');
+      return ApiResult.failure(e.toString());
+    }
+  }
+
+  // ──────────────────────────────────────────────
+  // PAYMENT METHODS
+  // ──────────────────────────────────────────────
+
+  /// Dohvati kartice (payment methods) za korisnika.
+  Future<ApiResult<List<Map<String, dynamic>>>> getPaymentMethods(
+    int userId,
+  ) async {
+    try {
+      final response = await _client.get(
+        ApiEndpoints.paymentMethodsByUser(userId),
+      );
+      final list = response.data as List<dynamic>;
+      final methods = list
+          .map((e) => e as Map<String, dynamic>)
+          .toList();
+      return ApiResult.success(methods);
+    } catch (e) {
+      debugPrint('[AppApiService] getPaymentMethods error: $e');
       return ApiResult.failure(e.toString());
     }
   }

@@ -49,8 +49,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _agreedToTerms = true;
   bool _isLoading = true;
 
-  // Mock kartice
-  final List<String> _cards = ['**** 4821', '**** 9037'];
+  // Kartice iz API-ja
+  List<Map<String, dynamic>> _cards = [];
 
   @override
   void initState() {
@@ -108,6 +108,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _senDob = DateTime.tryParse(senDobStr) ?? _senDob;
         }
       }
+    }
+
+    // Kartice
+    final cardsResult = await api.getPaymentMethods(userId);
+    if (!mounted) return;
+    if (cardsResult.success && cardsResult.data != null) {
+      _cards = cardsResult.data!;
     }
 
     setState(() => _isLoading = false);
@@ -261,7 +268,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   )
                 else
                   ..._cards.map(
-                    (card) => Padding(
+                    (card) {
+                      final brand = card['brand'] as String? ?? '';
+                      final last4 = card['last4'] as String? ?? '****';
+                      final display = brand.isNotEmpty
+                          ? '$brand **** $last4'
+                          : '**** $last4';
+                      return Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: InputDecorator(
                         decoration: InputDecoration(
@@ -295,7 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               : null,
                         ),
                         child: Text(
-                          card,
+                          display,
                           style: TextStyle(
                             color: _isEditing
                                 ? theme.colorScheme.onSurface
@@ -304,7 +317,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ),
-                    ),
+                    );
+                    },
                   ),
                 if (_isEditing) ...[
                   const SizedBox(height: 8),

@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:helpi_app/core/constants/colors.dart';
 import 'package:helpi_app/core/constants/pricing.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/core/network/token_storage.dart';
+import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/core/utils/formatters.dart';
 import 'package:helpi_app/features/booking/data/order_model.dart';
 import 'package:helpi_app/shared/widgets/info_card.dart';
@@ -70,17 +72,32 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
   final TextEditingController _promoCodeController = TextEditingController();
   String? _appliedPromoCode;
 
-  // Mock saved cards
-  static const _mockCards = [
-    {'brand': 'Visa', 'last4': '4242'},
-    {'brand': 'Mastercard', 'last4': '8901'},
-  ];
-  int _selectedCardIndex = 0; // default: first card
+  // Kartice iz API-ja
+  List<Map<String, dynamic>> _cards = [];
+  int _selectedCardIndex = 0;
 
   // ── Constants ─────────────────────────────────
   static const _timeHours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
   static const _timeMinutes = [0, 15, 30, 45];
   static const _durations = [1, 2, 3, 4];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCards();
+  }
+
+  Future<void> _loadCards() async {
+    final userId = await TokenStorage().getUserId();
+    if (userId == null || !mounted) return;
+
+    final result = await AppApiService().getPaymentMethods(userId);
+    if (!mounted) return;
+
+    if (result.success && result.data != null) {
+      setState(() => _cards = result.data!);
+    }
+  }
 
   @override
   void dispose() {
@@ -1222,7 +1239,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                ..._mockCards.asMap().entries.map((entry) {
+                ..._cards.asMap().entries.map((entry) {
                   final i = entry.key;
                   final card = entry.value;
                   final isSelected = _selectedCardIndex == i;
@@ -1486,7 +1503,9 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
       notes: _notesController.text.trim(),
       serviceNote: _serviceNoteController.text.trim(),
       promoCode: _appliedPromoCode ?? '',
-      paymentMethodId: _mockCards[_selectedCardIndex]['last4'] ?? '',
+      paymentMethodId: _cards.isNotEmpty
+          ? (_cards[_selectedCardIndex]['id']?.toString() ?? '')
+          : '',
       isOneTime: isOneTime,
       time: time,
       duration: duration,

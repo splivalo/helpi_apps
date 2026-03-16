@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 
 import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/core/network/token_storage.dart';
+import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/features/schedule/data/job_model.dart';
 import 'package:helpi_app/features/schedule/utils/formatters.dart';
 import 'package:helpi_app/features/schedule/widgets/job_status_badge.dart';
@@ -19,8 +21,9 @@ class ScheduleScreen extends StatefulWidget {
 class _ScheduleScreenState extends State<ScheduleScreen> {
   late DateTime _selectedDate;
   late DateTime _weekStart;
-  late List<Job> _jobs;
-  late Set<DateTime> _datesWithJobs;
+  List<Job> _jobs = [];
+  Set<DateTime> _datesWithJobs = {};
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -28,8 +31,27 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final now = DateTime.now();
     _selectedDate = DateTime(now.year, now.month, now.day);
     _weekStart = _getWeekStart(_selectedDate);
-    _jobs = List.of(MockJobs.all);
-    _datesWithJobs = MockJobs.datesWithJobs;
+    _loadJobs();
+  }
+
+  Future<void> _loadJobs() async {
+    final userId = await TokenStorage().getUserId();
+    if (userId == null || !mounted) return;
+
+    final api = AppApiService();
+    final result = await api.getSessionsByStudent(userId);
+    if (!mounted) return;
+
+    if (result.success && result.data != null) {
+      _jobs = result.data!;
+    } else {
+      _jobs = List.of(MockJobs.all);
+    }
+    _datesWithJobs = {
+      for (final j in _jobs)
+        DateTime(j.date.year, j.date.month, j.date.day),
+    };
+    setState(() => _isLoading = false);
   }
 
   DateTime _getWeekStart(DateTime date) {
@@ -124,6 +146,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: Text(AppStrings.scheduleTitle)),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     final theme = Theme.of(context);
     final teal = theme.colorScheme.secondary;
     final todayJobs = _jobsForDate(_selectedDate);

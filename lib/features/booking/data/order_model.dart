@@ -123,185 +123,11 @@ class OrderModel {
   final List<JobModel> jobs;
 }
 
-/// Mock imena studenata za prototype.
-const _mockStudentNames = ['Ana M.', 'Marko K.', 'Ivana P.', 'Luka S.'];
-int _mockNameIndex = 0;
-
 /// In-memory spremnik narudžbi.
 class OrdersNotifier extends ChangeNotifier {
-  OrdersNotifier() {
-    _seedMockData();
-  }
+  OrdersNotifier();
 
   final List<OrderModel> _orders = [];
-
-  void _seedMockData() {
-    final seedOneTime = OrderModel(
-      id: _nextId,
-      services: ['Čišćenje', 'Kuhanje'],
-      date: DateTime(2026, 2, 25),
-      frequency: 'Jednom',
-      status: OrderStatus.completed,
-      isOneTime: true,
-      time: '10:00',
-      duration: '2 sata',
-      weekday: 3,
-      durationHours: 2,
-      students: [
-        StudentAssignment(name: 'Ana M.', fromDate: DateTime(2026, 2, 25)),
-      ],
-      jobs: [
-        JobModel(
-          date: DateTime(2026, 2, 25),
-          weekday: 3,
-          time: '10:00',
-          durationHours: 2,
-          studentName: 'Ana M.',
-          status: JobStatus.completed,
-        ),
-      ],
-    );
-    _orders.add(seedOneTime);
-    _nextId++;
-
-    final seedRecurring = OrderModel(
-      id: _nextId,
-      services: ['Čišćenje'],
-      date: DateTime(2026, 1, 3),
-      frequency: 'Ponavljajuće',
-      status: OrderStatus.completed,
-      isOneTime: false,
-      time: '09:00',
-      duration: '3 sata',
-      weekday: 1,
-      durationHours: 3,
-      dayEntries: const [
-        OrderDayEntry(
-          dayName: 'Ponedjeljak',
-          time: '09:00',
-          duration: '3 sata',
-          weekday: 1,
-          durationHours: 3,
-        ),
-        OrderDayEntry(
-          dayName: 'Četvrtak',
-          time: '14:00',
-          duration: '2 sata',
-          weekday: 4,
-          durationHours: 2,
-        ),
-      ],
-      students: [
-        StudentAssignment(name: 'Marko K.', fromDate: DateTime(2026, 1, 3)),
-      ],
-      jobs: [
-        JobModel(
-          date: DateTime(2026, 1, 5),
-          weekday: 1,
-          time: '09:00',
-          durationHours: 3,
-          studentName: 'Marko K.',
-          status: JobStatus.completed,
-        ),
-        JobModel(
-          date: DateTime(2026, 1, 8),
-          weekday: 4,
-          time: '14:00',
-          durationHours: 2,
-          studentName: 'Marko K.',
-          status: JobStatus.completed,
-        ),
-        JobModel(
-          date: DateTime(2026, 1, 12),
-          weekday: 1,
-          time: '09:00',
-          durationHours: 3,
-          studentName: 'Marko K.',
-          status: JobStatus.completed,
-        ),
-        JobModel(
-          date: DateTime(2026, 1, 15),
-          weekday: 4,
-          time: '14:00',
-          durationHours: 2,
-          studentName: 'Marko K.',
-          status: JobStatus.completed,
-        ),
-      ],
-    );
-    _orders.add(seedRecurring);
-    _nextId++;
-
-    final seedUntilDate = OrderModel(
-      id: _nextId,
-      services: ['Kuhanje', 'Šetnja'],
-      date: DateTime(2026, 1, 10),
-      frequency: 'Do 07.02.2026',
-      status: OrderStatus.completed,
-      isOneTime: false,
-      time: '11:00',
-      duration: '2 sata',
-      weekday: 6,
-      durationHours: 2,
-      endDate: DateTime(2026, 2, 7),
-      dayEntries: const [
-        OrderDayEntry(
-          dayName: 'Subota',
-          time: '11:00',
-          duration: '2 sata',
-          weekday: 6,
-          durationHours: 2,
-        ),
-      ],
-      students: [
-        StudentAssignment(name: 'Ivana P.', fromDate: DateTime(2026, 1, 10)),
-      ],
-      jobs: [
-        JobModel(
-          date: DateTime(2026, 1, 10),
-          weekday: 6,
-          time: '11:00',
-          durationHours: 2,
-          studentName: 'Ivana P.',
-          status: JobStatus.completed,
-        ),
-        JobModel(
-          date: DateTime(2026, 1, 17),
-          weekday: 6,
-          time: '11:00',
-          durationHours: 2,
-          studentName: 'Ivana P.',
-          status: JobStatus.completed,
-        ),
-        JobModel(
-          date: DateTime(2026, 1, 24),
-          weekday: 6,
-          time: '11:00',
-          durationHours: 2,
-          studentName: 'Ivana P.',
-          status: JobStatus.completed,
-        ),
-        JobModel(
-          date: DateTime(2026, 1, 31),
-          weekday: 6,
-          time: '11:00',
-          durationHours: 2,
-          studentName: 'Ivana P.',
-          status: JobStatus.completed,
-        ),
-        JobModel(
-          date: DateTime(2026, 2, 7),
-          weekday: 6,
-          time: '11:00',
-          durationHours: 2,
-          studentName: 'Ivana P.',
-          status: JobStatus.cancelled,
-        ),
-      ],
-    );
-    _orders.add(seedUntilDate);
-    _nextId++;
-  }
 
   List<OrderModel> get orders => List.unmodifiable(_orders);
 
@@ -351,8 +177,7 @@ class OrdersNotifier extends ChangeNotifier {
   void addOrder(OrderModel order) {
     order.status = OrderStatus.active;
     final studentName =
-        _mockStudentNames[_mockNameIndex % _mockStudentNames.length];
-    _mockNameIndex++;
+        order.students.isNotEmpty ? order.students.first.name : 'Student';
     if (order.students.isEmpty) {
       order.students.add(
         StudentAssignment(name: studentName, fromDate: order.date),
