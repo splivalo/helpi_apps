@@ -87,8 +87,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final fullName = contact['fullName'] as String? ?? '';
       final nameParts = fullName.split(' ');
       _firstNameCtrl.text = nameParts.isNotEmpty ? nameParts.first : '';
-      _lastNameCtrl.text =
-          nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+      _lastNameCtrl.text = nameParts.length > 1
+          ? nameParts.sublist(1).join(' ')
+          : '';
       _phoneCtrl.text = contact['phone'] as String? ?? '';
       _addressCtrl.text = contact['fullAddress'] as String? ?? '';
       _studentIdCardCtrl.text = data['studentNumber'] as String? ?? '';
@@ -157,219 +158,223 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // â”€â”€ PRISTUPNI PODACI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-          _sectionHeader(AppStrings.accessData),
-          const SizedBox(height: 12),
-          _buildField(
-            AppStrings.email,
-            _emailCtrl,
-            keyboardType: TextInputType.emailAddress,
-          ),
-          const SizedBox(height: 12),
-          OutlinedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.lock_outline, size: 20),
-            label: Text(AppStrings.changePassword),
-          ),
-          const SizedBox(height: 32),
+              padding: const EdgeInsets.all(16),
+              children: [
+                // â”€â”€ PRISTUPNI PODACI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                _sectionHeader(AppStrings.accessData),
+                const SizedBox(height: 12),
+                _buildField(
+                  AppStrings.email,
+                  _emailCtrl,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.lock_outline, size: 20),
+                  label: Text(AppStrings.changePassword),
+                ),
+                const SizedBox(height: 32),
 
-          // â”€â”€ OSOBNI PODACI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-          _sectionHeader(AppStrings.studentData),
-          const SizedBox(height: 12),
-          _buildField(AppStrings.firstName, _firstNameCtrl),
-          const SizedBox(height: 12),
-          _buildField(AppStrings.lastName, _lastNameCtrl),
-          const SizedBox(height: 12),
-          _buildGenderPicker(_gender, (v) => setState(() => _gender = v)),
-          const SizedBox(height: 12),
-          _buildDatePicker(
-            AppStrings.dateOfBirth,
-            _dob,
-            (d) => setState(() => _dob = d),
-          ),
-          const SizedBox(height: 12),
-          _buildField(
-            AppStrings.phone,
-            _phoneCtrl,
-            keyboardType: TextInputType.phone,
-          ),
-          const SizedBox(height: 12),
-          _buildField(AppStrings.address, _addressCtrl),
-          const SizedBox(height: 12),
-          _buildFacultyField(),
-          const SizedBox(height: 12),
-          _buildField(AppStrings.studentIdCard, _studentIdCardCtrl),
-          const SizedBox(height: 32),
+                // â”€â”€ OSOBNI PODACI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                _sectionHeader(AppStrings.studentData),
+                const SizedBox(height: 12),
+                _buildField(AppStrings.firstName, _firstNameCtrl),
+                const SizedBox(height: 12),
+                _buildField(AppStrings.lastName, _lastNameCtrl),
+                const SizedBox(height: 12),
+                _buildGenderPicker(_gender, (v) => setState(() => _gender = v)),
+                const SizedBox(height: 12),
+                _buildDatePicker(
+                  AppStrings.dateOfBirth,
+                  _dob,
+                  (d) => setState(() => _dob = d),
+                ),
+                const SizedBox(height: 12),
+                _buildField(
+                  AppStrings.phone,
+                  _phoneCtrl,
+                  keyboardType: TextInputType.phone,
+                ),
+                const SizedBox(height: 12),
+                _buildField(AppStrings.address, _addressCtrl),
+                const SizedBox(height: 12),
+                _buildFacultyField(),
+                const SizedBox(height: 12),
+                _buildField(AppStrings.studentIdCard, _studentIdCardCtrl),
+                const SizedBox(height: 32),
 
-          // â”€â”€ DOSTUPNOST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-          _sectionHeader(AppStrings.availabilitySection),
-          const SizedBox(height: 4),
-          Text(
-            AppStrings.availabilityDescription,
-            style: theme.textTheme.bodySmall,
-          ),
-          const SizedBox(height: 12),
-          ..._availability.map(
-            (day) => AvailabilityDayRow(
-              day: day,
-              enabled: _isEditing,
-              onEnabledChanged: (v) {
-                setState(() => day.enabled = v);
-                widget.availabilityNotifier.notify();
-              },
-              onPickFrom: () => _pickTime(day: day, isFrom: true),
-              onPickTo: () => _pickTime(day: day, isFrom: false),
-            ),
-          ),
-          const SizedBox(height: 8),
+                // â”€â”€ DOSTUPNOST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                _sectionHeader(AppStrings.availabilitySection),
+                const SizedBox(height: 4),
+                Text(
+                  AppStrings.availabilityDescription,
+                  style: theme.textTheme.bodySmall,
+                ),
+                const SizedBox(height: 12),
+                ..._availability.map(
+                  (day) => AvailabilityDayRow(
+                    day: day,
+                    enabled: _isEditing,
+                    onEnabledChanged: (v) {
+                      setState(() => day.enabled = v);
+                      widget.availabilityNotifier.notify();
+                    },
+                    onPickFrom: () => _pickTime(day: day, isFrom: true),
+                    onPickTo: () => _pickTime(day: day, isFrom: false),
+                  ),
+                ),
+                const SizedBox(height: 8),
 
-          // â”€â”€ UVJETI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Checkbox(
-                value: _agreedToTerms,
-                onChanged: _isEditing
-                    ? (v) => setState(() => _agreedToTerms = v ?? false)
-                    : null,
-                activeColor: theme.colorScheme.secondary,
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    launchUrl(
-                      Uri.parse('https://helpi.social/pravila-privatnosti/'),
-                      mode: LaunchMode.externalApplication,
-                    );
-                  },
-                  child: RichText(
-                    text: TextSpan(
-                      style: theme.textTheme.bodyMedium,
-                      children: [
-                        TextSpan(text: AppStrings.agreeToTerms),
-                        TextSpan(
-                          text: AppStrings.termsOfUse,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: theme.colorScheme.secondary,
-                            decorationColor: theme.colorScheme.secondary,
+                // â”€â”€ UVJETI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                      value: _agreedToTerms,
+                      onChanged: _isEditing
+                          ? (v) => setState(() => _agreedToTerms = v ?? false)
+                          : null,
+                      activeColor: theme.colorScheme.secondary,
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          launchUrl(
+                            Uri.parse(
+                              'https://helpi.social/pravila-privatnosti/',
+                            ),
+                            mode: LaunchMode.externalApplication,
+                          );
+                        },
+                        child: RichText(
+                          text: TextSpan(
+                            style: theme.textTheme.bodyMedium,
+                            children: [
+                              TextSpan(text: AppStrings.agreeToTerms),
+                              TextSpan(
+                                text: AppStrings.termsOfUse,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.secondary,
+                                  decorationColor: theme.colorScheme.secondary,
+                                ),
+                              ),
+                            ],
                           ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // â”€â”€ UREDI / SPREMI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                SizedBox(
+                  width: double.infinity,
+                  child: _isEditing
+                      ? Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () =>
+                                  setState(() => _isEditing = false),
+                              child: Text(AppStrings.save),
+                            ),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: () =>
+                                  setState(() => _isEditing = false),
+                              child: Text(AppStrings.cancel),
+                            ),
+                          ],
+                        )
+                      : OutlinedButton.icon(
+                          onPressed: () => setState(() => _isEditing = true),
+                          icon: const Icon(Icons.edit, size: 20),
+                          label: Text(AppStrings.editProfile),
+                        ),
+                ),
+                const SizedBox(height: 32),
+
+                // â”€â”€ JEZIK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                InputDecorator(
+                  decoration: InputDecoration(
+                    labelText: AppStrings.language,
+                    labelStyle: TextStyle(
+                      color: theme.colorScheme.onSurface.withAlpha(180),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.language,
+                      color: theme.colorScheme.secondary,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _selectedLang,
+                      isDense: true,
+                      isExpanded: true,
+                      onChanged: (v) {
+                        if (v != null) {
+                          setState(() => _selectedLang = v);
+                          widget.localeNotifier.setLocale(v);
+                        }
+                      },
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface,
+                        fontSize: 16,
+                      ),
+                      items: [
+                        DropdownMenuItem(
+                          value: 'HR',
+                          child: Text(AppStrings.langHrvatski),
+                        ),
+                        DropdownMenuItem(
+                          value: 'EN',
+                          child: Text(AppStrings.langEnglish),
                         ),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
+                const SizedBox(height: 24),
 
-          // â”€â”€ UREDI / SPREMI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-          SizedBox(
-            width: double.infinity,
-            child: _isEditing
-                ? Column(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () => setState(() => _isEditing = false),
-                        child: Text(AppStrings.save),
-                      ),
-                      const SizedBox(height: 8),
-                      TextButton(
-                        onPressed: () => setState(() => _isEditing = false),
-                        child: Text(AppStrings.cancel),
-                      ),
-                    ],
-                  )
-                : OutlinedButton.icon(
-                    onPressed: () => setState(() => _isEditing = true),
-                    icon: const Icon(Icons.edit, size: 20),
-                    label: Text(AppStrings.editProfile),
-                  ),
-          ),
-          const SizedBox(height: 32),
-
-          // â”€â”€ JEZIK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-          InputDecorator(
-            decoration: InputDecoration(
-              labelText: AppStrings.language,
-              labelStyle: TextStyle(
-                color: theme.colorScheme.onSurface.withAlpha(180),
-              ),
-              prefixIcon: Icon(
-                Icons.language,
-                color: theme.colorScheme.secondary,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: _selectedLang,
-                isDense: true,
-                isExpanded: true,
-                onChanged: (v) {
-                  if (v != null) {
-                    setState(() => _selectedLang = v);
-                    widget.localeNotifier.setLocale(v);
-                  }
-                },
-                style: TextStyle(
-                  color: theme.colorScheme.onSurface,
-                  fontSize: 16,
+                // â”€â”€ ODJAVA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                OutlinedButton.icon(
+                  onPressed: widget.onLogout,
+                  icon: const Icon(Icons.logout),
+                  label: Text(AppStrings.logout),
+                  style: HelpiTheme.coralOutlinedStyle,
                 ),
-                items: [
-                  DropdownMenuItem(
-                    value: 'HR',
-                    child: Text(AppStrings.langHrvatski),
+                const SizedBox(height: 16),
+
+                // ── IZBRIŠI RAČUN ───────────────────────────
+                TextButton(
+                  onPressed: () => _showDeleteAccountDialog(context),
+                  style: TextButton.styleFrom(
+                    foregroundColor: theme.colorScheme.error,
                   ),
-                  DropdownMenuItem(
-                    value: 'EN',
-                    child: Text(AppStrings.langEnglish),
+                  child: Text(
+                    AppStrings.deleteAccount,
+                    style: const TextStyle(fontSize: 14),
                   ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
+                ),
+                const SizedBox(height: 32),
 
-          // â”€â”€ ODJAVA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-          OutlinedButton.icon(
-            onPressed: widget.onLogout,
-            icon: const Icon(Icons.logout),
-            label: Text(AppStrings.logout),
-            style: HelpiTheme.coralOutlinedStyle,
-          ),
-          const SizedBox(height: 16),
-
-          // ── IZBRIŠI RAČUN ───────────────────────────
-          TextButton(
-            onPressed: () => _showDeleteAccountDialog(context),
-            style: TextButton.styleFrom(
-              foregroundColor: theme.colorScheme.error,
+                // â”€â”€ Verzija â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                Center(
+                  child: Text(
+                    AppStrings.appVersion,
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
             ),
-            child: Text(
-              AppStrings.deleteAccount,
-              style: const TextStyle(fontSize: 14),
-            ),
-          ),
-          const SizedBox(height: 32),
-
-          // â”€â”€ Verzija â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-          Center(
-            child: Text(
-              AppStrings.appVersion,
-              style: theme.textTheme.bodySmall,
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ),
     );
   }
 

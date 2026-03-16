@@ -76,8 +76,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final fullName = contact['fullName'] as String? ?? '';
       final nameParts = fullName.split(' ');
       _ordFirstNameCtrl.text = nameParts.isNotEmpty ? nameParts.first : '';
-      _ordLastNameCtrl.text =
-          nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+      _ordLastNameCtrl.text = nameParts.length > 1
+          ? nameParts.sublist(1).join(' ')
+          : '';
       _ordPhoneCtrl.text = contact['phone'] as String? ?? '';
       final genderVal = contact['gender'];
       _ordGender = (genderVal == 0 || genderVal == 'Male') ? 'M' : 'F';
@@ -92,15 +93,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final senContact = senior['contact'] as Map<String, dynamic>? ?? {};
         final senFullName = senContact['fullName'] as String? ?? '';
         final senNameParts = senFullName.split(' ');
-        _senFirstNameCtrl.text =
-            senNameParts.isNotEmpty ? senNameParts.first : '';
-        _senLastNameCtrl.text =
-            senNameParts.length > 1 ? senNameParts.sublist(1).join(' ') : '';
+        _senFirstNameCtrl.text = senNameParts.isNotEmpty
+            ? senNameParts.first
+            : '';
+        _senLastNameCtrl.text = senNameParts.length > 1
+            ? senNameParts.sublist(1).join(' ')
+            : '';
         _senPhoneCtrl.text = senContact['phone'] as String? ?? '';
         _senAddressCtrl.text = senContact['fullAddress'] as String? ?? '';
         final senGenderVal = senContact['gender'];
-        _senGender =
-            (senGenderVal == 0 || senGenderVal == 'Male') ? 'M' : 'F';
+        _senGender = (senGenderVal == 0 || senGenderVal == 'Male') ? 'M' : 'F';
         final senDobStr = senContact['dateOfBirth'] as String?;
         if (senDobStr != null) {
           _senDob = DateTime.tryParse(senDobStr) ?? _senDob;
@@ -133,324 +135,336 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // ── PRISTUPNI PODACI ────────────────────────
-          HelpiSectionHeader(title: AppStrings.accessData),
-          const SizedBox(height: 12),
-          HelpiTextField(
-            label: AppStrings.email,
-            controller: _emailCtrl,
-            keyboardType: TextInputType.emailAddress,
-            enabled: _isEditing,
-          ),
-          const SizedBox(height: 12),
-          // Promijeni lozinku
-          OutlinedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.lock_outline, size: 20),
-            label: Text(AppStrings.changePassword),
-          ),
-          const SizedBox(height: 32),
-
-          // ── PODACI O NARUČITELJU ────────────────────
-          HelpiSectionHeader(title: AppStrings.ordererData),
-          const SizedBox(height: 12),
-          HelpiTextField(
-            label: AppStrings.firstName,
-            controller: _ordFirstNameCtrl,
-            enabled: _isEditing,
-          ),
-          const SizedBox(height: 12),
-          HelpiTextField(
-            label: AppStrings.lastName,
-            controller: _ordLastNameCtrl,
-            enabled: _isEditing,
-          ),
-          const SizedBox(height: 12),
-          HelpiGenderPicker(
-            value: _ordGender,
-            onChanged: (v) => setState(() => _ordGender = v),
-            enabled: _isEditing,
-          ),
-          const SizedBox(height: 12),
-          HelpiDatePicker(
-            label: AppStrings.dateOfBirth,
-            date: _ordDob,
-            onChanged: (d) => setState(() => _ordDob = d),
-            enabled: _isEditing,
-          ),
-          const SizedBox(height: 12),
-          HelpiTextField(
-            label: AppStrings.phone,
-            controller: _ordPhoneCtrl,
-            keyboardType: TextInputType.phone,
-            enabled: _isEditing,
-          ),
-          const SizedBox(height: 32),
-
-          // ── PODACI O KORISNIKU (SENIOR) ─────────────
-          HelpiSectionHeader(title: AppStrings.seniorData),
-          const SizedBox(height: 12),
-          HelpiTextField(
-            label: AppStrings.firstName,
-            controller: _senFirstNameCtrl,
-            enabled: _isEditing,
-          ),
-          const SizedBox(height: 12),
-          HelpiTextField(
-            label: AppStrings.lastName,
-            controller: _senLastNameCtrl,
-            enabled: _isEditing,
-          ),
-          const SizedBox(height: 12),
-          HelpiGenderPicker(
-            value: _senGender,
-            onChanged: (v) => setState(() => _senGender = v),
-            enabled: _isEditing,
-          ),
-          const SizedBox(height: 12),
-          HelpiDatePicker(
-            label: AppStrings.dateOfBirth,
-            date: _senDob,
-            onChanged: (d) => setState(() => _senDob = d),
-            enabled: _isEditing,
-          ),
-          const SizedBox(height: 12),
-          HelpiTextField(
-            label: AppStrings.address,
-            controller: _senAddressCtrl,
-            enabled: _isEditing,
-          ),
-          const SizedBox(height: 12),
-          HelpiTextField(
-            label: AppStrings.phone,
-            controller: _senPhoneCtrl,
-            keyboardType: TextInputType.phone,
-            enabled: _isEditing,
-          ),
-          const SizedBox(height: 32),
-
-          // ── KREDITNE KARTICE ────────────────────────
-          HelpiSectionHeader(title: AppStrings.creditCards),
-          const SizedBox(height: 12),
-          if (_cards.isEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
+              padding: const EdgeInsets.all(16),
+              children: [
+                // ── PRISTUPNI PODACI ────────────────────────
+                HelpiSectionHeader(title: AppStrings.accessData),
+                const SizedBox(height: 12),
+                HelpiTextField(
+                  label: AppStrings.email,
+                  controller: _emailCtrl,
+                  keyboardType: TextInputType.emailAddress,
+                  enabled: _isEditing,
                 ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: AppColors.border),
-                  borderRadius: BorderRadius.circular(16),
+                const SizedBox(height: 12),
+                // Promijeni lozinku
+                OutlinedButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.lock_outline, size: 20),
+                  label: Text(AppStrings.changePassword),
                 ),
-                child: Text(
-                  AppStrings.noCards,
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurface.withAlpha(153),
-                    fontSize: 16,
+                const SizedBox(height: 32),
+
+                // ── PODACI O NARUČITELJU ────────────────────
+                HelpiSectionHeader(title: AppStrings.ordererData),
+                const SizedBox(height: 12),
+                HelpiTextField(
+                  label: AppStrings.firstName,
+                  controller: _ordFirstNameCtrl,
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 12),
+                HelpiTextField(
+                  label: AppStrings.lastName,
+                  controller: _ordLastNameCtrl,
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 12),
+                HelpiGenderPicker(
+                  value: _ordGender,
+                  onChanged: (v) => setState(() => _ordGender = v),
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 12),
+                HelpiDatePicker(
+                  label: AppStrings.dateOfBirth,
+                  date: _ordDob,
+                  onChanged: (d) => setState(() => _ordDob = d),
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 12),
+                HelpiTextField(
+                  label: AppStrings.phone,
+                  controller: _ordPhoneCtrl,
+                  keyboardType: TextInputType.phone,
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 32),
+
+                // ── PODACI O KORISNIKU (SENIOR) ─────────────
+                HelpiSectionHeader(title: AppStrings.seniorData),
+                const SizedBox(height: 12),
+                HelpiTextField(
+                  label: AppStrings.firstName,
+                  controller: _senFirstNameCtrl,
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 12),
+                HelpiTextField(
+                  label: AppStrings.lastName,
+                  controller: _senLastNameCtrl,
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 12),
+                HelpiGenderPicker(
+                  value: _senGender,
+                  onChanged: (v) => setState(() => _senGender = v),
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 12),
+                HelpiDatePicker(
+                  label: AppStrings.dateOfBirth,
+                  date: _senDob,
+                  onChanged: (d) => setState(() => _senDob = d),
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 12),
+                HelpiTextField(
+                  label: AppStrings.address,
+                  controller: _senAddressCtrl,
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 12),
+                HelpiTextField(
+                  label: AppStrings.phone,
+                  controller: _senPhoneCtrl,
+                  keyboardType: TextInputType.phone,
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 32),
+
+                // ── KREDITNE KARTICE ────────────────────────
+                HelpiSectionHeader(title: AppStrings.creditCards),
+                const SizedBox(height: 12),
+                if (_cards.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(color: AppColors.border),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        AppStrings.noCards,
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface.withAlpha(153),
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  ..._cards.map(
+                    (card) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          disabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: const BorderSide(
+                              color: AppColors.border,
+                            ),
+                          ),
+                          enabled: _isEditing,
+                          filled: true,
+                          fillColor: Colors.white,
+                          prefixIcon: Icon(
+                            Icons.credit_card,
+                            color: theme.colorScheme.secondary,
+                          ),
+                          suffixIcon: _isEditing
+                              ? GestureDetector(
+                                  onTap: () {
+                                    setState(() => _cards.remove(card));
+                                  },
+                                  child: Icon(
+                                    Icons.delete_outline,
+                                    color: theme.colorScheme.error,
+                                    size: 22,
+                                  ),
+                                )
+                              : null,
+                        ),
+                        child: Text(
+                          card,
+                          style: TextStyle(
+                            color: _isEditing
+                                ? theme.colorScheme.onSurface
+                                : theme.colorScheme.onSurface.withAlpha(153),
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
+                if (_isEditing) ...[
+                  const SizedBox(height: 8),
+                  OutlinedButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.add, size: 20),
+                    label: Text(AppStrings.addCard),
+                  ),
+                ],
+                const SizedBox(height: 8),
+
+                // ── UVJETI ──────────────────────────────────
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                      value: _agreedToTerms,
+                      onChanged: _isEditing
+                          ? (v) => setState(() => _agreedToTerms = v ?? false)
+                          : null,
+                      activeColor: theme.colorScheme.secondary,
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          launchUrl(
+                            Uri.parse(
+                              'https://helpi.social/pravila-privatnosti/',
+                            ),
+                            mode: LaunchMode.externalApplication,
+                          );
+                        },
+                        child: RichText(
+                          text: TextSpan(
+                            style: theme.textTheme.bodyMedium,
+                            children: [
+                              TextSpan(text: AppStrings.agreeToTerms),
+                              TextSpan(
+                                text: AppStrings.termsOfUse,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.secondary,
+                                  decorationColor: theme.colorScheme.secondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            )
-          else
-            ..._cards.map(
-              (card) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: InputDecorator(
+                const SizedBox(height: 16),
+
+                // ── UREDI / SPREMI ──────────────────────────
+                SizedBox(
+                  width: double.infinity,
+                  child: _isEditing
+                      ? Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () =>
+                                  setState(() => _isEditing = false),
+                              child: Text(AppStrings.save),
+                            ),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: () =>
+                                  setState(() => _isEditing = false),
+                              child: Text(AppStrings.cancel),
+                            ),
+                          ],
+                        )
+                      : OutlinedButton.icon(
+                          onPressed: () => setState(() => _isEditing = true),
+                          icon: const Icon(Icons.edit, size: 20),
+                          label: Text(AppStrings.editProfile),
+                        ),
+                ),
+                const SizedBox(height: 32),
+
+                // ── JEZIK ───────────────────────────────────
+                InputDecorator(
                   decoration: InputDecoration(
+                    labelText: AppStrings.language,
+                    labelStyle: TextStyle(
+                      color: theme.colorScheme.onSurface.withAlpha(180),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.language,
+                      color: theme.colorScheme.secondary,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    disabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: const BorderSide(color: AppColors.border),
-                    ),
-                    enabled: _isEditing,
                     filled: true,
                     fillColor: Colors.white,
-                    prefixIcon: Icon(
-                      Icons.credit_card,
-                      color: theme.colorScheme.secondary,
-                    ),
-                    suffixIcon: _isEditing
-                        ? GestureDetector(
-                            onTap: () {
-                              setState(() => _cards.remove(card));
-                            },
-                            child: Icon(
-                              Icons.delete_outline,
-                              color: theme.colorScheme.error,
-                              size: 22,
-                            ),
-                          )
-                        : null,
                   ),
-                  child: Text(
-                    card,
-                    style: TextStyle(
-                      color: _isEditing
-                          ? theme.colorScheme.onSurface
-                          : theme.colorScheme.onSurface.withAlpha(153),
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          if (_isEditing) ...[
-            const SizedBox(height: 8),
-            OutlinedButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.add, size: 20),
-              label: Text(AppStrings.addCard),
-            ),
-          ],
-          const SizedBox(height: 8),
-
-          // ── UVJETI ──────────────────────────────────
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Checkbox(
-                value: _agreedToTerms,
-                onChanged: _isEditing
-                    ? (v) => setState(() => _agreedToTerms = v ?? false)
-                    : null,
-                activeColor: theme.colorScheme.secondary,
-              ),
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    launchUrl(
-                      Uri.parse('https://helpi.social/pravila-privatnosti/'),
-                      mode: LaunchMode.externalApplication,
-                    );
-                  },
-                  child: RichText(
-                    text: TextSpan(
-                      style: theme.textTheme.bodyMedium,
-                      children: [
-                        TextSpan(text: AppStrings.agreeToTerms),
-                        TextSpan(
-                          text: AppStrings.termsOfUse,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: theme.colorScheme.secondary,
-                            decorationColor: theme.colorScheme.secondary,
-                          ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _selectedLang,
+                      isDense: true,
+                      isExpanded: true,
+                      onChanged: (v) {
+                        if (v != null) {
+                          setState(() => _selectedLang = v);
+                          widget.localeNotifier.setLocale(v);
+                        }
+                      },
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface,
+                        fontSize: 16,
+                      ),
+                      items: [
+                        DropdownMenuItem(
+                          value: 'HR',
+                          child: Text(AppStrings.langHr),
+                        ),
+                        DropdownMenuItem(
+                          value: 'EN',
+                          child: Text(AppStrings.langEn),
                         ),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
+                const SizedBox(height: 24),
 
-          // ── UREDI / SPREMI ──────────────────────────
-          SizedBox(
-            width: double.infinity,
-            child: _isEditing
-                ? Column(
-                    children: [
-                      ElevatedButton(
-                        onPressed: () => setState(() => _isEditing = false),
-                        child: Text(AppStrings.save),
-                      ),
-                      const SizedBox(height: 8),
-                      TextButton(
-                        onPressed: () => setState(() => _isEditing = false),
-                        child: Text(AppStrings.cancel),
-                      ),
-                    ],
-                  )
-                : OutlinedButton.icon(
-                    onPressed: () => setState(() => _isEditing = true),
-                    icon: const Icon(Icons.edit, size: 20),
-                    label: Text(AppStrings.editProfile),
-                  ),
-          ),
-          const SizedBox(height: 32),
-
-          // ── JEZIK ───────────────────────────────────
-          InputDecorator(
-            decoration: InputDecoration(
-              labelText: AppStrings.language,
-              labelStyle: TextStyle(
-                color: theme.colorScheme.onSurface.withAlpha(180),
-              ),
-              prefixIcon: Icon(
-                Icons.language,
-                color: theme.colorScheme.secondary,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: _selectedLang,
-                isDense: true,
-                isExpanded: true,
-                onChanged: (v) {
-                  if (v != null) {
-                    setState(() => _selectedLang = v);
-                    widget.localeNotifier.setLocale(v);
-                  }
-                },
-                style: TextStyle(
-                  color: theme.colorScheme.onSurface,
-                  fontSize: 16,
+                // ── ODJAVA ──────────────────────────────────
+                OutlinedButton.icon(
+                  onPressed: widget.onLogout,
+                  icon: const Icon(Icons.logout),
+                  label: Text(AppStrings.logout),
+                  style: AppColors.coralOutlinedStyle,
                 ),
-                items: [
-                  DropdownMenuItem(value: 'HR', child: Text(AppStrings.langHr)),
-                  DropdownMenuItem(value: 'EN', child: Text(AppStrings.langEn)),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
+                const SizedBox(height: 16),
 
-          // ── ODJAVA ──────────────────────────────────
-          OutlinedButton.icon(
-            onPressed: widget.onLogout,
-            icon: const Icon(Icons.logout),
-            label: Text(AppStrings.logout),
-            style: AppColors.coralOutlinedStyle,
-          ),
-          const SizedBox(height: 16),
+                // ── IZBRIŠI RAČUN ───────────────────────────
+                TextButton(
+                  onPressed: () => _showDeleteAccountDialog(context),
+                  style: TextButton.styleFrom(
+                    foregroundColor: theme.colorScheme.error,
+                  ),
+                  child: Text(
+                    AppStrings.deleteAccount,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ),
+                const SizedBox(height: 32),
 
-          // ── IZBRIŠI RAČUN ───────────────────────────
-          TextButton(
-            onPressed: () => _showDeleteAccountDialog(context),
-            style: TextButton.styleFrom(
-              foregroundColor: theme.colorScheme.error,
+                // ── Verzija ─────────────────────────────────
+                Center(
+                  child: Text(
+                    AppStrings.appVersion,
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
             ),
-            child: Text(
-              AppStrings.deleteAccount,
-              style: const TextStyle(fontSize: 14),
-            ),
-          ),
-          const SizedBox(height: 32),
-
-          // ── Verzija ─────────────────────────────────
-          Center(
-            child: Text(
-              AppStrings.appVersion,
-              style: theme.textTheme.bodySmall,
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ),
     );
   }
 

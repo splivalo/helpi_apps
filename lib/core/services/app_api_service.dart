@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:helpi_app/core/network/api_client.dart';
@@ -80,10 +81,12 @@ class AppApiService {
     int customerId,
   ) async {
     try {
-      final response = await _client.get(
-        ApiEndpoints.customerById(customerId),
-      );
+      final response = await _client.get(ApiEndpoints.customerById(customerId));
       return ApiResult.success(response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      debugPrint('[AppApiService] getCustomerProfile error: '
+        'status=${e.response?.statusCode}');
+      return ApiResult.failure('HTTP ${e.response?.statusCode}: ${e.message}');
     } catch (e) {
       debugPrint('[AppApiService] getCustomerProfile error: $e');
       return ApiResult.failure(e.toString());
@@ -95,9 +98,7 @@ class AppApiService {
     int studentId,
   ) async {
     try {
-      final response = await _client.get(
-        ApiEndpoints.studentById(studentId),
-      );
+      final response = await _client.get(ApiEndpoints.studentById(studentId));
       return ApiResult.success(response.data as Map<String, dynamic>);
     } catch (e) {
       debugPrint('[AppApiService] getStudentProfile error: $e');

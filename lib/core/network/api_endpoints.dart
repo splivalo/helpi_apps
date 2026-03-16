@@ -1,12 +1,15 @@
 import 'dart:io' show Platform;
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class ApiEndpoints {
   ApiEndpoints._();
 
-  // Base — Android emulator maps 10.0.2.2 to host machine's localhost
-  static final String baseUrl = Platform.isAndroid
-      ? 'http://10.0.2.2:5142'
-      : 'http://localhost:5142';
+  // Android emulator koristi 10.0.2.2 za pristup host localhost-u
+  // Za fizički uređaj: postavi API_BASE_URL u .env na svoju LAN IP
+  static final String baseUrl =
+      dotenv.env['API_BASE_URL'] ??
+      (Platform.isAndroid ? 'http://10.0.2.2:5142' : 'http://localhost:5142');
 
   // Auth
   static const String login = '/api/auth/login';
@@ -57,10 +60,18 @@ class ApiEndpoints {
       '/api/reviews/student/$studentId/pending';
 
   // Notifications
-  static const String notifications = '/api/notifications';
+  static String notificationsByUser(int userId) =>
+      '/api/HNotifications/user/$userId';
+  static String notificationsUnread(int userId) =>
+      '/api/HNotifications/user/$userId/unread';
+  static String notificationsUnreadCount(int userId) =>
+      '/api/HNotifications/user/$userId/unread-count';
 
   // Payment Methods
-  static const String paymentMethods = '/api/payment-methods';
+  static String paymentMethodsByUser(int userId) =>
+      '/api/payment-methods/user/$userId';
+  static const String paymentMethodsCreate = '/api/payment-methods';
+  static String paymentMethodDelete(int id) => '/api/payment-methods/$id';
 
   // Cities
   static const String cities = '/api/cities';
@@ -75,5 +86,8 @@ class ApiEndpoints {
   static const String faculties = '/api/faculties';
 
   // Dashboard
-  static const String dashboard = '/api/dashboard';
+  static String dashboardSenior(int seniorId) =>
+      '/api/dashboard/senior/$seniorId';
+  static String dashboardStudent(int studentId) =>
+      '/api/dashboard/student/$studentId';
 }
