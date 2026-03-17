@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 
 import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/core/network/token_storage.dart';
+import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/features/schedule/data/job_model.dart';
 import 'package:helpi_app/features/schedule/data/review_model.dart';
 import 'package:helpi_app/features/schedule/utils/formatters.dart';
@@ -28,11 +30,39 @@ class JobDetailScreen extends StatefulWidget {
 
 class _JobDetailScreenState extends State<JobDetailScreen> {
   late Job _job;
+  int? _pendingReviewId;
 
   @override
   void initState() {
     super.initState();
     _job = widget.job;
+    _loadPendingReviewId();
+  }
+
+  /// Učitaj pending review ID za ovaj job.
+  Future<void> _loadPendingReviewId() async {
+    if (_job.sessionId == null) return;
+
+    final sessionIdInt = int.tryParse(_job.sessionId!);
+    if (sessionIdInt == null) return;
+
+    final userId = await TokenStorage().getUserId();
+    if (userId == null || !mounted) return;
+
+    final api = AppApiService();
+    final result = await api.getPendingReviewsByStudent(userId);
+
+    if (!mounted) return;
+
+    if (result.success && result.data != null) {
+      // Find review for this job instance
+      for (final review in result.data!) {
+        if (review.jobInstanceId == sessionIdInt) {
+          setState(() => _pendingReviewId = review.id);
+          break;
+        }
+      }
+    }
   }
 
   void _showReviewSheet() {
@@ -119,8 +149,31 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     );
   }
 
-  void _onReviewSubmitted(ReviewModel review) {
+  Future<void> _onReviewSubmitted(ReviewModel review) async {
     if (!context.mounted) return;
+
+    // Ako imamo pendingReviewId, pošalji na backend
+    if (_pendingReviewId != null) {
+      final api = AppApiService();
+      final result = await api.submitReview({
+        'reviewId': _pendingReviewId,
+        'rating': review.rating.toDouble(),
+        'comment': review.comment,
+      });
+
+      if (!mounted) return;
+
+      if (!result.success) {
+        showHelpiSnackBar(
+          context,
+          result.error ?? AppStrings.error,
+          isError: true,
+        );
+        return;
+      }
+    }
+
+    // Lokalno ažuriraj prikaz
     final updatedJob = Job(
       id: _job.id,
       date: _job.date,
@@ -133,7 +186,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       notes: _job.notes,
       review: review,
     );
-    setState(() => _job = updatedJob);
+    setState(() {
+      _job = updatedJob;
+      _pendingReviewId = null; // Reset - review submitted
+    });
     widget.onJobUpdated(updatedJob);
 
     showHelpiSnackBar(context, AppStrings.reviewSent);
@@ -465,72 +521,35 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   }
 
   Future<void> _showDeclineFromDetail() async {
-    final controller = TextEditingController();
-    final theme = Theme.of(context);
     final messenger = ScaffoldMessenger.of(context);
 
-    final confirmed = await showModalBottomSheet<bool>(
+    final confirmed = await showDialog<bool>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) {
-        return SafeArea(
-          top: false,
-          child: Padding(
-            padding: EdgeInsets.only(
-              left: 24,
-              right: 24,
-              top: 24,
-              bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppStrings.jobDeclineTitle,
-                  style: theme.textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: controller,
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                    hintText: AppStrings.jobDeclineHint,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => Navigator.pop(ctx, true),
-                    child: Text(AppStrings.jobDeclineConfirm),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton(
-                    onPressed: () => Navigator.pop(ctx, false),
-                    child: Text(AppStrings.cancel),
-                  ),
-                ),
-              ],
-            ),
+      builder: (ctx) => AlertDialog(
+        title: Text(AppStrings.cancelJobLabel),
+        content: Text(AppStrings.cancelJobConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(AppStrings.cancel),
           ),
-        );
-      },
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(AppStrings.confirm),
+          ),
+        ],
+      ),
     );
 
     if (!context.mounted) return;
+    if (confirmed != true) return;
 
-    if (confirmed == true) {
+    final api = AppApiService();
+    final result = await api.cancelSession(int.parse(_job.id));
+
+    if (!context.mounted) return;
+
+    if (result.success) {
       final updatedJob = Job(
         id: _job.id,
         orderId: _job.orderId,
@@ -553,6 +572,13 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         SnackBar(
           content: Text(AppStrings.jobDeclineSuccess),
           backgroundColor: HelpiTheme.teal,
+        ),
+      );
+    } else {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(result.error ?? 'Error'),
+          backgroundColor: HelpiTheme.coral,
         ),
       );
     }

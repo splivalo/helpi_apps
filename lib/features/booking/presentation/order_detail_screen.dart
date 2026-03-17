@@ -4,8 +4,13 @@ import 'package:flutter/services.dart';
 import 'package:helpi_app/core/constants/colors.dart';
 import 'package:helpi_app/core/constants/pricing.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/core/network/token_storage.dart';
+import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/core/utils/formatters.dart';
+import 'package:helpi_app/core/utils/snackbar_helper.dart';
 import 'package:helpi_app/features/booking/data/order_model.dart';
+import 'package:helpi_app/features/schedule/data/review_model.dart'
+    as schedule_review;
 import 'package:helpi_app/shared/widgets/job_status_badge.dart';
 import 'package:helpi_app/shared/widgets/review_inline_card.dart';
 import 'package:helpi_app/shared/widgets/service_chips_wrap.dart';
@@ -30,11 +35,28 @@ class OrderDetailScreen extends StatefulWidget {
 
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
   bool _jobsExpanded = false;
+  List<schedule_review.ReviewModel> _pendingReviews = [];
 
   @override
   void initState() {
     super.initState();
     widget.ordersNotifier.addListener(_onChanged);
+    _loadPendingReviews();
+  }
+
+  /// Dohvati pending reviews za ovog seniora.
+  Future<void> _loadPendingReviews() async {
+    final seniorId = await TokenStorage().getSeniorId();
+    if (seniorId == null || !mounted) return;
+
+    final api = AppApiService();
+    final result = await api.getPendingReviewsBySenior(seniorId);
+
+    if (!mounted) return;
+
+    if (result.success && result.data != null) {
+      setState(() => _pendingReviews = result.data!);
+    }
   }
 
   void _onChanged() {
@@ -45,6 +67,24 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   void dispose() {
     widget.ordersNotifier.removeListener(_onChanged);
     super.dispose();
+  }
+
+  Future<void> _cancelOrder(int orderId) async {
+    final api = AppApiService();
+    final result = await api.cancelOrder(orderId);
+
+    if (!mounted) return;
+
+    if (result.success) {
+      widget.ordersNotifier.cancelOrder(orderId);
+      Navigator.pop(context);
+    } else {
+      showHelpiSnackBar(
+        context,
+        result.error ?? AppStrings.error,
+        isError: true,
+      );
+    }
   }
 
   @override
@@ -92,9 +132,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 OutlinedButton.icon(
                   onPressed: () {
                     HapticFeedback.selectionClick();
-                    widget.ordersNotifier.cancelOrder(order.id);
-                    if (!context.mounted) return;
-                    Navigator.pop(context);
+                    _cancelOrder(order.id);
                   },
                   icon: const Icon(Icons.close, size: 20),
                   label: Text(AppStrings.cancelOrder),
@@ -548,6 +586,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     final now = DateTime.now();
     final lastDate = DateTime(now.year + 2);
 
+    DateTime? startDate;
+    DateTime? endDate;
+
     // Recurring with end date → date range picker
     if (!order.isOneTime && order.endDate != null) {
       final range = await showDateRangePicker(
@@ -561,61 +602,89 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       if (!mounted) return;
       if (range == null) return;
 
-      final newFrequency = AppStrings.recurringWithEnd(
-        AppFormatters.date(range.end),
-      );
-
-      widget.ordersNotifier.addProcessingOrder(
-        OrderModel(
-          id: widget.ordersNotifier.nextId,
-          services: List<String>.from(order.services),
-          date: range.start,
-          frequency: newFrequency,
-          notes: order.notes,
-          isOneTime: false,
-          time: order.time,
-          duration: order.duration,
-          weekday: range.start.weekday,
-          durationHours: order.durationHours,
-          dayEntries: order.dayEntries,
-          endDate: range.end,
-        ),
+      startDate = range.start;
+      endDate = range.end;
+    } else {
+      // One-time or recurring without end date → single date picker
+      final picked = await showDatePicker(
+        context: context,
+        initialDate: now,
+        firstDate: now,
+        lastDate: lastDate,
+        locale: const Locale('hr'),
+        confirmText: AppStrings.confirm,
+        cancelText: AppStrings.cancel,
       );
       if (!mounted) return;
-      Navigator.pop(context, 'repeated');
-      return;
+      if (picked == null) return;
+
+      startDate = picked;
+      endDate = order.isOneTime
+          ? picked
+          : picked.add(const Duration(days: 365));
     }
 
-    // One-time or recurring without end date → single date picker
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: now,
-      firstDate: now,
-      lastDate: lastDate,
-      locale: const Locale('hr'),
-      confirmText: AppStrings.confirm,
-      cancelText: AppStrings.cancel,
-    );
-    if (!mounted) return;
-    if (picked == null) return;
+    // Build schedule payload from dayEntries or fallback
+    final schedules = <Map<String, dynamic>>[];
+    if (order.dayEntries.isNotEmpty) {
+      for (final entry in order.dayEntries) {
+        final fromH = order.fromHour ?? 9;
+        final fromM = order.fromMinute ?? 0;
+        final dur = entry.durationHours;
+        schedules.add({
+          'dayOfWeek': entry.weekday,
+          'startTime':
+              '${fromH.toString().padLeft(2, '0')}:${fromM.toString().padLeft(2, '0')}:00',
+          'endTime':
+              '${(fromH + dur).toString().padLeft(2, '0')}:${fromM.toString().padLeft(2, '0')}:00',
+        });
+      }
+    } else {
+      // Fallback: use weekday and durationHours from order
+      final fromH = order.fromHour ?? 9;
+      final fromM = order.fromMinute ?? 0;
+      final dur = order.durationHours > 0 ? order.durationHours : 1;
+      schedules.add({
+        'dayOfWeek': startDate.weekday,
+        'startTime':
+            '${fromH.toString().padLeft(2, '0')}:${fromM.toString().padLeft(2, '0')}:00',
+        'endTime':
+            '${(fromH + dur).toString().padLeft(2, '0')}:${fromM.toString().padLeft(2, '0')}:00',
+      });
+    }
 
-    widget.ordersNotifier.addProcessingOrder(
-      OrderModel(
-        id: widget.ordersNotifier.nextId,
-        services: List<String>.from(order.services),
-        date: picked,
-        frequency: order.frequency,
-        notes: order.notes,
-        isOneTime: order.isOneTime,
-        time: order.time,
-        duration: order.duration,
-        weekday: picked.weekday,
-        durationHours: order.durationHours,
-        dayEntries: order.dayEntries,
-      ),
-    );
+    // Build payload
+    final seniorId = int.tryParse(order.seniorId) ?? 0;
+    String fmtDate(DateTime d) =>
+        '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+    final payload = <String, dynamic>{
+      'seniorId': seniorId,
+      'isRecurring': !order.isOneTime,
+      'startDate': fmtDate(startDate),
+      'endDate': fmtDate(endDate),
+      'notes': order.notes,
+      'services': order.serviceIds,
+      'schedules': schedules,
+      if (!order.isOneTime) 'recurrencePattern': 0,
+    };
+
+    // Call API
+    final api = AppApiService();
+    final result = await api.createOrder(payload);
+
     if (!mounted) return;
-    Navigator.pop(context, 'repeated');
+
+    if (result.success && result.data != null) {
+      widget.ordersNotifier.addProcessingOrder(result.data!);
+      Navigator.pop(context, 'repeated');
+    } else {
+      showHelpiSnackBar(
+        context,
+        result.error ?? AppStrings.orderCreateError,
+        isError: true,
+      );
+    }
   }
 
   /// Confirm cancel dialog for a job.
@@ -646,9 +715,29 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   /// Review bottom sheet for a specific job.
   void _showJobReviewSheet(OrderModel order, int jobIndex) {
+    // Pronađi pending review za ovaj order
+    // (ako job ima id, match po jobInstanceId; inače koristi prvi available)
+    int? pendingReviewId;
+    final job = order.jobs[jobIndex];
+
+    if (job.id != null) {
+      // Match by jobInstanceId
+      for (final pr in _pendingReviews) {
+        if (pr.jobInstanceId == job.id) {
+          pendingReviewId = pr.id;
+          break;
+        }
+      }
+    }
+
+    // Fallback: koristi prvi pending review ako nema exact match
+    if (pendingReviewId == null && _pendingReviews.isNotEmpty) {
+      pendingReviewId = _pendingReviews.first.id;
+    }
+
     int selectedRating = 0;
     final commentCtrl = TextEditingController();
-    final job = order.jobs[jobIndex];
+    bool isSubmitting = false;
 
     showModalBottomSheet<void>(
       context: context,
@@ -715,8 +804,38 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: selectedRating > 0
-                          ? () {
+                      onPressed: (selectedRating > 0 && !isSubmitting)
+                          ? () async {
+                              setSheetState(() => isSubmitting = true);
+
+                              // Ako imamo pendingReviewId, pošalji na backend
+                              if (pendingReviewId != null) {
+                                final api = AppApiService();
+                                final result = await api.submitReview({
+                                  'reviewId': pendingReviewId,
+                                  'rating': selectedRating.toDouble(),
+                                  'comment': commentCtrl.text.trim(),
+                                });
+
+                                if (!ctx.mounted) return;
+
+                                if (!result.success) {
+                                  setSheetState(() => isSubmitting = false);
+                                  showHelpiSnackBar(
+                                    ctx,
+                                    result.error ?? AppStrings.error,
+                                    isError: true,
+                                  );
+                                  return;
+                                }
+
+                                // Ukloni iz pending liste
+                                _pendingReviews.removeWhere(
+                                  (r) => r.id == pendingReviewId,
+                                );
+                              }
+
+                              // Lokalno ažuriraj UI
                               widget.ordersNotifier.addJobReview(
                                 order.id,
                                 jobIndex,
@@ -726,11 +845,18 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                   date: DateTime.now(),
                                 ),
                               );
+
                               if (!ctx.mounted) return;
                               Navigator.pop(ctx);
                             }
                           : null,
-                      child: Text(AppStrings.sendReview),
+                      child: isSubmitting
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Text(AppStrings.sendReview),
                     ),
                   ),
                 ],

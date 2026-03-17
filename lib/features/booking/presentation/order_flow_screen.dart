@@ -71,6 +71,9 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
   final TextEditingController _notesController = TextEditingController();
   final TextEditingController _promoCodeController = TextEditingController();
   String? _appliedPromoCode;
+  bool _promoValidating = false;
+  double? _promoDiscount;
+  String? _promoError;
 
   // Kartice iz API-ja
   List<Map<String, dynamic>> _cards = [];
@@ -1354,6 +1357,8 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                           onTap: () {
                             setState(() {
                               _appliedPromoCode = null;
+                              _promoDiscount = null;
+                              _promoError = null;
                               _promoCodeController.clear();
                             });
                           },
@@ -1402,12 +1407,67 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                       ),
                       const SizedBox(width: 10),
                       ElevatedButton(
-                        onPressed: () {
-                          final code = _promoCodeController.text.trim();
-                          if (code.isNotEmpty) {
-                            setState(() => _appliedPromoCode = code);
-                          }
-                        },
+                        onPressed: _promoValidating
+                            ? null
+                            : () async {
+                                final code = _promoCodeController.text.trim();
+                                if (code.isEmpty) return;
+
+                                setState(() {
+                                  _promoValidating = true;
+                                  _promoError = null;
+                                });
+
+                                final userId = await TokenStorage().getUserId();
+                                if (!mounted) return;
+
+                                if (userId == null) {
+                                  setState(() {
+                                    _promoValidating = false;
+                                    _promoError = AppStrings.promoCodeInvalid;
+                                  });
+                                  return;
+                                }
+
+                                final result = await AppApiService()
+                                    .validatePromoCode(
+                                      code: code,
+                                      customerId: userId,
+                                      orderTotal: 0,
+                                    );
+                                if (!mounted) return;
+
+                                if (result.success && result.data != null) {
+                                  final data = result.data!;
+                                  final isValid =
+                                      data['isValid'] as bool? ?? false;
+                                  if (isValid) {
+                                    final discount =
+                                        (data['discountAmount'] as num?)
+                                            ?.toDouble();
+                                    setState(() {
+                                      _appliedPromoCode = code;
+                                      _promoDiscount = discount;
+                                      _promoError = null;
+                                      _promoValidating = false;
+                                    });
+                                  } else {
+                                    setState(() {
+                                      _promoError =
+                                          (data['errorMessage'] as String?) ??
+                                          AppStrings.promoCodeInvalid;
+                                      _promoValidating = false;
+                                    });
+                                  }
+                                } else {
+                                  setState(() {
+                                    _promoError =
+                                        result.error ??
+                                        AppStrings.promoCodeInvalid;
+                                    _promoValidating = false;
+                                  });
+                                }
+                              },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.teal,
                           foregroundColor: Colors.white,
@@ -1420,9 +1480,41 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                             vertical: 14,
                           ),
                         ),
-                        child: Text(AppStrings.promoCodeApply),
+                        child: _promoValidating
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Text(AppStrings.promoCodeApply),
                       ),
                     ],
+                  ),
+                if (_promoError != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      _promoError!,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppColors.coral,
+                      ),
+                    ),
+                  ),
+                if (_promoDiscount != null && _appliedPromoCode != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      AppStrings.promoCodeDiscount(
+                        '${_promoDiscount!.toStringAsFixed(2)} €',
+                      ),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppColors.teal,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
               ],
             ),
@@ -1551,6 +1643,19 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     if (!mounted) return;
 
     if (result.success && result.data != null) {
+      // Apply promo code if validated
+      if (_appliedPromoCode != null) {
+        final userId = await storage.getUserId();
+        if (userId != null) {
+          await api.applyPromoCode(
+            code: _appliedPromoCode!,
+            orderId: result.data!.id,
+            customerId: userId,
+            orderTotal: 0,
+          );
+        }
+      }
+      if (!mounted) return;
       widget.ordersNotifier.addProcessingOrder(result.data!);
       Navigator.pop(context);
     } else {

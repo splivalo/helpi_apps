@@ -53,7 +53,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _agreedToTerms = true;
   bool _isLoading = true;
   List<Faculty> _faculties = [];
-
+  // Contact ID za spremanje
+  int? _contactId;
+  int? _studentUserId;
   // â”€â”€ Dostupnost â€” Äita/piÅ¡e iz dijeljenog notifiera â”€â”€â”€â”€â”€
   List<DayAvailability> get _availability => widget.availabilityNotifier.value;
   final _apiClient = ApiClient();
@@ -66,6 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _loadProfile() async {
     final userId = await TokenStorage().getUserId();
+    _studentUserId = userId;
     await Future.wait([
       _loadFaculties(),
       if (userId != null) _loadStudentData(userId),
@@ -82,6 +85,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (result.success && result.data != null) {
       final data = result.data!;
       final contact = data['contact'] as Map<String, dynamic>? ?? {};
+
+      // Store contact ID for saving
+      _contactId = (contact['id'] as num?)?.toInt();
 
       _emailCtrl.text = contact['email'] as String? ?? '';
       final fullName = contact['fullName'] as String? ?? '';
@@ -149,6 +155,74 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  /// Spremi dostupnost na backend.
+  Future<void> _saveAvailability() async {
+    final storage = TokenStorage();
+    final userId = await storage.getUserId();
+    if (userId == null) return;
+
+    final api = AppApiService();
+    final payload = widget.availabilityNotifier.toBackendPayload(userId);
+    final result = await api.updateStudentAvailability(payload);
+
+    if (!mounted) return;
+
+    if (result.success) {
+      debugPrint('[ProfileScreen] availability saved: ${payload.length} slots');
+    } else {
+      debugPrint('[ProfileScreen] availability save failed: ${result.error}');
+      // Opcionalno: prikaži grešku
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.error ?? 'Failed to save availability')),
+      );
+    }
+  }
+
+  /// Spremi osobne podatke na backend.
+  Future<void> _savePersonalData() async {
+    if (_contactId == null) return;
+
+    final api = AppApiService();
+
+    // Format date helper
+    String fmtDate(DateTime d) =>
+        '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+    final fullName =
+        '${_firstNameCtrl.text.trim()} ${_lastNameCtrl.text.trim()}';
+    final result = await api.updateContactInfo(
+      contactId: _contactId!,
+      fullName: fullName,
+      email: _emailCtrl.text.trim(),
+      phone: _phoneCtrl.text.trim(),
+      fullAddress: _addressCtrl.text.trim(),
+      gender: _gender == 'M' ? 0 : 1,
+      dateOfBirth: fmtDate(_dob),
+    );
+
+    if (!mounted) return;
+
+    if (result.success) {
+      // Also update student-specific fields (faculty, student number)
+      if (_studentUserId != null) {
+        await api.updateStudent(
+          studentId: _studentUserId!,
+          facultyId: _selectedFaculty?.id,
+          studentNumber: _studentIdCardCtrl.text.trim().isNotEmpty
+              ? _studentIdCardCtrl.text.trim()
+              : null,
+        );
+      }
+      if (!mounted) return;
+      debugPrint('[ProfileScreen] personal data saved');
+    } else {
+      debugPrint('[ProfileScreen] personal data save failed: ${result.error}');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result.error ?? AppStrings.error)));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -170,7 +244,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 12),
                 OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) =>
+                          _ChangePasswordDialog(authService: AuthService()),
+                    );
+                  },
                   icon: const Icon(Icons.lock_outline, size: 20),
                   label: Text(AppStrings.changePassword),
                 ),
@@ -276,8 +356,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ? Column(
                           children: [
                             ElevatedButton(
-                              onPressed: () =>
-                                  setState(() => _isEditing = false),
+                              onPressed: () async {
+                                await Future.wait([
+                                  _saveAvailability(),
+                                  _savePersonalData(),
+                                ]);
+                                if (!mounted) return;
+                                setState(() => _isEditing = false);
+                              },
                               child: Text(AppStrings.save),
                             ),
                             const SizedBox(height: 8),
@@ -617,6 +703,166 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: TextStyle(color: HelpiTheme.textSecondary, fontSize: 16),
               ),
       ),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════
+// Change Password Dialog
+// ══════════════════════════════════════════════
+class _ChangePasswordDialog extends StatefulWidget {
+  const _ChangePasswordDialog({required this.authService});
+
+  final AuthService authService;
+
+  @override
+  State<_ChangePasswordDialog> createState() => _ChangePasswordDialogState();
+}
+
+class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
+  final _currentCtrl = TextEditingController();
+  final _newCtrl = TextEditingController();
+  final _confirmCtrl = TextEditingController();
+  bool _isLoading = false;
+  String? _message;
+  bool _isError = false;
+
+  @override
+  void dispose() {
+    _currentCtrl.dispose();
+    _newCtrl.dispose();
+    _confirmCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final current = _currentCtrl.text;
+    final newPass = _newCtrl.text;
+    final confirm = _confirmCtrl.text;
+
+    if (current.isEmpty || newPass.isEmpty || confirm.isEmpty) {
+      setState(() {
+        _message = AppStrings.fillAllFields;
+        _isError = true;
+      });
+      return;
+    }
+
+    if (newPass != confirm) {
+      setState(() {
+        _message = AppStrings.passwordsMismatch;
+        _isError = true;
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _message = null;
+    });
+
+    final result = await widget.authService.changePassword(
+      current,
+      newPass,
+      confirm,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+      if (result.success) {
+        _message = AppStrings.resetPasswordSuccess;
+        _isError = false;
+      } else {
+        _message = result.message ?? AppStrings.error;
+        _isError = true;
+      }
+    });
+
+    if (result.success) {
+      await Future.delayed(const Duration(milliseconds: 1500));
+      if (mounted) Navigator.pop(context);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(AppStrings.changePassword),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _currentCtrl,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: AppStrings.currentPassword,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _newCtrl,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: AppStrings.newPassword,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _confirmCtrl,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: AppStrings.confirmNewPassword,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            if (_message != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                _message!,
+                style: TextStyle(
+                  color: _isError ? Colors.red : Colors.green,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(AppStrings.cancel),
+        ),
+        if (_isLoading)
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          )
+        else
+          ElevatedButton(
+            onPressed: _submit,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: HelpiTheme.teal,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(AppStrings.save),
+          ),
+      ],
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:helpi_app/core/network/token_storage.dart';
 import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/features/booking/data/order_model.dart';
+import 'package:helpi_app/features/schedule/data/availability_model.dart';
 import 'package:helpi_app/features/schedule/data/job_model.dart';
 
 /// Učitava podatke s backenda prema ulozi korisnika.
@@ -26,9 +27,17 @@ class DataLoader {
   ///
   /// [ordersNotifier] je potreban samo za Senior (Customer) — ako je null,
   /// senior narudžbe se preskaču.
-  static Future<bool> loadAll({OrdersNotifier? ordersNotifier}) async {
+  /// [availabilityNotifier] je potreban samo za Student — ako je null,
+  /// student availability se preskače.
+  static Future<bool> loadAll({
+    OrdersNotifier? ordersNotifier,
+    AvailabilityNotifier? availabilityNotifier,
+  }) async {
     try {
-      return await _doLoad(ordersNotifier: ordersNotifier).timeout(_timeout);
+      return await _doLoad(
+        ordersNotifier: ordersNotifier,
+        availabilityNotifier: availabilityNotifier,
+      ).timeout(_timeout);
     } on TimeoutException {
       debugPrint('[DataLoader] loadAll TIMEOUT — using mock data');
       return false;
@@ -38,7 +47,10 @@ class DataLoader {
     }
   }
 
-  static Future<bool> _doLoad({OrdersNotifier? ordersNotifier}) async {
+  static Future<bool> _doLoad({
+    OrdersNotifier? ordersNotifier,
+    AvailabilityNotifier? availabilityNotifier,
+  }) async {
     final storage = TokenStorage();
     final userId = await storage.getUserId();
     final userType = await storage.getUserType();
@@ -104,6 +116,26 @@ class DataLoader {
           '[DataLoader] student sessions failed: ${sessionsResult.error}',
         );
         allOk = false;
+      }
+
+      // Student: load availability slots
+      if (availabilityNotifier != null) {
+        final availResult = await api.getStudentAvailability(userId);
+        if (availResult.success && availResult.data != null) {
+          availabilityNotifier.loadFromBackend(
+            (availResult.data! as List)
+                .map((e) => e as Map<String, dynamic>)
+                .toList(),
+          );
+          debugPrint(
+            '[DataLoader] student availability loaded: ${availResult.data!.length} slots',
+          );
+        } else {
+          debugPrint(
+            '[DataLoader] student availability failed: ${availResult.error}',
+          );
+          // Availability nije kritična — ne fail-amo allOk
+        }
       }
     }
 

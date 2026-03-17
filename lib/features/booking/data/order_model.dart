@@ -26,6 +26,8 @@ class OrderDayEntry {
 /// Jedan konkretan termin (posao) unutar narudžbe.
 class JobModel {
   JobModel({
+    this.id,
+    this.pendingReviewId,
     required this.date,
     required this.weekday,
     required this.time,
@@ -36,6 +38,12 @@ class JobModel {
     this.status = JobStatus.scheduled,
     this.review,
   });
+
+  /// Backend job instance ID.
+  final int? id;
+
+  /// Pending review ID (ako senior treba ocijeniti).
+  int? pendingReviewId;
 
   final DateTime date;
   final int weekday; // 1=Mon … 7=Sun
@@ -82,6 +90,7 @@ class OrderModel {
     required this.date,
     required this.frequency,
     this.seniorId = '',
+    this.serviceIds = const [],
     this.status = OrderStatus.processing,
     this.notes = '',
     this.serviceNote = '',
@@ -94,6 +103,8 @@ class OrderModel {
     this.endDate,
     this.weekday = 1,
     this.durationHours = 0,
+    this.fromHour,
+    this.fromMinute,
     List<StudentAssignment>? students,
     List<JobModel>? jobs,
   }) : students = students ?? [],
@@ -102,6 +113,7 @@ class OrderModel {
   final int id;
   final String seniorId;
   final List<String> services;
+  final List<int> serviceIds;
   final DateTime date;
   final String frequency;
   final String notes;
@@ -118,6 +130,8 @@ class OrderModel {
   final DateTime? endDate;
   final int weekday;
   final int durationHours;
+  final int? fromHour;
+  final int? fromMinute;
 
   final List<StudentAssignment> students;
   final List<JobModel> jobs;

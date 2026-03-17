@@ -36,6 +36,7 @@ class ApiEndpoints {
       '/api/sessions/completed/student/$studentId';
   static String sessionsCompletedBySenior(int seniorId) =>
       '/api/sessions/completed/senior/$seniorId';
+  static String sessionCancel(int id) => '/api/sessions/$id/cancel';
 
   // Legacy alias
   static const String jobInstances = '/api/sessions';
@@ -85,9 +86,23 @@ class ApiEndpoints {
   // Faculties
   static const String faculties = '/api/faculties';
 
+  // Student Availability
+  static String availabilityByStudent(int studentId) =>
+      '/api/student-availability-slots/student/$studentId';
+  static const String availabilityBulkUpdate =
+      '/api/student-availability-slots/bulk';
+
   // Dashboard
   static String dashboardSenior(int seniorId) =>
       '/api/dashboard/senior/$seniorId';
   static String dashboardStudent(int studentId) =>
       '/api/dashboard/student/$studentId';
+
+  // Contact Infos
+  static const String contactInfos = '/api/contact-infos';
+  static String contactInfoById(int id) => '/api/contact-infos/$id';
+
+  // Promo Codes
+  static const String promoCodeValidate = '/api/promo-codes/validate';
+  static const String promoCodeApply = '/api/promo-codes/apply';
 }

@@ -52,6 +52,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // Kartice iz API-ja
   List<Map<String, dynamic>> _cards = [];
 
+  // Contact IDs za spremanje
+  int? _customerContactId;
+  int? _seniorContactId;
+
   @override
   void initState() {
     super.initState();
@@ -70,6 +74,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final data = result.data!;
       final contact = data['contact'] as Map<String, dynamic>? ?? {};
       final seniors = data['seniors'] as List<dynamic>? ?? [];
+
+      // Store contact ID for saving
+      _customerContactId = (contact['id'] as num?)?.toInt();
 
       // Naručitelj (customer contact)
       _emailCtrl.text = contact['email'] as String? ?? '';
@@ -91,6 +98,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (seniors.isNotEmpty) {
         final senior = seniors[0] as Map<String, dynamic>;
         final senContact = senior['contact'] as Map<String, dynamic>? ?? {};
+
+        // Store senior contact ID
+        _seniorContactId = (senContact['id'] as num?)?.toInt();
+
         final senFullName = senContact['fullName'] as String? ?? '';
         final senNameParts = senFullName.split(' ');
         _senFirstNameCtrl.text = senNameParts.isNotEmpty
@@ -133,6 +144,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.dispose();
   }
 
+  /// Spremi profil podatke na backend.
+  Future<void> _saveProfile() async {
+    final api = AppApiService();
+    bool hasError = false;
+
+    // Format date helper
+    String fmtDate(DateTime d) =>
+        '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+    // Update Customer contact info
+    if (_customerContactId != null) {
+      final customerFullName =
+          '${_ordFirstNameCtrl.text.trim()} ${_ordLastNameCtrl.text.trim()}';
+      final result = await api.updateContactInfo(
+        contactId: _customerContactId!,
+        fullName: customerFullName,
+        email: _emailCtrl.text.trim(),
+        phone: _ordPhoneCtrl.text.trim(),
+        fullAddress: '', // Customer uses senior's address
+        gender: _ordGender == 'M' ? 0 : 1,
+        dateOfBirth: fmtDate(_ordDob),
+      );
+      if (!result.success) hasError = true;
+    }
+
+    // Update Senior contact info
+    if (_seniorContactId != null) {
+      final seniorFullName =
+          '${_senFirstNameCtrl.text.trim()} ${_senLastNameCtrl.text.trim()}';
+      final result = await api.updateContactInfo(
+        contactId: _seniorContactId!,
+        fullName: seniorFullName,
+        email: _emailCtrl.text.trim(),
+        phone: _senPhoneCtrl.text.trim(),
+        fullAddress: _senAddressCtrl.text.trim(),
+        gender: _senGender == 'M' ? 0 : 1,
+        dateOfBirth: fmtDate(_senDob),
+      );
+      if (!result.success) hasError = true;
+    }
+
+    if (!mounted) return;
+
+    if (hasError) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(AppStrings.error)));
+    }
+  }
+
+  /// Prikaži dijalog za promjenu lozinke.
+  void _showChangePasswordDialog() {
+    showDialog(
+      context: context,
+      builder: (ctx) => _ChangePasswordDialog(authService: AuthService()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -156,7 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 12),
                 // Promijeni lozinku
                 OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: _showChangePasswordDialog,
                   icon: const Icon(Icons.lock_outline, size: 20),
                   label: Text(AppStrings.changePassword),
                 ),
@@ -378,8 +447,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ? Column(
                           children: [
                             ElevatedButton(
-                              onPressed: () =>
-                                  setState(() => _isEditing = false),
+                              onPressed: () async {
+                                await _saveProfile();
+                                if (!mounted) return;
+                                setState(() => _isEditing = false);
+                              },
                               child: Text(AppStrings.save),
                             ),
                             const SizedBox(height: 8),
@@ -516,5 +588,166 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
     }
+  }
+}
+
+// ══════════════════════════════════════════════
+// Change Password Dialog
+// ══════════════════════════════════════════════
+class _ChangePasswordDialog extends StatefulWidget {
+  const _ChangePasswordDialog({required this.authService});
+
+  final AuthService authService;
+
+  @override
+  State<_ChangePasswordDialog> createState() => _ChangePasswordDialogState();
+}
+
+class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
+  final _currentCtrl = TextEditingController();
+  final _newCtrl = TextEditingController();
+  final _confirmCtrl = TextEditingController();
+  bool _isLoading = false;
+  String? _message;
+  bool _isError = false;
+
+  @override
+  void dispose() {
+    _currentCtrl.dispose();
+    _newCtrl.dispose();
+    _confirmCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final current = _currentCtrl.text;
+    final newPass = _newCtrl.text;
+    final confirm = _confirmCtrl.text;
+
+    if (current.isEmpty || newPass.isEmpty || confirm.isEmpty) {
+      setState(() {
+        _message = AppStrings.fillAllFields;
+        _isError = true;
+      });
+      return;
+    }
+
+    if (newPass != confirm) {
+      setState(() {
+        _message = AppStrings.passwordsMismatch;
+        _isError = true;
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _message = null;
+    });
+
+    final result = await widget.authService.changePassword(
+      current,
+      newPass,
+      confirm,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+      if (result.success) {
+        _message = AppStrings.resetPasswordSuccess;
+        _isError = false;
+      } else {
+        _message = result.message ?? AppStrings.error;
+        _isError = true;
+      }
+    });
+
+    // Close after success
+    if (result.success) {
+      await Future.delayed(const Duration(milliseconds: 1500));
+      if (mounted) Navigator.pop(context);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(AppStrings.changePassword),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _currentCtrl,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: AppStrings.currentPassword,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _newCtrl,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: AppStrings.newPassword,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _confirmCtrl,
+              obscureText: true,
+              decoration: InputDecoration(
+                labelText: AppStrings.confirmNewPassword,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            if (_message != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                _message!,
+                style: TextStyle(
+                  color: _isError ? Colors.red : Colors.green,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(AppStrings.cancel),
+        ),
+        if (_isLoading)
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          )
+        else
+          ElevatedButton(
+            onPressed: _submit,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.teal,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(AppStrings.save),
+          ),
+      ],
+    );
   }
 }

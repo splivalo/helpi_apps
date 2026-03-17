@@ -59,6 +59,9 @@ class _HelpiAppState extends State<HelpiApp> {
       // Učitaj podatke u pozadini
       DataLoader.loadAll(
         ordersNotifier: userType == 'Customer' ? _ordersNotifier : null,
+        availabilityNotifier: userType == 'Student'
+            ? _availabilityNotifier
+            : null,
       );
     } catch (_) {
       // Nikad ne blokiraj startup
@@ -78,6 +81,9 @@ class _HelpiAppState extends State<HelpiApp> {
     // Učitaj podatke u pozadini
     DataLoader.loadAll(
       ordersNotifier: userType == 'Customer' ? _ordersNotifier : null,
+      availabilityNotifier: userType == 'Student'
+          ? _availabilityNotifier
+          : null,
     );
   }
 

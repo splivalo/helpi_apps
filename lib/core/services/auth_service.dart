@@ -274,7 +274,7 @@ class AuthService {
     String confirmNewPassword,
   ) async {
     try {
-      await _apiClient.post(
+      final response = await _apiClient.post(
         ApiEndpoints.changePassword,
         data: {
           'currentPassword': currentPassword,
@@ -282,12 +282,23 @@ class AuthService {
           'confirmNewPassword': confirmNewPassword,
         },
       );
+
+      // Backend vraća novi TokenResponseDto — spremi novi JWT
+      final body = response.data as Map<String, dynamic>;
+      final newToken = body['accessToken'] as String?;
+      if (newToken != null && newToken.isNotEmpty) {
+        await _tokenStorage.saveToken(newToken);
+      }
+
       return AuthResult(
         success: true,
         message: AppStrings.resetPasswordSuccess,
       );
-    } on DioException catch (_) {
-      return AuthResult(success: false, message: AppStrings.loginError);
+    } on DioException catch (e) {
+      final msg = (e.response?.data is Map<String, dynamic>)
+          ? (e.response!.data as Map<String, dynamic>)['message'] as String?
+          : null;
+      return AuthResult(success: false, message: msg ?? AppStrings.loginError);
     }
   }
 

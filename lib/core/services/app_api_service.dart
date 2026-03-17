@@ -72,6 +72,67 @@ class AppApiService {
     }
   }
 
+  /// Otkaži pojedinu sesiju (job instance) — student cancel.
+  Future<ApiResult<bool>> cancelSession(int sessionId) async {
+    try {
+      await _client.post(ApiEndpoints.sessionCancel(sessionId));
+      return ApiResult.success(true);
+    } catch (e) {
+      debugPrint('[AppApiService] cancelSession error: $e');
+      return ApiResult.failure(e.toString());
+    }
+  }
+
+  // ──────────────────────────────────────────────
+  // PROMO CODES
+  // ──────────────────────────────────────────────
+
+  /// Validate promo code — returns validation result from backend.
+  Future<ApiResult<Map<String, dynamic>>> validatePromoCode({
+    required String code,
+    required int customerId,
+    required double orderTotal,
+  }) async {
+    try {
+      final response = await _client.post(
+        ApiEndpoints.promoCodeValidate,
+        queryParameters: {
+          'code': code,
+          'customerId': customerId,
+          'orderTotal': orderTotal,
+        },
+      );
+      return ApiResult.success(response.data as Map<String, dynamic>);
+    } catch (e) {
+      debugPrint('[AppApiService] validatePromoCode error: $e');
+      return ApiResult.failure(e.toString());
+    }
+  }
+
+  /// Apply promo code to order after creation.
+  Future<ApiResult<Map<String, dynamic>>> applyPromoCode({
+    required String code,
+    required int orderId,
+    required int customerId,
+    required double orderTotal,
+  }) async {
+    try {
+      final response = await _client.post(
+        ApiEndpoints.promoCodeApply,
+        queryParameters: {
+          'code': code,
+          'orderId': orderId,
+          'customerId': customerId,
+          'orderTotal': orderTotal,
+        },
+      );
+      return ApiResult.success(response.data as Map<String, dynamic>);
+    } catch (e) {
+      debugPrint('[AppApiService] applyPromoCode error: $e');
+      return ApiResult.failure(e.toString());
+    }
+  }
+
   // ──────────────────────────────────────────────
   // PROFILE
   // ──────────────────────────────────────────────
@@ -185,6 +246,24 @@ class AppApiService {
     }
   }
 
+  /// Dohvati pending recenzije za studenta (student mora ocijeniti seniora).
+  Future<ApiResult<List<schedule_review.ReviewModel>>>
+  getPendingReviewsByStudent(int studentId) async {
+    try {
+      final response = await _client.get(
+        ApiEndpoints.pendingReviewsByStudent(studentId),
+      );
+      final list = response.data as List<dynamic>;
+      final reviews = list
+          .map((e) => _mapReview(e as Map<String, dynamic>))
+          .toList();
+      return ApiResult.success(reviews);
+    } catch (e) {
+      debugPrint('[AppApiService] getPendingReviewsByStudent error: $e');
+      return ApiResult.failure(e.toString());
+    }
+  }
+
   /// Pošalji recenziju (senior ocjenjuje studenta).
   Future<ApiResult<bool>> submitReview(Map<String, dynamic> reviewData) async {
     try {
@@ -218,6 +297,97 @@ class AppApiService {
   }
 
   // ──────────────────────────────────────────────
+  // STUDENT AVAILABILITY
+  // ──────────────────────────────────────────────
+
+  /// Dohvati dostupnost za studenta.
+  Future<ApiResult<List<Map<String, dynamic>>>> getStudentAvailability(
+    int studentId,
+  ) async {
+    try {
+      final response = await _client.get(
+        ApiEndpoints.availabilityByStudent(studentId),
+      );
+      final list = response.data as List<dynamic>;
+      final slots = list.map((e) => e as Map<String, dynamic>).toList();
+      return ApiResult.success(slots);
+    } catch (e) {
+      debugPrint('[AppApiService] getStudentAvailability error: $e');
+      return ApiResult.failure(e.toString());
+    }
+  }
+
+  /// Spremi dostupnost studenta (bulk update).
+  Future<ApiResult<bool>> updateStudentAvailability(
+    List<Map<String, dynamic>> slots,
+  ) async {
+    try {
+      await _client.put(ApiEndpoints.availabilityBulkUpdate, data: slots);
+      return ApiResult.success(true);
+    } catch (e) {
+      debugPrint('[AppApiService] updateStudentAvailability error: $e');
+      return ApiResult.failure(e.toString());
+    }
+  }
+
+  // ──────────────────────────────────────────────
+  // CONTACT INFO
+  // ──────────────────────────────────────────────
+
+  /// Update contact info (profile data: name, phone, address, etc.)
+  Future<ApiResult<bool>> updateContactInfo({
+    required int contactId,
+    required String fullName,
+    required String email,
+    required String phone,
+    required String fullAddress,
+    required int gender,
+    required String dateOfBirth,
+    int cityId = 1,
+  }) async {
+    try {
+      await _client.put(
+        ApiEndpoints.contactInfoById(contactId),
+        data: {
+          'fullName': fullName,
+          'email': email,
+          'phone': phone,
+          'fullAddress': fullAddress,
+          'gender': gender,
+          'dateOfBirth': dateOfBirth,
+          'googlePlaceId': 'app-manual-entry',
+          'languageCode': 'hr',
+          'country': 'Croatia',
+          'cityId': cityId,
+        },
+      );
+      return ApiResult.success(true);
+    } catch (e) {
+      debugPrint('[AppApiService] updateContactInfo error: $e');
+      return ApiResult.failure(e.toString());
+    }
+  }
+
+  /// Update student-specific fields (facultyId, studentNumber).
+  Future<ApiResult<bool>> updateStudent({
+    required int studentId,
+    int? facultyId,
+    String? studentNumber,
+  }) async {
+    try {
+      final data = <String, dynamic>{};
+      if (facultyId != null) data['facultyId'] = facultyId;
+      if (studentNumber != null) data['studentNumber'] = studentNumber;
+      if (data.isEmpty) return ApiResult.success(true);
+      await _client.put(ApiEndpoints.studentById(studentId), data: data);
+      return ApiResult.success(true);
+    } catch (e) {
+      debugPrint('[AppApiService] updateStudent error: $e');
+      return ApiResult.failure(e.toString());
+    }
+  }
+
+  // ──────────────────────────────────────────────
   // MAPPERS
   // ──────────────────────────────────────────────
 
@@ -232,6 +402,13 @@ class AppApiService {
       final hr = translations['hr'] as Map<String, dynamic>?;
       return (hr?['name'] as String?) ?? 'Usluga';
     }).toList();
+
+    // Extract service IDs for repeat order
+    final serviceIds = services
+        .map((s) => (s['id'] as num?)?.toInt())
+        .where((id) => id != null)
+        .cast<int>()
+        .toList();
 
     // Mapiranje rasporeda u dayEntries
     final dayEntries = schedules.map((s) {
@@ -283,6 +460,7 @@ class AppApiService {
       id: (json['id'] as num?)?.toInt() ?? 0,
       seniorId: (json['seniorId'] as num?)?.toInt().toString() ?? '',
       services: serviceNames,
+      serviceIds: serviceIds,
       date: startDate,
       frequency: frequency,
       status: _mapOrderStatus(json['status']),
@@ -294,6 +472,8 @@ class AppApiService {
       endDate: endDate,
       weekday: firstWeekday,
       durationHours: firstDurHours,
+      fromHour: firstStart.hour,
+      fromMinute: firstStart.minute,
     );
   }
 
@@ -360,6 +540,8 @@ class AppApiService {
       }
     }
     return schedule_review.ReviewModel(
+      id: (json['id'] as num?)?.toInt(),
+      jobInstanceId: (json['jobInstanceId'] as num?)?.toInt(),
       rating: (json['rating'] as num?)?.toInt() ?? 0,
       comment: json['comment'] as String? ?? '',
       date: dateStr,

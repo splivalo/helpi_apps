@@ -125,8 +125,10 @@ class AppStrings {
       'forgotPasswordSubtitle': 'Unesite email adresu za slanje koda',
       'sendResetCode': 'Pošalji kod',
       'resetCode': 'Kod za resetiranje',
+      'currentPassword': 'Trenutna lozinka',
       'newPassword': 'Nova lozinka',
       'confirmNewPassword': 'Potvrdi novu lozinku',
+      'passwordsMismatch': 'Lozinke se ne podudaraju',
       'resetPasswordButton': 'Resetiraj lozinku',
       'resetPasswordSuccess': 'Lozinka uspješno promijenjena',
       'codeSent': 'Kod poslan na email',
@@ -326,6 +328,10 @@ class AppStrings {
       'promoCode': 'Promo kod',
       'promoCodeHint': 'Unesite promo kod',
       'promoCodeApply': 'Primijeni',
+      'promoCodeInvalid': 'Nevažeći promo kod',
+      'promoCodeValidating': 'Provjera...',
+      'promoCodeDiscount': 'Popust: {amount}',
+      'promoCodeApplied': 'Promo kod primijenjen',
       'agreeToTerms': 'Slažem se s ',
       'termsOfUse': 'uvjetima',
       'byClickingRegister': 'Klikom na "Završi registraciju" prihvaćate ',
@@ -565,8 +571,10 @@ class AppStrings {
       'forgotPasswordSubtitle': 'Enter your email to receive a reset code',
       'sendResetCode': 'Send code',
       'resetCode': 'Reset code',
+      'currentPassword': 'Current password',
       'newPassword': 'New password',
       'confirmNewPassword': 'Confirm new password',
+      'passwordsMismatch': 'Passwords do not match',
       'resetPasswordButton': 'Reset password',
       'resetPasswordSuccess': 'Password changed successfully',
       'codeSent': 'Code sent to email',
@@ -766,6 +774,10 @@ class AppStrings {
       'promoCode': 'Promo code',
       'promoCodeHint': 'Enter promo code',
       'promoCodeApply': 'Apply',
+      'promoCodeInvalid': 'Invalid promo code',
+      'promoCodeValidating': 'Validating...',
+      'promoCodeDiscount': 'Discount: {amount}',
+      'promoCodeApplied': 'Promo code applied',
       'agreeToTerms': 'I agree to the ',
       'termsOfUse': 'terms',
       'byClickingRegister':
@@ -1027,8 +1039,10 @@ class AppStrings {
   static String get forgotPasswordSubtitle => _t('forgotPasswordSubtitle');
   static String get sendResetCode => _t('sendResetCode');
   static String get resetCode => _t('resetCode');
+  static String get currentPassword => _t('currentPassword');
   static String get newPassword => _t('newPassword');
   static String get confirmNewPassword => _t('confirmNewPassword');
+  static String get passwordsMismatch => _t('passwordsMismatch');
   static String get resetPasswordButton => _t('resetPasswordButton');
   static String get resetPasswordSuccess => _t('resetPasswordSuccess');
   static String get codeSent => _t('codeSent');
@@ -1229,6 +1243,11 @@ class AppStrings {
   static String get promoCode => _t('promoCode');
   static String get promoCodeHint => _t('promoCodeHint');
   static String get promoCodeApply => _t('promoCodeApply');
+  static String get promoCodeInvalid => _t('promoCodeInvalid');
+  static String get promoCodeValidating => _t('promoCodeValidating');
+  static String promoCodeDiscount(String amount) =>
+      _t('promoCodeDiscount', params: {'amount': amount});
+  static String get promoCodeApplied => _t('promoCodeApplied');
   static String get agreeToTerms => _t('agreeToTerms');
   static String get termsOfUse => _t('termsOfUse');
   static String get byClickingRegister => _t('byClickingRegister');

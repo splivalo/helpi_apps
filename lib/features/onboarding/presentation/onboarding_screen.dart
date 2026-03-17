@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/core/network/token_storage.dart';
+import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/features/schedule/data/availability_model.dart';
 import 'package:helpi_app/features/schedule/utils/availability_helpers.dart';
 import 'package:helpi_app/features/schedule/widgets/availability_day_row.dart';
@@ -41,6 +43,36 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (changed) {
       setState(() {});
       widget.availabilityNotifier.notify();
+    }
+  }
+
+  bool _isSaving = false;
+
+  /// Spremi dostupnost na backend i završi onboarding.
+  Future<void> _saveAndComplete() async {
+    if (_isSaving) return;
+    setState(() => _isSaving = true);
+
+    final userId = await TokenStorage().getUserId();
+    if (userId == null || !mounted) {
+      setState(() => _isSaving = false);
+      return;
+    }
+
+    final api = AppApiService();
+    final payload = widget.availabilityNotifier.toBackendPayload(userId);
+    final result = await api.updateStudentAvailability(payload);
+
+    if (!mounted) return;
+
+    setState(() => _isSaving = false);
+
+    if (result.success) {
+      widget.onComplete();
+    } else {
+      // Prikaži grešku ali ipak dozvoli nastavak
+      debugPrint('[Onboarding] save failed: ${result.error}');
+      widget.onComplete();
     }
   }
 
@@ -93,7 +125,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: _canFinish ? widget.onComplete : null,
+                  onPressed: (_canFinish && !_isSaving)
+                      ? _saveAndComplete
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: HelpiTheme.coral,
                     foregroundColor: Colors.white,
@@ -108,7 +142,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  child: Text(AppStrings.onboardingFinish),
+                  child: _isSaving
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(AppStrings.onboardingFinish),
                 ),
               ),
               const SizedBox(height: 24),
