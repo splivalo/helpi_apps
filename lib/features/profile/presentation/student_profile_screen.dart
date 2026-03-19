@@ -690,13 +690,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         child: hasFaculty
             ? Text(
-                _selectedFaculty!.name,
+                _selectedFaculty!.abbreviation.isNotEmpty
+                    ? '${_selectedFaculty!.abbreviation} — ${_selectedFaculty!.name}'
+                    : _selectedFaculty!.name,
                 style: TextStyle(
                   color: _isEditing
                       ? theme.colorScheme.onSurface
                       : theme.colorScheme.onSurface.withAlpha(153),
                   fontSize: 16,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               )
             : Text(
                 AppStrings.facultyHint,

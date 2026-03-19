@@ -1,12 +1,17 @@
 /// Faculty model — loaded from backend API.
 class Faculty {
-  const Faculty({required this.id, required this.name});
+  const Faculty({
+    required this.id,
+    required this.name,
+    required this.abbreviation,
+  });
 
   final int id;
   final String name;
+  final String abbreviation;
 
   /// Parse a single faculty from the backend JSON response.
-  /// Backend format: { "id": 1, "translations": { "hr": { "name": "..." }, "en": { "name": "..." } } }
+  /// Backend format: { "id": 1, "translations": { "hr": { "name": "...", "abbreviation": "..." }, "en": { ... } } }
   factory Faculty.fromJson(Map<String, dynamic> json, {String lang = 'hr'}) {
     final id = json['id'] as int;
     final translations = json['translations'] as Map<String, dynamic>? ?? {};
@@ -16,7 +21,11 @@ class Faculty {
         (langMap?['name'] as String?) ??
         (fallbackMap?['name'] as String?) ??
         'Faculty $id';
-    return Faculty(id: id, name: name);
+    final abbreviation =
+        (langMap?['abbreviation'] as String?) ??
+        (fallbackMap?['abbreviation'] as String?) ??
+        '';
+    return Faculty(id: id, name: name, abbreviation: abbreviation);
   }
 
   /// Parse list of faculties from API response.

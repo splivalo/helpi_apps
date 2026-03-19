@@ -436,11 +436,15 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
         ),
         child: hasFaculty
             ? Text(
-                _selectedFaculty!.name,
+                _selectedFaculty!.abbreviation.isNotEmpty
+                    ? '${_selectedFaculty!.abbreviation} — ${_selectedFaculty!.name}'
+                    : _selectedFaculty!.name,
                 style: TextStyle(
                   color: theme.colorScheme.onSurface,
                   fontSize: 16,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               )
             : Text(
                 AppStrings.facultyHint,

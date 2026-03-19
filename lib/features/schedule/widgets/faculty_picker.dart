@@ -49,7 +49,8 @@ class _FacultyPickerSheetState extends State<_FacultyPickerSheet> {
         _filtered = widget.faculties;
       } else {
         _filtered = widget.faculties.where((f) {
-          return f.name.toLowerCase().contains(q);
+          return f.abbreviation.toLowerCase().contains(q) ||
+              f.name.toLowerCase().contains(q);
         }).toList();
       }
     });
@@ -141,10 +142,19 @@ class _FacultyPickerSheetState extends State<_FacultyPickerSheet> {
                             selectedTileColor: HelpiTheme.teal.withAlpha(20),
                             selectedColor: HelpiTheme.teal,
                             title: Text(
-                              f.name,
+                              f.abbreviation.isNotEmpty
+                                  ? f.abbreviation
+                                  : f.name,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 15,
+                              ),
+                            ),
+                            subtitle: Text(
+                              f.name,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: HelpiTheme.textSecondary,
                               ),
                             ),
                             trailing: isSelected
