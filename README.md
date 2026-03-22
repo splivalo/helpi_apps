@@ -4,17 +4,17 @@ Merged Flutter app (Customer [Senior] + Student) — 64 .dart files, 0 errors.
 
 ## 📖 Za Sidney-a — Što čitati (sva 3 repoa)
 
-| Repo            | Fajl                      | Sadržaj                                          |
-| --------------- | ------------------------- | ------------------------------------------------ |
-| **helpi_admin** | **docs/ROADMAP.md**       | **Svi preostali TODO-ovi (START HERE)**          |
-| helpi_admin     | docs/PROGRESS.md          | Admin app status (98% frontend done)             |
-| helpi_admin     | docs/ARCHITECTURE.md      | Admin tech stack, folder structure, UI standardi |
-| helpi_admin     | docs/PROJECT_HISTORY.md   | Kronologija odluka (Feb→Mart 2026)               |
-| helpi_backend   | PROGRESS.md               | Backend task tracking (16 taskova ✅)            |
-| helpi_backend   | README.md                 | DB schema, use case flows, 19 LINQ queries       |
-| helpi_backend   | seeds/README.md           | Test data, login credentials, promo codes        |
-| **helpi_app**   | **README.md (ovaj fajl)** | App tech stack, Riverpod/SignalR info            |
-| helpi_app       | ARCHITECTURE.md           | Folder structure, 64 fajlova, providers          |
+| GitHub repo (splivalo/) | Fajl                      | Sadržaj                                          |
+| ----------------------- | ------------------------- | ------------------------------------------------ |
+| **helpi_administrator** | **docs/ROADMAP.md**       | **Svi preostali TODO-ovi (START HERE)**          |
+| helpi_administrator     | docs/PROGRESS.md          | Admin app status (98% frontend done)             |
+| helpi_administrator     | docs/ARCHITECTURE.md      | Admin tech stack, folder structure, UI standardi |
+| helpi_administrator     | docs/PROJECT_HISTORY.md   | Kronologija odluka (Feb→Mart 2026)               |
+| helpi_backend_v2        | docs/PROGRESS.md          | Backend task tracking (16 taskova ✅)            |
+| helpi_backend_v2        | README.md                 | DB schema, use case flows, 19 LINQ queries       |
+| helpi_backend_v2        | seeds/README.md           | Test data, login credentials, promo codes        |
+| **helpi_apps**          | **README.md (ovaj fajl)** | App tech stack, Riverpod/SignalR info            |
+| helpi_apps              | docs/ARCHITECTURE.md      | Folder structure, 64 fajlova, providers          |
 
 ---
 
@@ -48,6 +48,6 @@ flutter run
 
 ## Documentation
 
-- [PROGRESS.md](PROGRESS.md) — Status & checklist (64/64 files done)
-- [ARCHITECTURE.md](ARCHITECTURE.md) — Tech stack & folder structure
-- [PROJECT_HISTORY.md](PROJECT_HISTORY.md) — Key decisions & changelog
+- [docs/PROGRESS.md](docs/PROGRESS.md) — Status & checklist (64/64 files done)
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — Tech stack & folder structure
+- [docs/PROJECT_HISTORY.md](docs/PROJECT_HISTORY.md) — Key decisions & changelog
