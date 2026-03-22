@@ -18,17 +18,22 @@
 | Framework | Flutter 3.x                               |
 | HTTP      | Dio 5.x                                   |
 | Auth      | JWT (FlutterSecureStorage)                |
-| State     | ValueNotifier / setState                  |
+| State     | **Riverpod** (flutter_riverpod ^2.6.1)    |
+| Real-time | **SignalR** (signalr_netcore ^1.4.4)      |
 | i18n      | AppStrings (HR/EN, Gemini Hybrid pattern) |
 | Assets    | SVG (flutter_svg)                         |
+
+> **Migracija 2026-03-22:** State management prebačen s ValueNotifier/setState na Riverpod.
+> `app.dart`, `schedule_screen.dart`, `statistics_screen.dart` su sada `ConsumerStatefulWidget`.
+> SignalR se automatski spaja na `/hubs/notifications` pri loginu i osvježava podatke u real-time.
 
 ## Direktorij Struktura
 
 ```
 lib/
-├── main.dart                          # Entry point
+├── main.dart                          # Entry point (ProviderScope wrapper)
 ├── app/
-│   ├── app.dart                       # Root widget, role-based routing
+│   ├── app.dart                       # Root widget, role-based routing (ConsumerStatefulWidget)
 │   ├── theme.dart                     # HelpiTheme (Material 3)
 │   ├── senior_shell.dart              # Customer: 4 taba (Naruči, Narudžbe, Poruke, Profil)
 │   └── student_shell.dart             # Student: 4 taba (Raspored, Poruke, Statistika, Profil)
@@ -40,17 +45,25 @@ lib/
 │   │   ├── app_strings.dart           # i18n (HR+EN, ~1000+ ključeva)
 │   │   └── locale_notifier.dart       # ValueNotifier<Locale>
 │   ├── network/
-│   │   ├── api_client.dart            # Dio wrapper s JWT interceptorom
+│   │   ├── api_client.dart            # Dio wrapper s JWT interceptorom + 403 suspension handler
 │   │   ├── api_endpoints.dart         # Svi API putevi
 │   │   └── token_storage.dart         # FlutterSecureStorage (token, userId, userType)
+│   ├── providers/                     # === RIVERPOD PROVIDERS (dodano 2026-03-22) ===
+│   │   ├── auth_provider.dart         # AuthState + AuthNotifier (StateNotifier) — centralni auth state
+│   │   ├── signalr_provider.dart      # SignalRService — WebSocket na /hubs/notifications, JWT, auto-reconnect
+│   │   ├── realtime_sync_provider.dart # Bridža SignalR evente → data refresh (orders/jobs)
+│   │   └── jobs_provider.dart         # JobsState + JobsNotifier — reaktivni student jobs
 │   ├── services/
-│   │   └── auth_service.dart          # Login, logout, register, forgot/reset password
+│   │   ├── auth_service.dart          # Login, logout, register, forgot/reset password
+│   │   ├── data_loader.dart           # Data loading service
+│   │   └── app_api_service.dart       # App API service
 │   └── utils/
 │       ├── formatters.dart            # AppFormatters (datum formatiranje)
 │       └── snackbar_helper.dart       # showHelpiSnackBar
 ├── features/
 │   ├── auth/presentation/
-│   │   └── login_screen.dart          # Zajednički login + registracija s role pickerom
+│   │   ├── login_screen.dart          # Zajednički login + registracija s role pickerom
+│   │   └── suspended_screen.dart      # Ekran za suspendirane korisnike (razlog + kontakt)
 │   ├── booking/                       # === CUSTOMER ONLY ===
 │   │   ├── data/
 │   │   │   └── order_model.dart       # OrderModel, OrdersNotifier, JobModel, ReviewModel
@@ -65,7 +78,7 @@ lib/
 │   │   │   ├── review_model.dart       # ReviewModel (student verzija)
 │   │   │   └── availability_model.dart # DayAvailability, AvailabilityNotifier
 │   │   ├── presentation/
-│   │   │   ├── schedule_screen.dart    # Tjedni raspored
+│   │   │   ├── schedule_screen.dart    # Tjedni raspored (ConsumerStatefulWidget, jobsProvider)
 │   │   │   └── job_detail_screen.dart  # Detalji posla + review/decline
 │   │   ├── widgets/
 │   │   │   ├── availability_day_row.dart
@@ -86,7 +99,7 @@ lib/
 │   │   ├── senior_profile_screen.dart   # Customer profil
 │   │   └── student_profile_screen.dart  # Student profil (+ dostupnost)
 │   ├── statistics/presentation/
-│   │   └── statistics_screen.dart       # Student statistika (weekly/monthly)
+│   │   └── statistics_screen.dart       # Student statistika (ConsumerStatefulWidget, jobsProvider)
 │   └── onboarding/presentation/
 │       ├── registration_data_screen.dart # Student registracija (osobni podaci)
 │       └── onboarding_screen.dart        # Student onboarding (dostupnost)

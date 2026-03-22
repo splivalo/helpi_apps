@@ -55,13 +55,53 @@
 
 ---
 
+## 2026-03-22 — Suspension ekran + 403 handler
+
+**Problem:** Suspendirani korisnici mogli su i dalje koristiti app normalno.
+
+**Odluka:**
+
+1. `suspended_screen.dart` — dedicirani ekran s razlogom suspenzije, kontakt info, i delete account
+2. `ApiClient` Dio interceptor hvata HTTP 403 → trigera `onSuspended` callback → app prikazuje suspension ekran
+3. Backend `SuspensionCheckMiddleware.cs` vraća 403 za sve rute (osim auth/suspensions endpointova)
+4. Backend `OrdersService.CreateOrderAsync()` provjerava `IsSuspended` na Senior→Customer→User lancu
+
+**Commit:** helpi_app `5ca6a13`, backend `a652bff`
+
+---
+
+## 2026-03-22 — Riverpod + SignalR real-time arhitektura
+
+**Problem:** App koristio setState/ValueNotifier — nema reaktivnosti, nema real-time refresha. Admin promijeni nešto u backendu, user mora ručno refreshat.
+
+**Odluka:** Migracija na Riverpod + SignalR:
+
+1. **flutter_riverpod ^2.6.1** — `ProviderScope` u main.dart, `ConsumerStatefulWidget` na key ekranima
+2. **signalr_netcore ^1.4.4** — WebSocket konekcija na `/hubs/notifications` s JWT auth
+3. **4 providera** u `lib/core/providers/`:
+   - `auth_provider.dart` — AuthState + AuthNotifier (StateNotifier), zamjenjuje sve lokalne setState iz app.dart
+   - `signalr_provider.dart` — SignalRService, auto-connect na login, auto-disconnect na logout, exponential backoff reconnect
+   - `realtime_sync_provider.dart` — Sluša `ReceiveNotification` + `SystemNotification` SignalR evente, auto-refresh orders (senior) ili jobs (student)
+   - `jobs_provider.dart` — JobsState + JobsNotifier za reaktivni student raspored i statistiku
+4. **Konvertirani ekrani:** `app.dart`, `schedule_screen.dart`, `statistics_screen.dart` → ConsumerStatefulWidget
+5. **Backward compat:** OrdersNotifier (ChangeNotifier) ostaje, RealTimeSyncService poziva `replaceAll()` → `notifyListeners()` → OrdersScreen/OrderDetailScreen se auto-rebuilda
+
+**Ključno:** Sidney-ev app koristi GoRouter + Freezed + Retrofit — mi NE koristimo nijednu od tih libova. Migracija je rađena "naš way" sa postojećim Dio/FlutterSecureStorage/Navigator.
+
+**Commit:** `213fd5e` (10 fajlova, 674 insertions, 225 deletions)
+
+---
+
 ## Statistika
 
-| Metrika                       | Vrijednost     |
-| ----------------------------- | -------------- |
-| Ukupno .dart fajlova          | 55             |
-| Analyze errori                | 0              |
-| i18n ključeva                 | ~1000+ (HR+EN) |
-| Shared widgets                | 11             |
-| Feature screens               | 14             |
-| Backend endpointi (korišteni) | 6              |
+| Metrika                       | Vrijednost              |
+| ----------------------------- | ----------------------- |
+| Ukupno .dart fajlova          | 64                      |
+| Analyze errori                | 0                       |
+| i18n ključeva                 | ~1000+ (HR+EN)          |
+| Shared widgets                | 12                      |
+| Feature screens               | 15 (+ suspended_screen) |
+| Riverpod providers            | 4                       |
+| Backend endpointi (korišteni) | 6                       |
+| State management              | Riverpod ^2.6.1         |
+| Real-time                     | SignalR ^1.4.4          |

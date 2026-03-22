@@ -2,11 +2,13 @@
 
 > Merged Flutter app (Customer + Student) — zamjenjuje `helpi_senior` + `helpi_student`
 
-## Status: UI Prototype Complete (Frontend Only)
+## Status: UI Prototype + Real-Time Architecture
 
-**Datum:** 15.03.2026.  
+**Datum:** 22.03.2026.  
 **Analyze:** 0 errors, 0 warnings  
-**Fajlovi:** 55 .dart files
+**Fajlovi:** 64 .dart files  
+**State mgmt:** Riverpod (flutter_riverpod ^2.6.1)  
+**Real-time:** SignalR (signalr_netcore ^1.4.4)
 
 ---
 
@@ -66,10 +68,10 @@
 
 ### Navigation & App Shell (4/4) — 100%
 
-- [x] app.dart — root widget, role-based routing
+- [x] app.dart — root widget, role-based routing (**ConsumerStatefulWidget**, Riverpod)
 - [x] senior_shell.dart — 4 taba (Naruči, Narudžbe, Poruke, Profil)
 - [x] student_shell.dart — 4 taba (Raspored, Poruke, Statistika, Profil)
-- [x] main.dart — entry point
+- [x] main.dart — entry point (**ProviderScope** wrapper)
 
 ### Student-Specific Widgets (7/7) — 100%
 
@@ -87,11 +89,32 @@
 - [x] formatters.dart (student verzija)
 - [x] availability_helpers.dart
 
+### Riverpod Providers (4/4) — 100% (dodano 2026-03-22)
+
+- [x] auth_provider.dart — AuthState + AuthNotifier (StateNotifier), zamjenjuje sve setState iz app.dart
+- [x] signalr_provider.dart — SignalRService, WebSocket na `/hubs/notifications`, JWT auth, auto-reconnect
+- [x] realtime_sync_provider.dart — Bridža SignalR evente na data refresh (orders/jobs)
+- [x] jobs_provider.dart — JobsState + JobsNotifier (StateNotifier) za student raspored + statistiku
+
+### Suspension (1/1) — 100% (dodano 2026-03-22)
+
+- [x] suspended_screen.dart — Ekran za suspendirane korisnike (razlog + kontakt + delete account)
+
+### Additional Services (2/2) — 100%
+
+- [x] data_loader.dart — Data loading service
+- [x] app_api_service.dart — App API service
+
+### Additional Shared (2/2) — 100%
+
+- [x] mc_address_field.dart — Address field widget
+- [x] selected_address_info.dart — Address info model
+
 ---
 
-## Ukupno: 55/55 fajlova — 100% frontend UI
+## Ukupno: 64/64 fajlova — 100% frontend UI + real-time
 
-### Verzija (2026-03-15)
+### Verzija (2026-03-22)
 
 - [x] App version → 2.0.0 (pubspec.yaml: 2.0.0+1)
 - [x] AppStrings `appVersion` → "Helpi v2.0.0" (HR + EN)
