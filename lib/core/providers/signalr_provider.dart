@@ -26,8 +26,7 @@ class SignalRService {
   final Map<String, List<void Function(List<Object?>?)>> _handlers = {};
 
   bool get isConnected =>
-      _connection != null &&
-      _connection!.state == HubConnectionState.Connected;
+      _connection != null && _connection!.state == HubConnectionState.Connected;
 
   String get _hubUrl => '${ApiEndpoints.baseUrl}/hubs/notifications';
 

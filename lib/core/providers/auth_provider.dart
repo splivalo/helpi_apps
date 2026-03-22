@@ -49,19 +49,18 @@ class AuthState {
       isLoggedIn: isLoggedIn ?? this.isLoggedIn,
       userType: clearUserType ? null : (userType ?? this.userType),
       isSuspended: isSuspended ?? this.isSuspended,
-      suspendReason:
-          clearSuspendReason ? null : (suspendReason ?? this.suspendReason),
+      suspendReason: clearSuspendReason
+          ? null
+          : (suspendReason ?? this.suspendReason),
       needsRegistrationData:
           needsRegistrationData ?? this.needsRegistrationData,
       needsOnboarding: needsOnboarding ?? this.needsOnboarding,
-      pendingStudentEmail:
-          clearPendingEmail
-              ? null
-              : (pendingStudentEmail ?? this.pendingStudentEmail),
-      pendingStudentPassword:
-          clearPendingPassword
-              ? null
-              : (pendingStudentPassword ?? this.pendingStudentPassword),
+      pendingStudentEmail: clearPendingEmail
+          ? null
+          : (pendingStudentEmail ?? this.pendingStudentEmail),
+      pendingStudentPassword: clearPendingPassword
+          ? null
+          : (pendingStudentPassword ?? this.pendingStudentPassword),
     );
   }
 }
