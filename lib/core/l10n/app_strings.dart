@@ -463,6 +463,14 @@ class AppStrings {
           'Ova rezervacija vrijedi do kraja mjeseca {month}. '
           'Automatski se obnavlja sljedeći mjesec ako student '
           'produži dostupnost. Možete otkazati bilo kada.',
+
+      // ── Suspenzija ────────────────────────────────────
+      'suspendedTitle': 'Račun suspendiran',
+      'suspendedMessage': 'Vaš račun je privremeno suspendiran.',
+      'suspendedReason': 'Razlog: {reason}',
+      'suspendedContact': 'Za više informacija obratite se podršci:',
+      'suspendedEmail': 'podrska@helpi.hr',
+      'suspendedLogout': 'Odjavi se',
     },
     'en': {
       // ── App ───────────────────────────────────
@@ -912,6 +920,14 @@ class AppStrings {
           'This booking is valid until the end of {month}. '
           'It auto-renews next month if the student extends '
           'availability. You can cancel anytime.',
+
+      // ── Suspension ────────────────────────────────────
+      'suspendedTitle': 'Account Suspended',
+      'suspendedMessage': 'Your account has been temporarily suspended.',
+      'suspendedReason': 'Reason: {reason}',
+      'suspendedContact': 'For more information, contact support:',
+      'suspendedEmail': 'support@helpi.hr',
+      'suspendedLogout': 'Log out',
     },
   };
 
@@ -933,6 +949,15 @@ class AppStrings {
   // ── App ───────────────────────────────────────
   static String get appName => _t('appName');
   static String get appTagline => _t('appTagline');
+
+  // ── Suspenzija ──
+  static String get suspendedTitle => _t('suspendedTitle');
+  static String get suspendedMessage => _t('suspendedMessage');
+  static String suspendedReason(String reason) =>
+      _t('suspendedReason', params: {'reason': reason});
+  static String get suspendedContact => _t('suspendedContact');
+  static String get suspendedEmail => _t('suspendedEmail');
+  static String get suspendedLogout => _t('suspendedLogout');
   static String get quickActionsTitle => _t('quickActionsTitle');
   static String get topBadge => _t('topBadge');
 

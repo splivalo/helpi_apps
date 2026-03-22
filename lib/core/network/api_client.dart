@@ -2,10 +2,16 @@ import 'package:dio/dio.dart';
 import 'api_endpoints.dart';
 import 'token_storage.dart';
 
+/// Callback za suspenziju — poziva se iz interceptora.
+typedef SuspensionCallback = void Function(String? reason);
+
 /// Dio HTTP klijent s automatskim JWT umetanjem.
 class ApiClient {
   late final Dio _dio;
   final TokenStorage _tokenStorage;
+
+  /// Postavlja se jednom iz App widgeta.
+  static SuspensionCallback? onSuspended;
 
   ApiClient({TokenStorage? tokenStorage})
     : _tokenStorage = tokenStorage ?? TokenStorage() {
@@ -30,6 +36,13 @@ class ApiClient {
         onError: (error, handler) async {
           if (error.response?.statusCode == 401) {
             await _tokenStorage.clearAll();
+          } else if (error.response?.statusCode == 403) {
+            final data = error.response?.data;
+            if (data is Map<String, dynamic> &&
+                data['error'] == 'AccountSuspended') {
+              final reason = data['reason'] as String?;
+              onSuspended?.call(reason);
+            }
           }
           return handler.next(error);
         },

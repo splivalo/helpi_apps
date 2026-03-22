@@ -6,9 +6,11 @@ import 'package:helpi_app/app/student_shell.dart';
 import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/l10n/locale_notifier.dart';
+import 'package:helpi_app/core/network/api_client.dart';
 import 'package:helpi_app/core/services/auth_service.dart';
 import 'package:helpi_app/core/services/data_loader.dart';
 import 'package:helpi_app/features/auth/presentation/login_screen.dart';
+import 'package:helpi_app/features/auth/presentation/suspended_screen.dart';
 import 'package:helpi_app/features/booking/data/order_model.dart';
 import 'package:helpi_app/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:helpi_app/features/onboarding/presentation/registration_data_screen.dart';
@@ -30,6 +32,8 @@ class _HelpiAppState extends State<HelpiApp> {
 
   bool _isLoggedIn = false;
   String? _userType;
+  bool _isSuspended = false;
+  String? _suspendReason;
 
   // Student-only flow state:
   bool _needsRegistrationData = false;
@@ -40,7 +44,16 @@ class _HelpiAppState extends State<HelpiApp> {
   @override
   void initState() {
     super.initState();
+    ApiClient.onSuspended = _handleSuspension;
     _checkExistingSession();
+  }
+
+  void _handleSuspension(String? reason) {
+    if (!mounted) return;
+    setState(() {
+      _isSuspended = true;
+      _suspendReason = reason;
+    });
   }
 
   Future<void> _checkExistingSession() async {
@@ -116,6 +129,8 @@ class _HelpiAppState extends State<HelpiApp> {
     setState(() {
       _isLoggedIn = false;
       _userType = null;
+      _isSuspended = false;
+      _suspendReason = null;
       _needsRegistrationData = false;
       _needsOnboarding = false;
       _pendingStudentEmail = null;
@@ -148,6 +163,11 @@ class _HelpiAppState extends State<HelpiApp> {
   }
 
   Widget _buildHome() {
+    // 0. Suspendiran → SuspendedScreen
+    if (_isSuspended) {
+      return SuspendedScreen(reason: _suspendReason, onLogout: _handleLogout);
+    }
+
     // 1. Nije logiran → LoginScreen
     if (!_isLoggedIn) {
       return LoginScreen(
