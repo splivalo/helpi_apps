@@ -2,6 +2,22 @@
 
 Merged Flutter app (Customer [Senior] + Student) — 64 .dart files, 0 errors.
 
+## 📖 Za Sidney-a — Što čitati (sva 3 repoa)
+
+| Repo            | Fajl                      | Sadržaj                                          |
+| --------------- | ------------------------- | ------------------------------------------------ |
+| **helpi_admin** | **docs/ROADMAP.md**       | **Svi preostali TODO-ovi (START HERE)**          |
+| helpi_admin     | docs/PROGRESS.md          | Admin app status (98% frontend done)             |
+| helpi_admin     | docs/ARCHITECTURE.md      | Admin tech stack, folder structure, UI standardi |
+| helpi_admin     | docs/PROJECT_HISTORY.md   | Kronologija odluka (Feb→Mart 2026)               |
+| helpi_backend   | PROGRESS.md               | Backend task tracking (16 taskova ✅)            |
+| helpi_backend   | README.md                 | DB schema, use case flows, 19 LINQ queries       |
+| helpi_backend   | seeds/README.md           | Test data, login credentials, promo codes        |
+| **helpi_app**   | **README.md (ovaj fajl)** | App tech stack, Riverpod/SignalR info            |
+| helpi_app       | ARCHITECTURE.md           | Folder structure, 64 fajlova, providers          |
+
+---
+
 ## Tech Stack
 
 - Flutter 3.x, Dio 5.x, JWT (FlutterSecureStorage)
