@@ -1,145 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:helpi_app/app/senior_shell.dart';
 import 'package:helpi_app/app/student_shell.dart';
 import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/l10n/locale_notifier.dart';
-import 'package:helpi_app/core/network/api_client.dart';
-import 'package:helpi_app/core/services/auth_service.dart';
-import 'package:helpi_app/core/services/data_loader.dart';
+import 'package:helpi_app/core/providers/auth_provider.dart';
+import 'package:helpi_app/core/providers/realtime_sync_provider.dart';
+import 'package:helpi_app/core/providers/signalr_provider.dart';
 import 'package:helpi_app/features/auth/presentation/login_screen.dart';
 import 'package:helpi_app/features/auth/presentation/suspended_screen.dart';
-import 'package:helpi_app/features/booking/data/order_model.dart';
 import 'package:helpi_app/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:helpi_app/features/onboarding/presentation/registration_data_screen.dart';
-import 'package:helpi_app/features/schedule/data/availability_model.dart';
 
 /// Root widget — role-based routing između Customer i Student shella.
-class HelpiApp extends StatefulWidget {
+class HelpiApp extends ConsumerStatefulWidget {
   const HelpiApp({super.key});
 
   @override
-  State<HelpiApp> createState() => _HelpiAppState();
+  ConsumerState<HelpiApp> createState() => _HelpiAppState();
 }
 
-class _HelpiAppState extends State<HelpiApp> {
+class _HelpiAppState extends ConsumerState<HelpiApp> {
   final _localeNotifier = LocaleNotifier();
-  final _authService = AuthService();
-  final _availabilityNotifier = AvailabilityNotifier();
-  final _ordersNotifier = OrdersNotifier();
-
-  bool _isLoggedIn = false;
-  String? _userType;
-  bool _isSuspended = false;
-  String? _suspendReason;
-
-  // Student-only flow state:
-  bool _needsRegistrationData = false;
-  bool _needsOnboarding = false;
-  String? _pendingStudentEmail;
-  String? _pendingStudentPassword;
-
-  @override
-  void initState() {
-    super.initState();
-    ApiClient.onSuspended = _handleSuspension;
-    _checkExistingSession();
-  }
-
-  void _handleSuspension(String? reason) {
-    if (!mounted) return;
-    setState(() {
-      _isSuspended = true;
-      _suspendReason = reason;
-    });
-  }
-
-  Future<void> _checkExistingSession() async {
-    try {
-      final loggedIn = await _authService.isLoggedIn();
-      if (!loggedIn) return;
-
-      final userType = await _authService.getCurrentUserType();
-      if (!mounted) return;
-
-      setState(() {
-        _isLoggedIn = true;
-        _userType = userType;
-      });
-
-      // Učitaj podatke u pozadini
-      DataLoader.loadAll(
-        ordersNotifier: userType == 'Customer' ? _ordersNotifier : null,
-        availabilityNotifier: userType == 'Student'
-            ? _availabilityNotifier
-            : null,
-      );
-    } catch (_) {
-      // Nikad ne blokiraj startup
-    }
-  }
-
-  // ── Login: API pozvan, token + userType spremljeni ──
-  Future<void> _handleLoginSuccess() async {
-    final userType = await _authService.getCurrentUserType();
-    if (!mounted) return;
-
-    setState(() {
-      _isLoggedIn = true;
-      _userType = userType;
-    });
-
-    // Učitaj podatke u pozadini
-    DataLoader.loadAll(
-      ordersNotifier: userType == 'Customer' ? _ordersNotifier : null,
-      availabilityNotifier: userType == 'Student'
-          ? _availabilityNotifier
-          : null,
-    );
-  }
-
-  // ── Register: profil dovršen u LoginScreen (Customer flow) ──
-  void _handleRegisterSuccess() {
-    setState(() {
-      _isLoggedIn = true;
-      _userType = 'Customer';
-    });
-  }
-
-  // ── Register: Student odabrao ulogu, ide na RegistrationData ──
-  void _handleStudentRegisterSuccess(String email, String password) {
-    setState(() {
-      _isLoggedIn = true;
-      _userType = 'Student';
-      _needsRegistrationData = true;
-      _pendingStudentEmail = email;
-      _pendingStudentPassword = password;
-    });
-  }
-
-  // ── Logout ──
-  Future<void> _handleLogout() async {
-    await _authService.logout();
-    _availabilityNotifier.reset();
-    DataLoader.reset();
-    if (!mounted) return;
-
-    setState(() {
-      _isLoggedIn = false;
-      _userType = null;
-      _isSuspended = false;
-      _suspendReason = null;
-      _needsRegistrationData = false;
-      _needsOnboarding = false;
-      _pendingStudentEmail = null;
-      _pendingStudentPassword = null;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
+    final auth = ref.watch(authProvider);
+
+    // Eagerly initialize SignalR + real-time sync
+    ref.watch(signalRProvider);
+    ref.watch(realTimeSyncProvider);
+
     return ValueListenableBuilder<Locale>(
       valueListenable: _localeNotifier,
       builder: (context, locale, _) {
@@ -156,78 +50,64 @@ class _HelpiAppState extends State<HelpiApp> {
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          home: _buildHome(),
+          home: _buildHome(auth),
         );
       },
     );
   }
 
-  Widget _buildHome() {
+  Widget _buildHome(AuthState auth) {
+    final authNotifier = ref.read(authProvider.notifier);
+
     // 0. Suspendiran → SuspendedScreen
-    if (_isSuspended) {
-      return SuspendedScreen(reason: _suspendReason, onLogout: _handleLogout);
+    if (auth.isSuspended) {
+      return SuspendedScreen(
+        reason: auth.suspendReason,
+        onLogout: authNotifier.handleLogout,
+      );
     }
 
     // 1. Nije logiran → LoginScreen
-    if (!_isLoggedIn) {
+    if (!auth.isLoggedIn) {
       return LoginScreen(
         localeNotifier: _localeNotifier,
-        onLoginSuccess: _handleLoginSuccess,
-        onRegisterSuccess: _handleRegisterSuccess,
-        onStudentRegisterSuccess: _handleStudentRegisterSuccess,
+        onLoginSuccess: authNotifier.handleLoginSuccess,
+        onRegisterSuccess: authNotifier.handleRegisterSuccess,
+        onStudentRegisterSuccess: authNotifier.handleStudentRegisterSuccess,
       );
     }
 
     // 2. Student: registracija → RegistrationData → Onboarding → Shell
-    if (_userType == 'Student') {
-      if (_needsRegistrationData) {
+    if (auth.userType == 'Student') {
+      if (auth.needsRegistrationData) {
         return RegistrationDataScreen(
-          email: _pendingStudentEmail ?? '',
-          password: _pendingStudentPassword ?? '',
-          onComplete: () {
-            setState(() {
-              _needsRegistrationData = false;
-              _needsOnboarding = true;
-              _pendingStudentEmail = null;
-              _pendingStudentPassword = null;
-            });
-          },
-          onBack: () {
-            setState(() {
-              _isLoggedIn = false;
-              _userType = null;
-              _needsRegistrationData = false;
-              _pendingStudentEmail = null;
-              _pendingStudentPassword = null;
-            });
-          },
+          email: auth.pendingStudentEmail ?? '',
+          password: auth.pendingStudentPassword ?? '',
+          onComplete: authNotifier.completeRegistrationData,
+          onBack: authNotifier.backFromRegistrationData,
         );
       }
 
-      if (_needsOnboarding) {
+      if (auth.needsOnboarding) {
         return OnboardingScreen(
-          availabilityNotifier: _availabilityNotifier,
-          onComplete: () {
-            setState(() => _needsOnboarding = false);
-          },
-          onBack: () {
-            setState(() => _needsRegistrationData = true);
-          },
+          availabilityNotifier: authNotifier.availabilityNotifier,
+          onComplete: authNotifier.completeOnboarding,
+          onBack: authNotifier.backFromOnboarding,
         );
       }
 
       return StudentShell(
         localeNotifier: _localeNotifier,
-        availabilityNotifier: _availabilityNotifier,
-        onLogout: _handleLogout,
+        availabilityNotifier: authNotifier.availabilityNotifier,
+        onLogout: authNotifier.handleLogout,
       );
     }
 
     // 3. Customer (Senior) → SeniorShell
     return SeniorShell(
       localeNotifier: _localeNotifier,
-      onLogout: _handleLogout,
-      ordersNotifier: _ordersNotifier,
+      onLogout: authNotifier.handleLogout,
+      ordersNotifier: authNotifier.ordersNotifier,
     );
   }
 }

@@ -1,28 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
-import 'package:helpi_app/core/network/token_storage.dart';
-import 'package:helpi_app/core/services/app_api_service.dart';
+import 'package:helpi_app/core/providers/jobs_provider.dart';
 import 'package:helpi_app/features/schedule/data/job_model.dart';
 import 'package:helpi_app/features/schedule/utils/formatters.dart';
 import 'package:helpi_app/features/schedule/widgets/helpi_card.dart';
 import 'package:helpi_app/features/schedule/widgets/star_rating.dart';
 
 /// Statistika ekran â€” tjedni/mjeseÄni pregled sati + prosjeÄna ocjena.
-class StatisticsScreen extends StatefulWidget {
+class StatisticsScreen extends ConsumerStatefulWidget {
   const StatisticsScreen({super.key});
 
   @override
-  State<StatisticsScreen> createState() => _StatisticsScreenState();
+  ConsumerState<StatisticsScreen> createState() => _StatisticsScreenState();
 }
 
-class _StatisticsScreenState extends State<StatisticsScreen> {
+class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
   late DateTime _currentWeekStart;
   late DateTime _currentMonthStart;
-  List<Job> _allJobs = [];
-  bool _isLoading = true;
 
   @override
   void initState() {
@@ -31,26 +29,11 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     final today = DateTime(now.year, now.month, now.day);
     _currentWeekStart = today.subtract(Duration(days: today.weekday - 1));
     _currentMonthStart = DateTime(now.year, now.month);
-    _loadJobs();
-  }
-
-  Future<void> _loadJobs() async {
-    final userId = await TokenStorage().getUserId();
-    if (userId == null || !mounted) return;
-
-    final api = AppApiService();
-    final result = await api.getSessionsByStudent(userId);
-    if (!mounted) return;
-
-    if (result.success && result.data != null) {
-      _allJobs = result.data!;
-    } else {
-      _allJobs = List.of(MockJobs.all);
-    }
-    setState(() => _isLoading = false);
   }
 
   // Data helpers
+
+  List<Job> get _allJobs => ref.read(jobsProvider).jobs;
 
   List<Job> get _completedJobs =>
       _allJobs.where((j) => j.status == JobStatus.completed).toList();
@@ -181,7 +164,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
+    final jobsState = ref.watch(jobsProvider);
+
+    if (jobsState.isLoading) {
       return Scaffold(
         backgroundColor: HelpiTheme.offWhite,
         appBar: AppBar(

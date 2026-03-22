@@ -1,0 +1,97 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:helpi_app/core/network/token_storage.dart';
+import 'package:helpi_app/core/providers/auth_provider.dart';
+import 'package:helpi_app/core/providers/jobs_provider.dart';
+import 'package:helpi_app/core/providers/signalr_provider.dart';
+import 'package:helpi_app/core/services/app_api_service.dart';
+
+/// Sluša SignalR evente i automatski osvježava podatke.
+///
+/// Backend šalje "ReceiveNotification" s HNotificationDto koji sadrži
+/// tip notifikacije. Na svaki relevantni event, refreshamo podatke
+/// za trenutnog korisnika.
+class RealTimeSyncService {
+  RealTimeSyncService(this._ref) {
+    _init();
+  }
+
+  final Ref _ref;
+  final _api = AppApiService();
+  final _tokenStorage = TokenStorage();
+  bool _listening = false;
+
+  void _init() {
+    _ref.listen<AuthState>(authProvider, (prev, next) {
+      if (next.isLoggedIn && !next.isSuspended && !_listening) {
+        _startListening();
+        // Initial data load via provider
+        if (next.userType == 'Student') {
+          _ref.read(jobsProvider.notifier).loadJobs();
+        }
+      } else if (prev != null && prev.isLoggedIn && !next.isLoggedIn) {
+        _listening = false;
+      }
+    });
+  }
+
+  void _startListening() {
+    final signalR = _ref.read(signalRProvider);
+    _listening = true;
+
+    signalR.on('ReceiveNotification', (args) {
+      debugPrint('[RealTimeSync] ReceiveNotification: $args');
+      _refreshData();
+    });
+
+    signalR.on('SystemNotification', (args) {
+      debugPrint('[RealTimeSync] SystemNotification: $args');
+      _refreshData();
+    });
+  }
+
+  Future<void> _refreshData() async {
+    final auth = _ref.read(authProvider);
+    if (!auth.isLoggedIn) return;
+
+    final authNotifier = _ref.read(authProvider.notifier);
+
+    if (auth.userType == 'Customer') {
+      await _refreshSeniorOrders(authNotifier);
+    } else if (auth.userType == 'Student') {
+      await _refreshStudentJobs(authNotifier);
+    }
+  }
+
+  Future<void> _refreshSeniorOrders(AuthNotifier authNotifier) async {
+    final seniorId = await _tokenStorage.getSeniorId();
+    if (seniorId == null) return;
+
+    final result = await _api.getOrdersBySenior(seniorId);
+    if (result.success && result.data != null) {
+      authNotifier.ordersNotifier.replaceAll(result.data!);
+      debugPrint(
+        '[RealTimeSync] senior orders refreshed: ${result.data!.length}',
+      );
+    }
+  }
+
+  Future<void> _refreshStudentJobs(AuthNotifier authNotifier) async {
+    final userId = await _tokenStorage.getUserId();
+    if (userId == null) return;
+
+    final result = await _api.getSessionsByStudent(userId);
+    if (result.success && result.data != null) {
+      _ref.read(jobsProvider.notifier).replaceAll(result.data!);
+      debugPrint(
+        '[RealTimeSync] student jobs refreshed: ${result.data!.length}',
+      );
+    }
+  }
+}
+
+/// Eager provider — inicijalizira se čim ga netko čita.
+final realTimeSyncProvider = Provider<RealTimeSyncService>((ref) {
+  return RealTimeSyncService(ref);
+});

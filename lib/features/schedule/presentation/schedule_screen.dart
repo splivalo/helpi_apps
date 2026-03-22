@@ -1,29 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
-import 'package:helpi_app/core/network/token_storage.dart';
-import 'package:helpi_app/core/services/app_api_service.dart';
+import 'package:helpi_app/core/providers/jobs_provider.dart';
 import 'package:helpi_app/features/schedule/data/job_model.dart';
 import 'package:helpi_app/features/schedule/utils/formatters.dart';
 import 'package:helpi_app/features/schedule/widgets/job_status_badge.dart';
 import 'package:helpi_app/features/schedule/presentation/job_detail_screen.dart';
 
 /// Raspored ekran — tjedni strip + lista poslova za odabrani dan.
-class ScheduleScreen extends StatefulWidget {
+class ScheduleScreen extends ConsumerStatefulWidget {
   const ScheduleScreen({super.key});
 
   @override
-  State<ScheduleScreen> createState() => _ScheduleScreenState();
+  ConsumerState<ScheduleScreen> createState() => _ScheduleScreenState();
 }
 
-class _ScheduleScreenState extends State<ScheduleScreen> {
+class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
   late DateTime _selectedDate;
   late DateTime _weekStart;
-  List<Job> _jobs = [];
-  Set<DateTime> _datesWithJobs = {};
-  bool _isLoading = true;
 
   @override
   void initState() {
@@ -31,26 +28,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final now = DateTime.now();
     _selectedDate = DateTime(now.year, now.month, now.day);
     _weekStart = _getWeekStart(_selectedDate);
-    _loadJobs();
-  }
 
-  Future<void> _loadJobs() async {
-    final userId = await TokenStorage().getUserId();
-    if (userId == null || !mounted) return;
-
-    final api = AppApiService();
-    final result = await api.getSessionsByStudent(userId);
-    if (!mounted) return;
-
-    if (result.success && result.data != null) {
-      _jobs = result.data!;
-    } else {
-      _jobs = List.of(MockJobs.all);
-    }
-    _datesWithJobs = {
-      for (final j in _jobs) DateTime(j.date.year, j.date.month, j.date.day),
-    };
-    setState(() => _isLoading = false);
+    // Trigger initial load
+    Future.microtask(() => ref.read(jobsProvider.notifier).loadJobs());
   }
 
   DateTime _getWeekStart(DateTime date) {
@@ -63,8 +43,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     ).subtract(Duration(days: diff));
   }
 
-  List<Job> _jobsForDate(DateTime date) {
-    return _jobs
+  List<Job> _jobsForDate(DateTime date, List<Job> jobs) {
+    return jobs
         .where(
           (j) =>
               j.date.year == date.year &&
@@ -79,8 +59,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       );
   }
 
-  bool _hasJobs(DateTime date) {
-    return _datesWithJobs.contains(DateTime(date.year, date.month, date.day));
+  bool _hasJobs(DateTime date, Set<DateTime> datesWithJobs) {
+    return datesWithJobs.contains(DateTime(date.year, date.month, date.day));
   }
 
   void _selectDate(DateTime date) {
@@ -131,12 +111,8 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         builder: (_) => JobDetailScreen(
           job: job,
           onJobUpdated: (updated) {
-            setState(() {
-              final idx = _jobs.indexWhere((j) => j.id == updated.id);
-              if (idx != -1) {
-                _jobs[idx] = updated;
-              }
-            });
+            // Refresh from API to keep in sync
+            ref.read(jobsProvider.notifier).loadJobs();
           },
         ),
       ),
@@ -145,16 +121,23 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
+    final jobsState = ref.watch(jobsProvider);
+
+    if (jobsState.isLoading) {
       return Scaffold(
         appBar: AppBar(title: Text(AppStrings.scheduleTitle)),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
+    final jobs = jobsState.jobs;
+    final datesWithJobs = {
+      for (final j in jobs) DateTime(j.date.year, j.date.month, j.date.day),
+    };
+
     final theme = Theme.of(context);
     final teal = theme.colorScheme.secondary;
-    final todayJobs = _jobsForDate(_selectedDate);
+    final todayJobs = _jobsForDate(_selectedDate, jobs);
 
     return Scaffold(
       appBar: AppBar(title: Text(AppStrings.scheduleTitle)),
@@ -164,7 +147,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           _WeekStrip(
             weekStart: _weekStart,
             selectedDate: _selectedDate,
-            hasJobs: _hasJobs,
+            hasJobs: (date) => _hasJobs(date, datesWithJobs),
             onDateSelected: _selectDate,
             onPreviousWeek: _previousWeek,
             onNextWeek: _nextWeek,
