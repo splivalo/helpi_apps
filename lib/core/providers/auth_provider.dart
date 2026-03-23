@@ -176,14 +176,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // Pokušaj load — ako uspije, user je aktiviran
       DataLoader.loadAll(
         ordersNotifier: state.userType == 'Customer' ? ordersNotifier : null,
-        availabilityNotifier:
-            state.userType == 'Student' ? availabilityNotifier : null,
+        availabilityNotifier: state.userType == 'Student'
+            ? availabilityNotifier
+            : null,
       ).then((ok) {
         if (ok) {
-          state = state.copyWith(
-            isSuspended: false,
-            clearSuspendReason: true,
-          );
+          state = state.copyWith(isSuspended: false, clearSuspendReason: true);
         }
       });
     } else {

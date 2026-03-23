@@ -68,7 +68,6 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
   final TextEditingController _serviceNoteController = TextEditingController();
 
   // ── Step 3 state ──────────────────────────────
-  final TextEditingController _notesController = TextEditingController();
   final TextEditingController _promoCodeController = TextEditingController();
   String? _appliedPromoCode;
   bool _promoValidating = false;
@@ -104,7 +103,6 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
 
   @override
   void dispose() {
-    _notesController.dispose();
     _promoCodeController.dispose();
     _serviceNoteController.dispose();
     _step1Scroll.dispose();
@@ -1628,7 +1626,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
       'isRecurring': !isOneTime,
       'startDate': fmtDate(date),
       'endDate': fmtDate(apiEndDate),
-      'notes': _notesController.text.trim(),
+      'notes': _serviceNoteController.text.trim(),
       'services': services,
       'schedules': schedules,
       if (!isOneTime) 'recurrencePattern': 0, // 0 = Weekly
