@@ -23,12 +23,14 @@ class AuthResult {
   final String? message;
   final int? userId;
   final String? userType;
+  final bool isConnectionError;
 
   const AuthResult({
     required this.success,
     this.message,
     this.userId,
     this.userType,
+    this.isConnectionError = false,
   });
 }
 
@@ -40,8 +42,8 @@ class AuthService {
     : _tokenStorage = tokenStorage ?? TokenStorage(),
       _apiClient = apiClient ?? ApiClient();
 
-  /// Returns `true` if a user with [email] already exists on the backend.
-  Future<bool> checkEmailExists(String email) async {
+  /// Returns `true` if exists, `false` if not, `null` if server unreachable.
+  Future<bool?> checkEmailExists(String email) async {
     try {
       final response = await _apiClient.get(
         ApiEndpoints.checkEmail,
@@ -49,6 +51,14 @@ class AuthService {
       );
       final data = response.data as Map<String, dynamic>;
       return data['exists'] as bool? ?? false;
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.response == null) {
+        return null;
+      }
+      return false;
     } catch (_) {
       return false;
     }
@@ -84,6 +94,16 @@ class AuthService {
         return AuthResult(
           success: false,
           message: AppStrings.invalidCredentials,
+        );
+      }
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.response == null) {
+        return AuthResult(
+          success: false,
+          message: AppStrings.serverUnavailableTitle,
+          isConnectionError: true,
         );
       }
       return AuthResult(success: false, message: AppStrings.loginError);

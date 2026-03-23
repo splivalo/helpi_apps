@@ -471,6 +471,13 @@ class AppStrings {
       'suspendedContact': 'Za više informacija obratite se podršci:',
       'suspendedEmail': 'podrska@helpi.hr',
       'suspendedLogout': 'Odjavi se',
+
+      // ── Server nedostupan ────────────────────────
+      'serverUnavailableTitle': 'Server nedostupan',
+      'serverUnavailableMessage':
+          'Nije moguće spojiti se na server. Provjerite internetsku vezu i pokušajte ponovo.',
+      'serverUnavailableRetrying': 'Pokušavam ponovo...',
+      'serverUnavailableRetry': 'Pokušaj ponovo',
     },
     'en': {
       // ── App ───────────────────────────────────

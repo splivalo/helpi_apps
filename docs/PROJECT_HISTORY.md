@@ -92,6 +92,16 @@
 
 ---
 
+## 2026-03-23 — Login Error Handling & Registration Server Check
+
+- **Login error distinction** — `AuthResult.isConnectionError` flag razlikuje server nedostupan (narančasta, cloud_off ikona) od krivih credentialsa (crvena poruka). DioException type checking: connectionTimeout, connectionError, receiveTimeout, null response.
+- **Registration server check** — `checkEmailExists` sada vraća `bool?` (true=postoji, false=ne postoji, null=server nedostupan). Registracija step 1 prikazuje narančastu "Server nedostupan" poruku ako je null.
+- **Forgot password text alignment** — Dodan `crossAxisAlignment: CrossAxisAlignment.start` na Column u `_ForgotPasswordDialog`
+- **AppStrings HR lokalizacija** — Dodani ključevi: `serverUnavailableTitle`, `serverUnavailableMessage`, `serverUnavailableRetrying`, `serverUnavailableRetry`
+- **Rezultat**: 0 errors → 0 errors (flutter analyze)
+
+---
+
 ## Statistika
 
 | Metrika                       | Vrijednost              |

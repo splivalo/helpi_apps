@@ -47,6 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   bool _isLoading = false;
   String? _errorMessage;
+  bool _isServerError = false;
 
   // ── Registration step 2: role picker, step 3: profile data ─────────
   int _registerStep =
@@ -244,13 +245,39 @@ class _LoginScreenState extends State<LoginScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.red.shade50,
+              color: _isServerError
+                  ? Colors.orange.shade50
+                  : Colors.red.shade50,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.red.shade200),
+              border: Border.all(
+                color: _isServerError
+                    ? Colors.orange.shade200
+                    : Colors.red.shade200,
+              ),
             ),
-            child: Text(
-              _errorMessage!,
-              style: TextStyle(color: Colors.red.shade700, fontSize: 14),
+            child: Row(
+              children: [
+                if (_isServerError)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Icon(
+                      Icons.cloud_off_outlined,
+                      color: Colors.orange.shade700,
+                      size: 20,
+                    ),
+                  ),
+                Expanded(
+                  child: Text(
+                    _errorMessage!,
+                    style: TextStyle(
+                      color: _isServerError
+                          ? Colors.orange.shade700
+                          : Colors.red.shade700,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 16),
@@ -550,13 +577,39 @@ class _LoginScreenState extends State<LoginScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.red.shade50,
+              color: _isServerError
+                  ? Colors.orange.shade50
+                  : Colors.red.shade50,
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.red.shade200),
+              border: Border.all(
+                color: _isServerError
+                    ? Colors.orange.shade200
+                    : Colors.red.shade200,
+              ),
             ),
-            child: Text(
-              _errorMessage!,
-              style: TextStyle(color: Colors.red.shade700, fontSize: 14),
+            child: Row(
+              children: [
+                if (_isServerError)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: Icon(
+                      Icons.cloud_off_outlined,
+                      color: Colors.orange.shade700,
+                      size: 20,
+                    ),
+                  ),
+                Expanded(
+                  child: Text(
+                    _errorMessage!,
+                    style: TextStyle(
+                      color: _isServerError
+                          ? Colors.orange.shade700
+                          : Colors.red.shade700,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 16),
@@ -643,11 +696,21 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
+      _isServerError = false;
     });
 
     final exists = await _authService.checkEmailExists(email);
 
     if (!mounted) return;
+
+    if (exists == null) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = AppStrings.serverUnavailableTitle;
+        _isServerError = true;
+      });
+      return;
+    }
 
     if (exists) {
       setState(() {
@@ -675,6 +738,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
+      _isServerError = false;
     });
 
     final result = await _authService.login(email, password);
@@ -686,7 +750,10 @@ class _LoginScreenState extends State<LoginScreen> {
     if (result.success) {
       widget.onLoginSuccess();
     } else {
-      setState(() => _errorMessage = result.message);
+      setState(() {
+        _errorMessage = result.message;
+        _isServerError = result.isConnectionError;
+      });
     }
   }
 
@@ -864,6 +931,7 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (!_codeSent) ...[
               Text(AppStrings.forgotPasswordSubtitle),
