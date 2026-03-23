@@ -11,6 +11,7 @@ import 'package:helpi_app/core/providers/auth_provider.dart';
 import 'package:helpi_app/core/providers/realtime_sync_provider.dart';
 import 'package:helpi_app/core/providers/signalr_provider.dart';
 import 'package:helpi_app/features/auth/presentation/login_screen.dart';
+import 'package:helpi_app/features/auth/presentation/server_unavailable_screen.dart';
 import 'package:helpi_app/features/auth/presentation/suspended_screen.dart';
 import 'package:helpi_app/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:helpi_app/features/onboarding/presentation/registration_data_screen.dart';
@@ -64,6 +65,13 @@ class _HelpiAppState extends ConsumerState<HelpiApp> {
       return SuspendedScreen(
         reason: auth.suspendReason,
         onLogout: authNotifier.handleLogout,
+      );
+    }
+
+    // 0.5 Server nedostupan → ServerUnavailableScreen
+    if (auth.isServerUnavailable) {
+      return ServerUnavailableScreen(
+        onServerBack: authNotifier.handleServerBack,
       );
     }
 

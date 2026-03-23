@@ -928,6 +928,13 @@ class AppStrings {
       'suspendedContact': 'For more information, contact support:',
       'suspendedEmail': 'support@helpi.hr',
       'suspendedLogout': 'Log out',
+
+      // ── Server Unavailable ────────────────────────
+      'serverUnavailableTitle': 'Server Unavailable',
+      'serverUnavailableMessage':
+          'Unable to connect to server. Please check your internet connection and try again.',
+      'serverUnavailableRetrying': 'Retrying...',
+      'serverUnavailableRetry': 'Retry',
     },
   };
 
@@ -1415,4 +1422,11 @@ class AppStrings {
   static String get recurringOutsideWindow => _t('recurringOutsideWindow');
   static String recurringAutoRenew(String month) =>
       _t('recurringAutoRenew', params: {'month': month});
+
+  // ── Server nedostupan ──
+  static String get serverUnavailableTitle => _t('serverUnavailableTitle');
+  static String get serverUnavailableMessage => _t('serverUnavailableMessage');
+  static String get serverUnavailableRetrying =>
+      _t('serverUnavailableRetrying');
+  static String get serverUnavailableRetry => _t('serverUnavailableRetry');
 }

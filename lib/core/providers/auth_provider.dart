@@ -14,6 +14,7 @@ class AuthState {
     this.userType,
     this.isSuspended = false,
     this.suspendReason,
+    this.isServerUnavailable = false,
     this.needsRegistrationData = false,
     this.needsOnboarding = false,
     this.pendingStudentEmail,
@@ -24,6 +25,7 @@ class AuthState {
   final String? userType;
   final bool isSuspended;
   final String? suspendReason;
+  final bool isServerUnavailable;
 
   // Student-only flow:
   final bool needsRegistrationData;
@@ -36,6 +38,7 @@ class AuthState {
     String? userType,
     bool? isSuspended,
     String? suspendReason,
+    bool? isServerUnavailable,
     bool? needsRegistrationData,
     bool? needsOnboarding,
     String? pendingStudentEmail,
@@ -52,6 +55,7 @@ class AuthState {
       suspendReason: clearSuspendReason
           ? null
           : (suspendReason ?? this.suspendReason),
+      isServerUnavailable: isServerUnavailable ?? this.isServerUnavailable,
       needsRegistrationData:
           needsRegistrationData ?? this.needsRegistrationData,
       needsOnboarding: needsOnboarding ?? this.needsOnboarding,
@@ -97,7 +101,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
     DataLoader.loadAll(
       ordersNotifier: userType == 'Customer' ? ordersNotifier : null,
       availabilityNotifier: userType == 'Student' ? availabilityNotifier : null,
-    );
+    ).then((ok) {
+      if (!ok) {
+        state = state.copyWith(isServerUnavailable: true);
+      }
+    });
   }
 
   /// Poziva se nakon uspješnog logina.
@@ -152,6 +160,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Back iz Onboarding → nazad na RegistrationData.
   void backFromOnboarding() {
     state = state.copyWith(needsRegistrationData: true);
+  }
+
+  /// Poziva se kad health check sa ServerUnavailableScreen uspije.
+  void handleServerBack() {
+    state = state.copyWith(isServerUnavailable: false);
+    _loadDataForUser(state.userType);
   }
 
   /// Logout — reset svega.
