@@ -168,6 +168,29 @@ class AuthNotifier extends StateNotifier<AuthState> {
     _loadDataForUser(state.userType);
   }
 
+  /// Poziva se kad se app vrati iz backgrounda — re-fetch data.
+  /// Ako je user suspendiran, API vrati 403 → interceptor postavi isSuspended.
+  /// Ako je user aktiviran, data se refresha normalno i briše suspension flag.
+  void refreshAfterResume() {
+    if (state.isSuspended) {
+      // Pokušaj load — ako uspije, user je aktiviran
+      DataLoader.loadAll(
+        ordersNotifier: state.userType == 'Customer' ? ordersNotifier : null,
+        availabilityNotifier:
+            state.userType == 'Student' ? availabilityNotifier : null,
+      ).then((ok) {
+        if (ok) {
+          state = state.copyWith(
+            isSuspended: false,
+            clearSuspendReason: true,
+          );
+        }
+      });
+    } else {
+      _loadDataForUser(state.userType);
+    }
+  }
+
   /// Logout — reset svega.
   Future<void> handleLogout() async {
     await _authService.logout();

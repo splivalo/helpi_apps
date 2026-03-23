@@ -24,8 +24,33 @@ class HelpiApp extends ConsumerStatefulWidget {
   ConsumerState<HelpiApp> createState() => _HelpiAppState();
 }
 
-class _HelpiAppState extends ConsumerState<HelpiApp> {
+class _HelpiAppState extends ConsumerState<HelpiApp>
+    with WidgetsBindingObserver {
   final _localeNotifier = LocaleNotifier();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      final auth = ref.read(authProvider);
+      if (auth.isLoggedIn) {
+        // Re-fetch data — if user was suspended, 403 interceptor will handle it.
+        // If user was activated, data refreshes and suspension clears.
+        ref.read(authProvider.notifier).refreshAfterResume();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
