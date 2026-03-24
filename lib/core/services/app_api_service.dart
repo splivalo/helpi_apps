@@ -1,6 +1,7 @@
-import 'package:dio/dio.dart';
+﻿import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
+import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/network/api_client.dart';
 import 'package:helpi_app/core/network/api_endpoints.dart';
 import 'package:helpi_app/features/booking/data/order_model.dart'
@@ -9,7 +10,7 @@ import 'package:helpi_app/features/schedule/data/job_model.dart';
 import 'package:helpi_app/features/schedule/data/review_model.dart'
     as schedule_review;
 
-/// Wrapper za API rezultat — uspjeh ili greška.
+/// Wrapper za API rezultat â€” uspjeh ili greÅ¡ka.
 class ApiResult<T> {
   ApiResult.success(this.data) : _success = true, error = null;
 
@@ -25,11 +26,27 @@ class ApiResult<T> {
 class AppApiService {
   final ApiClient _client = ApiClient();
 
-  // ──────────────────────────────────────────────
-  // SENIOR: Orders
-  // ──────────────────────────────────────────────
+  /// Pretvara iznimku u user-friendly poruku greÅ¡ke.
+  static String _friendlyError(Object e) {
+    if (e is DioException) {
+      final statusCode = e.response?.statusCode;
+      if (statusCode == 403) return AppStrings.suspendedMessage;
+      if (statusCode == 404) return AppStrings.error;
+      if (statusCode != null && statusCode >= 500) return AppStrings.serverError;
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.connectionError) {
+        return AppStrings.networkError;
+      }
+    }
+    return AppStrings.error;
+  }
 
-  /// Dohvati narudžbe za seniora po [seniorId].
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // SENIOR: Orders
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+  /// Dohvati narudÅ¾be za seniora po [seniorId].
   Future<ApiResult<List<OrderModel>>> getOrdersBySenior(int seniorId) async {
     try {
       final response = await _client.get(ApiEndpoints.ordersBySenior(seniorId));
@@ -40,11 +57,11 @@ class AppApiService {
       return ApiResult.success(orders);
     } catch (e) {
       debugPrint('[AppApiService] getOrdersBySenior error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
-  /// Kreiraj novu narudžbu.
+  /// Kreiraj novu narudÅ¾bu.
   Future<ApiResult<OrderModel>> createOrder(
     Map<String, dynamic> orderData,
   ) async {
@@ -54,11 +71,11 @@ class AppApiService {
       return ApiResult.success(order);
     } catch (e) {
       debugPrint('[AppApiService] createOrder error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
-  /// Otkaži narudžbu.
+  /// OtkaÅ¾i narudÅ¾bu.
   Future<ApiResult<bool>> cancelOrder(int orderId, {String? reason}) async {
     try {
       await _client.post(
@@ -68,26 +85,26 @@ class AppApiService {
       return ApiResult.success(true);
     } catch (e) {
       debugPrint('[AppApiService] cancelOrder error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
-  /// Otkaži pojedinu sesiju (job instance) — student cancel.
+  /// OtkaÅ¾i pojedinu sesiju (job instance) â€” student cancel.
   Future<ApiResult<bool>> cancelSession(int sessionId) async {
     try {
       await _client.post(ApiEndpoints.sessionCancel(sessionId));
       return ApiResult.success(true);
     } catch (e) {
       debugPrint('[AppApiService] cancelSession error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // PROMO CODES
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-  /// Validate promo code — returns validation result from backend.
+  /// Validate promo code â€” returns validation result from backend.
   Future<ApiResult<Map<String, dynamic>>> validatePromoCode({
     required String code,
     required int customerId,
@@ -105,7 +122,7 @@ class AppApiService {
       return ApiResult.success(response.data as Map<String, dynamic>);
     } catch (e) {
       debugPrint('[AppApiService] validatePromoCode error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
@@ -129,15 +146,15 @@ class AppApiService {
       return ApiResult.success(response.data as Map<String, dynamic>);
     } catch (e) {
       debugPrint('[AppApiService] applyPromoCode error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // PROFILE
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-  /// Dohvati profil kupca (Customer) — sadrži Contact + Seniors[].
+  /// Dohvati profil kupca (Customer) â€” sadrÅ¾i Contact + Seniors[].
   Future<ApiResult<Map<String, dynamic>>> getCustomerProfile(
     int customerId,
   ) async {
@@ -149,10 +166,10 @@ class AppApiService {
         '[AppApiService] getCustomerProfile error: '
         'status=${e.response?.statusCode}',
       );
-      return ApiResult.failure('HTTP ${e.response?.statusCode}: ${e.message}');
+      return ApiResult.failure(_friendlyError(e));
     } catch (e) {
       debugPrint('[AppApiService] getCustomerProfile error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
@@ -165,13 +182,13 @@ class AppApiService {
       return ApiResult.success(response.data as Map<String, dynamic>);
     } catch (e) {
       debugPrint('[AppApiService] getStudentProfile error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // STUDENT: Sessions / Jobs
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /// Dohvati sve sesije za studenta.
   Future<ApiResult<List<Job>>> getSessionsByStudent(int studentId) async {
@@ -184,11 +201,11 @@ class AppApiService {
       return ApiResult.success(jobs);
     } catch (e) {
       debugPrint('[AppApiService] getSessionsByStudent error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
-  /// Dohvati nadolazeće sesije za studenta.
+  /// Dohvati nadolazeÄ‡e sesije za studenta.
   Future<ApiResult<List<Job>>> getUpcomingSessionsByStudent(
     int studentId,
   ) async {
@@ -201,13 +218,13 @@ class AppApiService {
       return ApiResult.success(jobs);
     } catch (e) {
       debugPrint('[AppApiService] getUpcomingSessionsByStudent error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // REVIEWS
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /// Dohvati recenzije za seniora.
   Future<ApiResult<List<schedule_review.ReviewModel>>> getReviewsBySenior(
@@ -224,7 +241,7 @@ class AppApiService {
       return ApiResult.success(reviews);
     } catch (e) {
       debugPrint('[AppApiService] getReviewsBySenior error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
@@ -242,7 +259,7 @@ class AppApiService {
       return ApiResult.success(reviews);
     } catch (e) {
       debugPrint('[AppApiService] getPendingReviewsBySenior error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
@@ -260,24 +277,24 @@ class AppApiService {
       return ApiResult.success(reviews);
     } catch (e) {
       debugPrint('[AppApiService] getPendingReviewsByStudent error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
-  /// Pošalji recenziju (senior ocjenjuje studenta).
+  /// PoÅ¡alji recenziju (senior ocjenjuje studenta).
   Future<ApiResult<bool>> submitReview(Map<String, dynamic> reviewData) async {
     try {
       await _client.put(ApiEndpoints.reviews, data: reviewData);
       return ApiResult.success(true);
     } catch (e) {
       debugPrint('[AppApiService] submitReview error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // PAYMENT METHODS
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /// Dohvati kartice (payment methods) za korisnika.
   Future<ApiResult<List<Map<String, dynamic>>>> getPaymentMethods(
@@ -292,13 +309,13 @@ class AppApiService {
       return ApiResult.success(methods);
     } catch (e) {
       debugPrint('[AppApiService] getPaymentMethods error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // STUDENT AVAILABILITY
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /// Dohvati dostupnost za studenta.
   Future<ApiResult<List<Map<String, dynamic>>>> getStudentAvailability(
@@ -313,7 +330,7 @@ class AppApiService {
       return ApiResult.success(slots);
     } catch (e) {
       debugPrint('[AppApiService] getStudentAvailability error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
@@ -326,13 +343,13 @@ class AppApiService {
       return ApiResult.success(true);
     } catch (e) {
       debugPrint('[AppApiService] updateStudentAvailability error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // CONTACT INFO
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /// Update contact info (profile data: name, phone, address, etc.)
   Future<ApiResult<bool>> updateContactInfo({
@@ -364,7 +381,7 @@ class AppApiService {
       return ApiResult.success(true);
     } catch (e) {
       debugPrint('[AppApiService] updateContactInfo error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
@@ -383,15 +400,15 @@ class AppApiService {
       return ApiResult.success(true);
     } catch (e) {
       debugPrint('[AppApiService] updateStudent error: $e');
-      return ApiResult.failure(e.toString());
+      return ApiResult.failure(_friendlyError(e));
     }
   }
 
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // MAPPERS
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-  /// Backend OrderDto → App OrderModel.
+  /// Backend OrderDto â†’ App OrderModel.
   OrderModel _mapOrder(Map<String, dynamic> json) {
     final schedules = json['schedules'] as List<dynamic>? ?? [];
     final services = json['services'] as List<dynamic>? ?? [];
@@ -440,7 +457,7 @@ class AppApiService {
       frequency =
           'Do ${endDate.day.toString().padLeft(2, '0')}.${endDate.month.toString().padLeft(2, '0')}.${endDate.year}';
     } else {
-      frequency = 'Ponavljajuće';
+      frequency = 'PonavljajuÄ‡e';
     }
 
     // First schedule za time/weekday/duration
@@ -477,7 +494,7 @@ class AppApiService {
     );
   }
 
-  /// Backend SessionDto → App Job.
+  /// Backend SessionDto â†’ App Job.
   Job _mapJob(Map<String, dynamic> json) {
     final date = _parseDate(json['scheduledDate']);
     final startTime = _parseTimeOnly(json['startTime']);
@@ -500,7 +517,7 @@ class AppApiService {
       address = contact?['fullAddress'] as String? ?? '';
     }
 
-    // Service types iz order (if available) — fallback to empty
+    // Service types iz order (if available) â€” fallback to empty
     final serviceTypes = <ServiceType>[];
 
     // Review iz nested data (if available)
@@ -528,7 +545,7 @@ class AppApiService {
     );
   }
 
-  /// Backend ReviewDto → App ReviewModel.
+  /// Backend ReviewDto â†’ App ReviewModel.
   schedule_review.ReviewModel _mapReview(Map<String, dynamic> json) {
     final createdAt = json['createdAt'] as String? ?? '';
     String dateStr = '';
@@ -548,9 +565,9 @@ class AppApiService {
     );
   }
 
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // ENUM MAPPERS
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   OrderStatus _mapOrderStatus(dynamic status) {
     if (status is int) {
@@ -601,11 +618,11 @@ class AppApiService {
     return JobStatus.scheduled;
   }
 
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // HELPERS
-  // ──────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-  /// Parse "HH:mm:ss" or "HH:mm" → TimeOfDay.
+  /// Parse "HH:mm:ss" or "HH:mm" â†’ TimeOfDay.
   TimeOfDay _parseTimeOnly(dynamic value) {
     if (value == null) return const TimeOfDay(hour: 0, minute: 0);
     final parts = value.toString().split(':');
@@ -615,7 +632,7 @@ class AppApiService {
     );
   }
 
-  /// Parse date string (ISO or DateOnly "yyyy-MM-dd") → DateTime.
+  /// Parse date string (ISO or DateOnly "yyyy-MM-dd") â†’ DateTime.
   DateTime _parseDate(dynamic value) {
     if (value == null) return DateTime.now();
     return DateTime.tryParse(value.toString()) ?? DateTime.now();
@@ -637,7 +654,7 @@ class AppApiService {
       'Ponedjeljak',
       'Utorak',
       'Srijeda',
-      'Četvrtak',
+      'ÄŒetvrtak',
       'Petak',
       'Subota',
       'Nedjelja',

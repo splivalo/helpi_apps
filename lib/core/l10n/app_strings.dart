@@ -94,6 +94,8 @@ class AppStrings {
       // ── Općenito ──────────────────────────────
       'loading': 'Učitavanje...',
       'error': 'Greška',
+      'serverError': 'Greška na serveru. Pokušajte ponovo.',
+      'networkError': 'Nema internetske veze.',
       'orderCreateError': 'Greška pri kreiranju narudžbe',
       'retry': 'Pokušaj ponovo',
       'cancel': 'Odustani',
@@ -555,6 +557,8 @@ class AppStrings {
       // ── Općenito ──────────────────────────────
       'loading': 'Loading...',
       'error': 'Error',
+      'serverError': 'Server error. Please try again.',
+      'networkError': 'No internet connection.',
       'orderCreateError': 'Error creating order',
       'retry': 'Try again',
       'cancel': 'Cancel',
@@ -1047,6 +1051,8 @@ class AppStrings {
   // ── Općenito ──────────────────────────────────
   static String get loading => _t('loading');
   static String get error => _t('error');
+  static String get serverError => _t('serverError');
+  static String get networkError => _t('networkError');
   static String get orderCreateError => _t('orderCreateError');
   static String get retry => _t('retry');
   static String get cancel => _t('cancel');
