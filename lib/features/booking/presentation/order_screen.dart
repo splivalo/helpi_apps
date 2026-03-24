@@ -9,9 +9,14 @@ import 'package:helpi_app/features/booking/presentation/order_flow_screen.dart';
 
 /// Naruči ekran — jednostavan prikaz s gumbom za novu narudžbu.
 class OrderScreen extends StatelessWidget {
-  const OrderScreen({super.key, required this.ordersNotifier});
+  const OrderScreen({
+    super.key,
+    required this.ordersNotifier,
+    this.onOrderCreated,
+  });
 
   final OrdersNotifier ordersNotifier;
+  final VoidCallback? onOrderCreated;
 
   @override
   Widget build(BuildContext context) {
@@ -40,14 +45,17 @@ class OrderScreen extends StatelessWidget {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: () {
+                    onPressed: () async {
                       HapticFeedback.selectionClick();
-                      Navigator.of(context).push(
-                        MaterialPageRoute<void>(
+                      final created = await Navigator.of(context).push<bool>(
+                        MaterialPageRoute<bool>(
                           builder: (_) =>
                               OrderFlowScreen(ordersNotifier: ordersNotifier),
                         ),
                       );
+                      if (created == true) {
+                        onOrderCreated?.call();
+                      }
                     },
                     icon: const Icon(Icons.add_circle_outline, size: 22),
                     label: Text(AppStrings.newOrder),

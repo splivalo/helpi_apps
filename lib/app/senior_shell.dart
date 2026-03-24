@@ -35,7 +35,10 @@ class _SeniorShellState extends State<SeniorShell> {
   void initState() {
     super.initState();
     _screens = <Widget>[
-      OrderScreen(ordersNotifier: widget.ordersNotifier),
+      OrderScreen(
+        ordersNotifier: widget.ordersNotifier,
+        onOrderCreated: () => setState(() => _currentIndex = 1),
+      ),
       OrdersScreen(ordersNotifier: widget.ordersNotifier),
       const ChatScreen(),
       ProfileScreen(

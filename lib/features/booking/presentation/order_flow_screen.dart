@@ -1655,7 +1655,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
       }
       if (!mounted) return;
       widget.ordersNotifier.addProcessingOrder(result.data!);
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result.error ?? AppStrings.orderCreateError)),
