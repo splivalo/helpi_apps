@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:helpi_app/features/schedule/data/job_model.dart';
 import 'package:helpi_app/features/schedule/utils/job_helpers.dart';
 
-/// Status chip za Job — kolorirana kapsula s labelom.
+/// Status chip za Job - colored capsule with label.
 class JobStatusBadge extends StatelessWidget {
   const JobStatusBadge({super.key, required this.status});
 

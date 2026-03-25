@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/features/schedule/data/job_model.dart';
 
-/// Centralizirani helperi za Job status/service labele i boje.
+/// Centralized helpers for Job status/service labels and colors.
 class JobHelpers {
   JobHelpers._();
 
-  // ── Status ────────────────────────────────────────
+  // -- Status --
 
   static String statusLabel(JobStatus status) {
     switch (status) {
@@ -42,7 +42,7 @@ class JobHelpers {
     }
   }
 
-  // ── Service type ──────────────────────────────────
+  // -- Service type --
 
   static String serviceLabel(ServiceType type) {
     switch (type) {
@@ -61,7 +61,7 @@ class JobHelpers {
     }
   }
 
-  // ── Day name mapping ──────────────────────────────
+  // -- Day name mapping --
 
   static String dayName(String key) {
     switch (key) {

@@ -10,7 +10,7 @@ import 'package:helpi_app/features/schedule/utils/formatters.dart';
 import 'package:helpi_app/features/schedule/widgets/helpi_card.dart';
 import 'package:helpi_app/features/schedule/widgets/star_rating.dart';
 
-/// Statistika ekran â€” tjedni/mjeseÄni pregled sati + prosjeÄna ocjena.
+/// Statistics screen - weekly/monthly hours overview + average rating.
 class StatisticsScreen extends ConsumerStatefulWidget {
   const StatisticsScreen({super.key});
 

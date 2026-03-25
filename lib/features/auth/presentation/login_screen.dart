@@ -13,7 +13,7 @@ import 'package:helpi_app/shared/widgets/helpi_form_fields.dart';
 import 'package:helpi_app/shared/widgets/helpi_switch.dart';
 import 'package:helpi_app/shared/widgets/mc_address_field.dart';
 
-/// Login / Register ekran — UI prototype, bez prave autentikacije.
+/// Login / Register screen - UI prototype, without real authentication.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({
     super.key,
@@ -23,10 +23,10 @@ class LoginScreen extends StatefulWidget {
     required this.localeNotifier,
   });
 
-  /// Callback kad korisnik uspješno klikne Login (API pozvan, token spremljen).
+  /// Callback when user successfully clicks Login (API called, token saved).
   final VoidCallback onLoginSuccess;
 
-  /// Callback kad Customer završi registraciju (profil popunjen).
+  /// Callback when Customer completes registration (profile filled).
   final VoidCallback onRegisterSuccess;
 
   /// Callback kad Student odabere ulogu i upiše email/pass.
@@ -49,11 +49,11 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _errorMessage;
   bool _isServerError = false;
 
-  // ── Registration step 2: role picker, step 3: profile data ─────────
+  // -- Registration step 2: role picker, step 3: profile data --
   int _registerStep =
       0; // 0 = email/pass, 1 = role picker, 2 = profile (Customer only)
 
-  // Naručitelj
+  // Customer
   final _ordFirstNameCtrl = TextEditingController();
   final _ordLastNameCtrl = TextEditingController();
   final _ordPhoneCtrl = TextEditingController();
@@ -125,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         const SizedBox(height: 24),
 
-        // ── Logo / Branding ──
+        // -- Logo / Branding --
         Container(
           width: 100,
           height: 100,
@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 24),
 
-        // ── Title ──
+        // -- Title --
         Text(
           AppStrings.loginTitle,
           style: theme.textTheme.headlineSmall?.copyWith(
@@ -163,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 40),
 
-        // ── Email field ──
+        // -- Email field --
         AutofillGroup(
           child: Column(
             children: [
@@ -189,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 16),
 
-              // ── Password field ──
+              // -- Password field --
               TextField(
                 controller: _passwordCtrl,
                 obscureText: _obscurePassword,
@@ -224,7 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 12),
 
-        // ── Forgot password ──
+        // -- Forgot password --
         if (!_isRegisterMode)
           Align(
             alignment: Alignment.centerRight,
@@ -239,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         const SizedBox(height: 20),
 
-        // ── Error message ──
+        // -- Error message --
         if (_errorMessage != null) ...[
           Container(
             width: double.infinity,
@@ -283,7 +283,7 @@ class _LoginScreenState extends State<LoginScreen> {
           const SizedBox(height: 16),
         ],
 
-        // ── Main CTA button ──
+        // -- Main CTA button --
         SizedBox(
           width: double.infinity,
           height: 52,
@@ -319,7 +319,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 24),
 
-        // ── Toggle login / register ──
+        // -- Toggle login / register --
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -347,7 +347,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 32),
 
-        // ── Language picker ──
+        // -- Language picker --
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -381,14 +381,14 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // ══════════════════════════════════════════════
-  // STEP 1: Role picker (Naručitelj ili Student)
+  // STEP 1: Role picker (Customer ili Student)
   // ══════════════════════════════════════════════
   Widget _buildRolePickerStep(ThemeData theme) {
     return Column(
       children: [
         const SizedBox(height: 16),
 
-        // ── Back arrow ──
+        // -- Back arrow --
         Align(
           alignment: Alignment.centerLeft,
           child: GestureDetector(
@@ -398,7 +398,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 24),
 
-        // ── Title ──
+        // -- Title --
         Text(
           AppStrings.chooseRoleTitle,
           style: theme.textTheme.headlineSmall?.copyWith(
@@ -415,7 +415,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 40),
 
-        // ── Customer card ──
+        // -- Customer card --
         _RoleCard(
           icon: Icons.favorite_outline,
           iconColor: AppColors.coral,
@@ -425,7 +425,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 16),
 
-        // ── Student card ──
+        // -- Student card --
         _RoleCard(
           icon: Icons.school_outlined,
           iconColor: AppColors.teal,
@@ -450,14 +450,14 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         const SizedBox(height: 16),
 
-        // ── Back arrow ──
+        // -- Back arrow --
         GestureDetector(
           onTap: () => setState(() => _registerStep = 1),
           child: const Icon(Icons.arrow_back, size: 28),
         ),
         const SizedBox(height: 16),
 
-        // ── Title ──
+        // -- Title --
         Center(
           child: Text(
             AppStrings.regProfileTitle,
@@ -477,7 +477,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 32),
 
-        // ── PODACI O NARUČITELJU ────────────────────
+        // -- CUSTOMER DATA --
         HelpiSectionHeader(title: AppStrings.ordererData),
         const SizedBox(height: 12),
         HelpiTextField(
@@ -515,7 +515,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 16),
 
-        // ── "Naručujem za drugog" toggle ──
+        // -- "Ordering for someone else" toggle --
         Row(
           children: [
             Expanded(
@@ -531,8 +531,8 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
 
-        // ── PODACI O KORISNIKU (SENIOR) ─────────────
-        // Prikazuje se samo ako naručujem za drugog
+        // -- USER DATA (SENIOR) --
+        // Shown only when ordering for someone else
         if (_orderingForOther) ...[
           const SizedBox(height: 24),
           HelpiSectionHeader(title: AppStrings.seniorData),
@@ -571,7 +571,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
         const SizedBox(height: 32),
 
-        // ── Error message ──
+        // -- Error message --
         if (_errorMessage != null) ...[
           Container(
             width: double.infinity,
@@ -615,7 +615,7 @@ class _LoginScreenState extends State<LoginScreen> {
           const SizedBox(height: 16),
         ],
 
-        // ── CTA: Završi registraciju ──
+        // -- CTA: Complete registration --
         SizedBox(
           width: double.infinity,
           height: 52,
@@ -647,7 +647,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 12),
 
-        // ── Uvjeti (tekst ispod gumba) ──
+        // -- Terms (text below button) --
         Center(
           child: RichText(
             textAlign: TextAlign.center,
@@ -828,7 +828,7 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 // ══════════════════════════════════════════════
-// Forgot Password Dialog (2-step: email → code + new password)
+// Forgot Password Dialog (2-step: email -> code + new password)
 // ══════════════════════════════════════════════
 class _ForgotPasswordDialog extends StatefulWidget {
   const _ForgotPasswordDialog();

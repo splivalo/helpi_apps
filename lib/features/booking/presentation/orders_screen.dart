@@ -10,7 +10,7 @@ import 'package:helpi_app/shared/widgets/status_chip.dart';
 import 'package:helpi_app/shared/widgets/summary_row.dart';
 import 'package:helpi_app/shared/widgets/tab_bar_selector.dart';
 
-/// Ekran s listom narudžbi — 3 taba: U obradi, Aktivne, Neaktivne.
+/// Screen with order list - 3 tabs: Processing, Active, Inactive.
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key, required this.ordersNotifier});
 
@@ -53,7 +53,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
       appBar: AppBar(title: Text(AppStrings.myOrders)),
       body: Column(
         children: [
-          // ── Custom tab bar (coral underline, no black line) ──
+          // -- Custom tab bar (coral underline, no black line) --
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: TabBarSelector(
@@ -63,7 +63,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
             ),
           ),
 
-          // ── Tab content ──
+          // -- Tab content --
           Expanded(
             child: IndexedStack(
               index: _selectedTab,
@@ -79,7 +79,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
     );
   }
 
-  // ── Empty state ─────────────────────────────────
+  // -- Empty state --
   Widget _buildEmpty(ThemeData theme) {
     return Center(
       child: Padding(
@@ -106,7 +106,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
     );
   }
 
-  // ── Order list ──────────────────────────────────
+  // -- Order list --
   Widget _buildList(List<OrderModel> orders, _ActionType actionType) {
     final theme = Theme.of(context);
 
@@ -123,7 +123,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
     );
   }
 
-  // ── Compact order card — tap to open detail ──
+  // -- Compact order card - tap to open detail --
   Widget _buildOrderCard(ThemeData theme, OrderModel order) {
     return GestureDetector(
       onTap: () async {

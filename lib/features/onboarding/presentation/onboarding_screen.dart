@@ -8,8 +8,8 @@ import 'package:helpi_app/features/schedule/data/availability_model.dart';
 import 'package:helpi_app/features/schedule/utils/availability_helpers.dart';
 import 'package:helpi_app/features/schedule/widgets/availability_day_row.dart';
 
-/// Onboarding — student mora postaviti dostupnost prije korištenja app-a.
-/// Gumb "Završi" je disabled dok nema barem 1 dan s postavljenim vremenom.
+/// Onboarding - student must set availability before using the app.
+/// "Finish" button is disabled until at least 1 day has time set.
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({
     super.key,
@@ -48,7 +48,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   bool _isSaving = false;
 
-  /// Spremi dostupnost na backend i završi onboarding.
+  /// Save availability to backend and finish onboarding.
   Future<void> _saveAndComplete() async {
     if (_isSaving) return;
     setState(() => _isSaving = true);
@@ -70,7 +70,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (result.success) {
       widget.onComplete();
     } else {
-      // Prikaži grešku ali ipak dozvoli nastavak
+      // Show error but still allow continuation
       debugPrint('[Onboarding] save failed: ${result.error}');
       widget.onComplete();
     }
@@ -90,7 +90,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             children: [
               const SizedBox(height: 16),
 
-              // ── Back arrow ──
+              // -- Back arrow --
               if (widget.onBack != null)
                 GestureDetector(
                   onTap: widget.onBack,
@@ -98,7 +98,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               const SizedBox(height: 24),
 
-              // ── Title ──
+              // -- Title --
               Text(
                 AppStrings.onboardingTitle,
                 style: theme.textTheme.headlineMedium,
@@ -112,7 +112,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
               const SizedBox(height: 32),
 
-              // ── Day list ──
+              // -- Day list --
               Expanded(
                 child: ListView.builder(
                   itemCount: _days.length,
@@ -120,7 +120,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
 
-              // ── CTA button ──
+              // -- CTA button --
               SizedBox(
                 width: double.infinity,
                 height: 56,

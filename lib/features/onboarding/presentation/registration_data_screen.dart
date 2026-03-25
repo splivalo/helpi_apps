@@ -11,8 +11,8 @@ import 'package:helpi_app/shared/widgets/mc_address_field.dart';
 import 'package:helpi_app/features/schedule/utils/formatters.dart';
 import 'package:helpi_app/features/schedule/widgets/faculty_picker.dart';
 
-/// Registracija — student upisuje osobne podatke prije postavljanja dostupnosti.
-/// Gumb "Dalje" je disabled dok sva obavezna polja nisu popunjena.
+/// Registration - student enters personal data before setting availability.
+/// "Next" button is disabled until all required fields are filled.
 class RegistrationDataScreen extends StatefulWidget {
   const RegistrationDataScreen({
     super.key,
@@ -67,7 +67,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
         _faculties = Faculty.fromJsonList(list, lang: AppStrings.currentLocale);
       });
     } catch (_) {
-      // Faculties will remain empty — picker shows nothing
+      // Faculties will remain empty - picker shows nothing
     }
   }
 
@@ -110,7 +110,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
                   children: [
                     const SizedBox(height: 16),
 
-                    // ── Back arrow ──
+                    // -- Back arrow --
                     if (widget.onBack != null)
                       GestureDetector(
                         onTap: widget.onBack,
@@ -118,7 +118,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
                       ),
                     const SizedBox(height: 24),
 
-                    // ── Title ──
+                    // -- Title --
                     Text(
                       AppStrings.registrationDataTitle,
                       style: theme.textTheme.headlineMedium,
@@ -132,7 +132,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
                     ),
                     const SizedBox(height: 32),
 
-                    // ── Ime ──
+                    // -- First name --
                     _buildField(
                       label: AppStrings.firstName,
                       controller: _firstNameCtrl,
@@ -140,7 +140,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // ── Prezime ──
+                    // -- Last name --
                     _buildField(
                       label: AppStrings.lastName,
                       controller: _lastNameCtrl,
@@ -148,15 +148,15 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // ── Spol ──
+                    // -- Gender --
                     _buildGenderPicker(theme),
                     const SizedBox(height: 12),
 
-                    // ── Datum rođenja ──
+                    // -- Date of birth --
                     _buildDatePicker(theme),
                     const SizedBox(height: 12),
 
-                    // ── Telefon ──
+                    // -- Phone --
                     _buildField(
                       label: AppStrings.phone,
                       controller: _phoneCtrl,
@@ -165,7 +165,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // ── Adresa ──
+                    // -- Address --
                     McAddressField(
                       controller: _addressCtrl,
                       onAddressSelected: (info) {
@@ -174,11 +174,11 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // ── Fakultet ──
+                    // -- Faculty --
                     _buildFacultyPicker(theme),
                     const SizedBox(height: 12),
 
-                    // ── Broj studentske iskaznice ──
+                    // -- Student ID number --
                     _buildField(
                       label: AppStrings.studentIdCard,
                       controller: _studentIdCardCtrl,
@@ -188,7 +188,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
                     ),
                     const SizedBox(height: 32),
 
-                    // ── Error message ──
+                    // -- Error message --
                     if (_errorMessage != null) ...[
                       Container(
                         width: double.infinity,
@@ -209,7 +209,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
                       const SizedBox(height: 16),
                     ],
 
-                    // ── CTA button ──
+                    // -- CTA button --
                     SizedBox(
                       width: double.infinity,
                       height: 56,
@@ -254,7 +254,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
     );
   }
 
-  // ── Registration logic ───────────────────────────────────
+  // -- Registration logic --
 
   Future<void> _handleRegister() async {
     setState(() {
@@ -305,7 +305,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
     }
   }
 
-  // ── Helpers ──────────────────────────────────────────
+  // -- Helpers --
 
   Widget _buildField({
     required String label,

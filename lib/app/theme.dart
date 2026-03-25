@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'package:helpi_app/core/constants/colors.dart';
 
-/// Helpi tema — soft, topla, pristupačna.
+/// Helpi theme - soft, warm, accessible.
 class HelpiTheme {
   HelpiTheme._();
 
-  // ── Color aliases (student screens koriste HelpiTheme.xyz) ──
+  // -- Color aliases (student screens use HelpiTheme.xyz) --
   static const Color teal = AppColors.teal;
   static const Color coral = AppColors.coral;
   static const Color textSecondary = AppColors.textSecondary;
@@ -16,21 +16,21 @@ class HelpiTheme {
   static const Color avatarBg = Color(0xFFE8F1FB);
   static const Color star = Color(0xFFFFC107);
 
-  // ── ButtonStyle aliases ──
+  // -- ButtonStyle aliases --
   static final ButtonStyle coralOutlinedStyle = AppColors.coralOutlinedStyle;
 
-  // Pastelne boje za kartice
+  // Pastel colors for cards
   static const Color cardMint = Color(0xFFE8F5F1);
   static const Color cardLavender = Color(0xFFF0EBFA);
   static const Color cardCream = Color(0xFFFFF8E7);
   static const Color cardBlue = Color(0xFFE8F1FB);
 
-  // ─── Dimenzije gumba ────────────────────────────────────────────
+  // -- Button dimensions --
   static const double buttonHeight = 56.0;
   static const double buttonRadius = 16.0;
   static const double cardRadius = 16.0;
 
-  // ─── Tema ───────────────────────────────────────────────────────
+  // -- Theme --
   static ThemeData get light => ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
@@ -48,7 +48,7 @@ class HelpiTheme {
     ),
     scaffoldBackgroundColor: AppColors.background,
 
-    // ─── AppBar ─────────────────────────────────────
+    // -- AppBar --
     appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.background,
       foregroundColor: AppColors.textPrimary,
@@ -62,7 +62,7 @@ class HelpiTheme {
       ),
     ),
 
-    // ─── Tekst ─────────────────────────────────────
+    // -- Text --
     textTheme: const TextTheme(
       headlineLarge: TextStyle(
         fontSize: 30,
@@ -101,7 +101,7 @@ class HelpiTheme {
       ),
     ),
 
-    // ─── Elevated Button (veliki, zaobljeni) ───────
+    // -- Elevated Button (large, rounded) --
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.coral,
@@ -115,7 +115,7 @@ class HelpiTheme {
       ),
     ),
 
-    // ─── Outlined Button ────────────────────────────
+    // -- Outlined Button --
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.teal,
@@ -128,7 +128,7 @@ class HelpiTheme {
       ),
     ),
 
-    // ─── Text Button ───────────────────────────────
+    // -- Text Button --
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: AppColors.teal,
@@ -136,7 +136,7 @@ class HelpiTheme {
       ),
     ),
 
-    // ─── Card ───────────────────────────────────────
+    // -- Card --
     cardTheme: CardThemeData(
       color: AppColors.surface,
       elevation: 0,
@@ -147,7 +147,7 @@ class HelpiTheme {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     ),
 
-    // ─── Input Decoration ───────────────────────────
+    // -- Input Decoration --
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppColors.surface,
@@ -172,7 +172,7 @@ class HelpiTheme {
       hintStyle: const TextStyle(fontSize: 16, color: AppColors.textSecondary),
     ),
 
-    // ─── Bottom Navigation ──────────────────────────
+    // -- Bottom Navigation --
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
       backgroundColor: AppColors.surface,
       selectedItemColor: AppColors.teal,
@@ -186,21 +186,21 @@ class HelpiTheme {
       elevation: 0,
     ),
 
-    // ─── Floating Action Button ─────────────────────
+    // -- Floating Action Button --
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: AppColors.teal,
       foregroundColor: Colors.white,
       elevation: 2,
     ),
 
-    // ─── Divider ────────────────────────────────────
+    // -- Divider --
     dividerTheme: const DividerThemeData(
       color: Color(0xFFEEEEEE),
       thickness: 1,
       space: 1,
     ),
 
-    // ─── DatePicker / TimePicker — no uppercase buttons ──
+    // -- DatePicker / TimePicker - no uppercase buttons --
     datePickerTheme: DatePickerThemeData(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(cardRadius),

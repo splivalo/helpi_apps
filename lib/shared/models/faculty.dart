@@ -1,4 +1,4 @@
-/// Faculty model — loaded from backend API.
+/// Faculty model - loaded from backend API.
 class Faculty {
   const Faculty({
     required this.id,

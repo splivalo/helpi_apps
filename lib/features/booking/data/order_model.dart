@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 
-/// Status narudžbe (canonical: processing → active → completed | cancelled | archived).
+/// Status narudžbe (canonical: processing -> active -> completed | cancelled | archived).
 enum OrderStatus { processing, active, completed, cancelled, archived }
 
-/// Status pojedinog posla/termina (canonical: scheduled → completed | cancelled).
+/// Status pojedinog posla/termina (canonical: scheduled -> completed | cancelled).
 enum JobStatus { completed, scheduled, cancelled }
 
 /// Strukturirani zapis jednog dana u ponavljajućoj narudžbi.
@@ -57,7 +57,7 @@ class JobModel {
   ReviewModel? review;
 }
 
-/// Recenzija studenta od strane seniora.
+/// Student review by senior.
 class ReviewModel {
   ReviewModel({required this.rating, this.comment = '', required this.date});
 
@@ -82,7 +82,7 @@ class StudentAssignment {
   final List<ReviewModel> reviews = [];
 }
 
-/// Pojednostavljen model narudžbe (mock — bez bacenda).
+/// Simplified order model (mock - without backend).
 class OrderModel {
   OrderModel({
     required this.id,
@@ -177,7 +177,7 @@ class OrdersNotifier extends ChangeNotifier {
 
   int _nextId = 1;
 
-  /// Zamijeni sve narudžbe API podacima (DataLoader poziva ovo).
+  /// Replace all orders with API data (DataLoader calls this).
   void replaceAll(List<OrderModel> apiOrders) {
     _orders
       ..clear()

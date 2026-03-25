@@ -10,7 +10,7 @@ import 'package:helpi_app/features/schedule/data/job_model.dart';
 import 'package:helpi_app/features/schedule/data/review_model.dart'
     as schedule_review;
 
-/// Wrapper za API rezultat â€” uspjeh ili greška.
+/// Wrapper for API result - success or error.
 class ApiResult<T> {
   ApiResult.success(this.data) : _success = true, error = null;
 
@@ -43,11 +43,11 @@ class AppApiService {
     return AppStrings.error;
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // --
   // SENIOR: Orders
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // --
 
-  /// Dohvati narudžbe za seniora po [seniorId].
+  /// Fetch orders for senior by [seniorId].
   Future<ApiResult<List<OrderModel>>> getOrdersBySenior(int seniorId) async {
     try {
       final response = await _client.get(ApiEndpoints.ordersBySenior(seniorId));
@@ -90,7 +90,7 @@ class AppApiService {
     }
   }
 
-  /// Otkaži pojedinu sesiju (job instance) â€” student cancel.
+  /// Otkaži pojedinu sesiju (job instance) - student cancel.
   Future<ApiResult<bool>> cancelSession(int sessionId) async {
     try {
       await _client.post(ApiEndpoints.sessionCancel(sessionId));
@@ -103,7 +103,7 @@ class AppApiService {
 
   // PROMO CODES
 
-  /// Validate promo code â€” returns validation result from backend.
+  /// Validate promo code - returns validation result from backend.
   Future<ApiResult<Map<String, dynamic>>> validatePromoCode({
     required String code,
     required int customerId,
@@ -151,7 +151,7 @@ class AppApiService {
 
   // PROFILE
 
-  /// Dohvati profil kupca (Customer) â€” sadrži Contact + Seniors[].
+  /// Fetch customer profile (Customer) - contains Contact + Seniors[].
   Future<ApiResult<Map<String, dynamic>>> getCustomerProfile(
     int customerId,
   ) async {
@@ -170,7 +170,7 @@ class AppApiService {
     }
   }
 
-  /// Dohvati profil studenta.
+  /// Fetch student profile.
   Future<ApiResult<Map<String, dynamic>>> getStudentProfile(
     int studentId,
   ) async {
@@ -185,7 +185,7 @@ class AppApiService {
 
   // STUDENT: Sessions / Jobs
 
-  /// Dohvati sve sesije za studenta.
+  /// Fetch all sessions for student.
   Future<ApiResult<List<Job>>> getSessionsByStudent(int studentId) async {
     try {
       final response = await _client.get(
@@ -200,7 +200,7 @@ class AppApiService {
     }
   }
 
-  /// Dohvati nadolazeÄ‡e sesije za studenta.
+  /// Fetch upcoming sessions for student.
   Future<ApiResult<List<Job>>> getUpcomingSessionsByStudent(
     int studentId,
   ) async {
@@ -219,7 +219,7 @@ class AppApiService {
 
   // REVIEWS
 
-  /// Dohvati recenzije za seniora.
+  /// Fetch reviews for senior.
   Future<ApiResult<List<schedule_review.ReviewModel>>> getReviewsBySenior(
     int seniorId,
   ) async {
@@ -238,7 +238,7 @@ class AppApiService {
     }
   }
 
-  /// Dohvati pending recenzije za seniora.
+  /// Fetch pending reviews for senior.
   Future<ApiResult<List<schedule_review.ReviewModel>>>
   getPendingReviewsBySenior(int seniorId) async {
     try {
@@ -256,7 +256,7 @@ class AppApiService {
     }
   }
 
-  /// Dohvati pending recenzije za studenta (student mora ocijeniti seniora).
+  /// Fetch pending reviews for student (student must rate senior).
   Future<ApiResult<List<schedule_review.ReviewModel>>>
   getPendingReviewsByStudent(int studentId) async {
     try {
@@ -274,7 +274,7 @@ class AppApiService {
     }
   }
 
-  /// Pošalji recenziju (senior ocjenjuje studenta).
+  /// Submit review (senior rates student).
   Future<ApiResult<bool>> submitReview(Map<String, dynamic> reviewData) async {
     try {
       await _client.put(ApiEndpoints.reviews, data: reviewData);
@@ -287,7 +287,7 @@ class AppApiService {
 
   // PAYMENT METHODS
 
-  /// Dohvati kartice (payment methods) za korisnika.
+  /// Fetch cards (payment methods) for user.
   Future<ApiResult<List<Map<String, dynamic>>>> getPaymentMethods(
     int userId,
   ) async {
@@ -306,7 +306,7 @@ class AppApiService {
 
   // STUDENT AVAILABILITY
 
-  /// Dohvati dostupnost za studenta.
+  /// Fetch availability for student.
   Future<ApiResult<List<Map<String, dynamic>>>> getStudentAvailability(
     int studentId,
   ) async {
@@ -323,7 +323,7 @@ class AppApiService {
     }
   }
 
-  /// Spremi dostupnost studenta (bulk update).
+  /// Save student availability (bulk update).
   Future<ApiResult<bool>> updateStudentAvailability(
     List<Map<String, dynamic>> slots,
   ) async {
@@ -412,7 +412,7 @@ class AppApiService {
         .cast<int>()
         .toList();
 
-    // Mapiranje rasporeda u dayEntries
+    // Mapping schedule to dayEntries
     final dayEntries = schedules.map((s) {
       final sch = s as Map<String, dynamic>;
       final dayOfWeek = (sch['dayOfWeek'] as num?)?.toInt() ?? 1;
@@ -442,7 +442,7 @@ class AppApiService {
       frequency =
           'Do ${endDate.day.toString().padLeft(2, '0')}.${endDate.month.toString().padLeft(2, '0')}.${endDate.year}';
     } else {
-      frequency = 'PonavljajuÄ‡e';
+      frequency = 'Ponavljajuce';
     }
 
     // First schedule za time/weekday/duration
@@ -502,7 +502,7 @@ class AppApiService {
       address = contact?['fullAddress'] as String? ?? '';
     }
 
-    // Service types iz order (if available) â€” fallback to empty
+    // Service types from order (if available) - fallback to empty
     final serviceTypes = <ServiceType>[];
 
     // Review iz nested data (if available)
@@ -601,9 +601,9 @@ class AppApiService {
     return JobStatus.scheduled;
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // --
   // HELPERS
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // --
 
   /// Parse "HH:mm:ss" or "HH:mm" â†’ TimeOfDay.
   TimeOfDay _parseTimeOnly(dynamic value) {
@@ -637,7 +637,7 @@ class AppApiService {
       'Ponedjeljak',
       'Utorak',
       'Srijeda',
-      'ÄŒetvrtak',
+      'Cetvrtak',
       'Petak',
       'Subota',
       'Nedjelja',

@@ -7,7 +7,7 @@ import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/features/booking/data/order_model.dart';
 import 'package:helpi_app/features/booking/presentation/order_flow_screen.dart';
 
-/// Naruči ekran — jednostavan prikaz s gumbom za novu narudžbu.
+/// Order screen - simple view with button for new order.
 class OrderScreen extends StatelessWidget {
   const OrderScreen({
     super.key,

@@ -74,7 +74,7 @@ class _FacultyPickerSheetState extends State<_FacultyPickerSheet> {
           height: MediaQuery.of(context).size.height * 0.65,
           child: Column(
             children: [
-              // ── Handle ──
+              // -- Handle --
               const SizedBox(height: 8),
               Container(
                 width: 40,
@@ -86,7 +86,7 @@ class _FacultyPickerSheetState extends State<_FacultyPickerSheet> {
               ),
               const SizedBox(height: 12),
 
-              // ── Title ──
+              // -- Title --
               Text(
                 AppStrings.facultyPickerTitle,
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -95,7 +95,7 @@ class _FacultyPickerSheetState extends State<_FacultyPickerSheet> {
               ),
               const SizedBox(height: 12),
 
-              // ── Search ──
+              // -- Search --
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: TextField(
@@ -116,7 +116,7 @@ class _FacultyPickerSheetState extends State<_FacultyPickerSheet> {
               ),
               const SizedBox(height: 8),
 
-              // ── List ──
+              // -- List --
               Expanded(
                 child: _filtered.isEmpty
                     ? Center(

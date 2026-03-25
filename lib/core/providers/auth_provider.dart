@@ -7,7 +7,7 @@ import 'package:helpi_app/core/services/data_loader.dart';
 import 'package:helpi_app/features/booking/data/order_model.dart';
 import 'package:helpi_app/features/schedule/data/availability_model.dart';
 
-/// Auth stanje — drži login status, user type i suspension info.
+/// Auth state - holds login status, user type and suspension info.
 class AuthState {
   const AuthState({
     this.isLoggedIn = false,
@@ -108,19 +108,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
     });
   }
 
-  /// Poziva se nakon uspješnog logina.
+  /// Called after successful login.
   Future<void> handleLoginSuccess() async {
     final userType = await _authService.getCurrentUserType();
     state = state.copyWith(isLoggedIn: true, userType: userType);
     _loadDataForUser(userType);
   }
 
-  /// Register Customer (Senior) — profil dovršen u LoginScreen.
+  /// Register Customer (Senior) - profile completed in LoginScreen.
   void handleRegisterSuccess() {
     state = state.copyWith(isLoggedIn: true, userType: 'Customer');
   }
 
-  /// Register Student — ide na RegistrationData flow.
+  /// Register Student - goes to RegistrationData flow.
   void handleStudentRegisterSuccess(String email, String password) {
     state = state.copyWith(
       isLoggedIn: true,
@@ -131,7 +131,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     );
   }
 
-  /// Student RegistrationData završen → ide na Onboarding.
+  /// Student RegistrationData završen -> ide na Onboarding.
   void completeRegistrationData() {
     state = state.copyWith(
       needsRegistrationData: false,
@@ -141,7 +141,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     );
   }
 
-  /// Back iz RegistrationData → nazad na login.
+  /// Back iz RegistrationData -> nazad na login.
   void backFromRegistrationData() {
     state = state.copyWith(
       isLoggedIn: false,
@@ -157,23 +157,23 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(needsOnboarding: false);
   }
 
-  /// Back iz Onboarding → nazad na RegistrationData.
+  /// Back iz Onboarding -> nazad na RegistrationData.
   void backFromOnboarding() {
     state = state.copyWith(needsRegistrationData: true);
   }
 
-  /// Poziva se kad health check sa ServerUnavailableScreen uspije.
+  /// Called when health check from ServerUnavailableScreen succeeds.
   void handleServerBack() {
     state = state.copyWith(isServerUnavailable: false);
     _loadDataForUser(state.userType);
   }
 
-  /// Poziva se kad se app vrati iz backgrounda — re-fetch data.
-  /// Ako je user suspendiran, API vrati 403 → interceptor postavi isSuspended.
+  /// Called when app returns from background - re-fetch data.
+  /// Ako je user suspendiran, API vrati 403 -> interceptor postavi isSuspended.
   /// Ako je user aktiviran, data se refresha normalno i briše suspension flag.
   void refreshAfterResume() {
     if (state.isSuspended) {
-      // Pokušaj load — ako uspije, user je aktiviran
+      // Pokušaj load - ako uspije, user je aktiviran
       DataLoader.loadAll(
         ordersNotifier: state.userType == 'Customer' ? ordersNotifier : null,
         availabilityNotifier: state.userType == 'Student'
@@ -189,7 +189,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  /// Logout — reset svega.
+  /// Logout - reset everything.
   Future<void> handleLogout() async {
     await _authService.logout();
     availabilityNotifier.reset();

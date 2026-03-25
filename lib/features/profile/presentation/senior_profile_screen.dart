@@ -9,7 +9,7 @@ import 'package:helpi_app/core/services/auth_service.dart';
 import 'package:helpi_app/core/network/token_storage.dart';
 import 'package:helpi_app/shared/widgets/helpi_form_fields.dart';
 
-/// Profil ekran — pristupni podaci, naručitelj, senior, kartice, uvjeti.
+/// Profile screen - credentials, customer, senior, cards, terms.
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({
     super.key,
@@ -25,17 +25,17 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // ── Pristupni podaci ──────────────────────────
+  // -- Access credentials --
   final _emailCtrl = TextEditingController();
 
-  // ── Naručitelj ────────────────────────────────
+  // -- Customer --
   final _ordFirstNameCtrl = TextEditingController();
   final _ordLastNameCtrl = TextEditingController();
   final _ordPhoneCtrl = TextEditingController();
   String _ordGender = 'M';
   DateTime _ordDob = DateTime(1985, 1, 1);
 
-  // ── Senior / korisnik ─────────────────────────
+  // -- Senior / user --
   final _senFirstNameCtrl = TextEditingController();
   final _senLastNameCtrl = TextEditingController();
   final _senPhoneCtrl = TextEditingController();
@@ -43,16 +43,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _senGender = 'F';
   DateTime _senDob = DateTime(1950, 1, 1);
 
-  // ── Ostalo ────────────────────────────────────
+  // -- Other --
   late String _selectedLang = AppStrings.currentLocale.toUpperCase();
   bool _isEditing = false;
   bool _agreedToTerms = true;
   bool _isLoading = true;
 
-  // Kartice iz API-ja
+  // Cards from API
   List<Map<String, dynamic>> _cards = [];
 
-  // Contact IDs za spremanje
+  // Contact IDs for saving
   int? _customerContactId;
   int? _seniorContactId;
 
@@ -78,7 +78,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // Store contact ID for saving
       _customerContactId = (contact['id'] as num?)?.toInt();
 
-      // Naručitelj (customer contact)
+      // Customer (customer contact)
       _emailCtrl.text = contact['email'] as String? ?? '';
       final fullName = contact['fullName'] as String? ?? '';
       final nameParts = fullName.split(' ');
@@ -121,7 +121,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     }
 
-    // Kartice
+    // Cards
     final cardsResult = await api.getPaymentMethods(userId);
     if (!mounted) return;
     if (cardsResult.success && cardsResult.data != null) {
@@ -144,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.dispose();
   }
 
-  /// Spremi profil podatke na backend.
+  /// Save profile data to backend.
   Future<void> _saveProfile() async {
     final api = AppApiService();
     bool hasError = false;
@@ -213,7 +213,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                // ── PRISTUPNI PODACI ────────────────────────
+                // -- ACCESS CREDENTIALS --
                 HelpiSectionHeader(title: AppStrings.accessData),
                 const SizedBox(height: 12),
                 HelpiTextField(
@@ -231,7 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // ── PODACI O NARUČITELJU ────────────────────
+                // -- CUSTOMER DATA --
                 HelpiSectionHeader(title: AppStrings.ordererData),
                 const SizedBox(height: 12),
                 HelpiTextField(
@@ -267,7 +267,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // ── PODACI O KORISNIKU (SENIOR) ─────────────
+                // -- USER DATA (SENIOR) --
                 HelpiSectionHeader(title: AppStrings.seniorData),
                 const SizedBox(height: 12),
                 HelpiTextField(
@@ -309,7 +309,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // ── KREDITNE KARTICE ────────────────────────
+                // -- CREDIT CARDS --
                 HelpiSectionHeader(title: AppStrings.creditCards),
                 const SizedBox(height: 12),
                 if (_cards.isEmpty)
@@ -397,7 +397,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
                 const SizedBox(height: 8),
 
-                // ── UVJETI ──────────────────────────────────
+                // -- TERMS --
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -440,7 +440,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // ── UREDI / SPREMI ──────────────────────────
+                // -- EDIT / SAVE --
                 SizedBox(
                   width: double.infinity,
                   child: _isEditing
@@ -470,7 +470,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // ── JEZIK ───────────────────────────────────
+                // -- LANGUAGE --
                 InputDecorator(
                   decoration: InputDecoration(
                     labelText: AppStrings.language,
@@ -517,7 +517,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // ── ODJAVA ──────────────────────────────────
+                // -- LOGOUT --
                 OutlinedButton.icon(
                   onPressed: widget.onLogout,
                   icon: const Icon(Icons.logout),
@@ -526,7 +526,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // ── IZBRIŠI RAČUN ───────────────────────────
+                // -- DELETE ACCOUNT --
                 TextButton(
                   onPressed: () => _showDeleteAccountDialog(context),
                   style: TextButton.styleFrom(
@@ -539,7 +539,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // ── Verzija ─────────────────────────────────
+                // -- Version --
                 Center(
                   child: Text(
                     AppStrings.appVersion,

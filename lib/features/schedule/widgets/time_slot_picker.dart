@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:helpi_app/core/l10n/app_strings.dart';
 
-/// Dozvoljeni sati za radno vrijeme studenta.
+/// Allowed hours for student working time.
 const _minHour = 8;
 const _maxHour = 20;
 
@@ -13,12 +13,12 @@ final _hours = List.generate(_maxHour - _minHour + 1, (i) => _minHour + i);
 /// Dozvoljene minute: 00, 15, 30, 45.
 const _minutes = [0, 15, 30, 45];
 
-/// Prikazuje bottom-sheet picker s dva wheela (sati 8–20 + minute 00/15/30/45).
+/// Shows bottom-sheet picker with two wheels (hours 8-20 + minutes 00/15/30/45).
 ///
-/// [minTime] — minimalno dozvoljeno vrijeme (koristi se za "Do" picker da
+/// [minTime] - minimum allowed time (used for "To" picker so that
 /// spriječi odabir vremena ≤ "Od"). Ako je null, nema ograničenja.
 ///
-/// Vraća [TimeOfDay] ako korisnik potvrdi, `null` ako odustane.
+/// Returns [TimeOfDay] if user confirms, `null` if cancelled.
 Future<TimeOfDay?> showTimeSlotPicker({
   required BuildContext context,
   required TimeOfDay initialTime,
@@ -75,7 +75,7 @@ Future<TimeOfDay?> showTimeSlotPicker({
         initialItem: minuteIndex,
       );
 
-      /// Osigurava da odabrano vrijeme nije ≤ minTime.
+      /// Ensures selected time is not ≤ minTime.
       void enforceMin() {
         if (minTime == null) return;
         final current = selectedHour * 60 + selectedMinute;
@@ -100,7 +100,7 @@ Future<TimeOfDay?> showTimeSlotPicker({
           height: 300,
           child: Column(
             children: [
-              // ── Header ──
+              // -- Header --
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -141,7 +141,7 @@ Future<TimeOfDay?> showTimeSlotPicker({
               ),
               const Divider(height: 1),
 
-              // ── Wheels ──
+              // -- Wheels --
               Expanded(
                 child: Row(
                   children: [

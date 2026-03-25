@@ -10,7 +10,7 @@ import 'package:helpi_app/features/schedule/utils/formatters.dart';
 import 'package:helpi_app/features/schedule/widgets/job_status_badge.dart';
 import 'package:helpi_app/features/schedule/presentation/job_detail_screen.dart';
 
-/// Raspored ekran — tjedni strip + lista poslova za odabrani dan.
+/// Schedule screen - weekly strip + job list for selected day.
 class ScheduleScreen extends ConsumerStatefulWidget {
   const ScheduleScreen({super.key});
 
@@ -143,7 +143,7 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
       appBar: AppBar(title: Text(AppStrings.scheduleTitle)),
       body: Column(
         children: [
-          // ── Tjedni strip ──
+          // -- Weekly strip --
           _WeekStrip(
             weekStart: _weekStart,
             selectedDate: _selectedDate,
@@ -154,7 +154,7 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
             teal: teal,
           ),
 
-          // ── Odabrani dan label ──
+          // -- Selected day label --
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Align(
@@ -166,7 +166,7 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
             ),
           ),
 
-          // ── Lista poslova ──
+          // -- Jobs list --
           Expanded(
             child: todayJobs.isEmpty
                 ? _EmptyDayState(theme: theme, teal: teal)
@@ -192,7 +192,7 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  WEEKLY STRIP — horizontalni tjedan s navigacijom
+//  WEEKLY STRIP - horizontalni tjedan s navigacijom
 // ═══════════════════════════════════════════════════════════════
 
 class _WeekStrip extends StatelessWidget {
@@ -237,7 +237,7 @@ class _WeekStrip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         children: [
-          // ── Month + arrows ──
+          // -- Month + arrows --
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
@@ -265,7 +265,7 @@ class _WeekStrip extends StatelessWidget {
 
           const SizedBox(height: 4),
 
-          // ── Days row ──
+          // -- Days row --
           Row(
             children: List.generate(7, (i) {
               final date = weekStart.add(Duration(days: i));
@@ -351,14 +351,14 @@ class _WeekStrip extends StatelessWidget {
   }
 
   String _monthLabel(BuildContext context) {
-    // Prikaži mjesec + godinu sredine tjedna
+    // Show month + year of week middle
     final mid = weekStart.add(const Duration(days: 3));
     return '${AppStrings.monthName(mid.month)} ${mid.year}';
   }
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  EMPTY STATE — kada nema poslova za odabrani dan
+//  EMPTY STATE - kada nema poslova za odabrani dan
 // ═══════════════════════════════════════════════════════════════
 
 class _EmptyDayState extends StatelessWidget {
@@ -402,7 +402,7 @@ class _EmptyDayState extends StatelessWidget {
 }
 
 // ═══════════════════════════════════════════════════════════════
-//  JOB CARD — kartica jednog posla
+//  JOB CARD - single job card
 // ═══════════════════════════════════════════════════════════════
 
 class _JobCard extends StatelessWidget {
@@ -434,7 +434,7 @@ class _JobCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Gornji dio: vrijeme + status chip ──
+              // -- Top: time + status chip --
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 child: Row(
@@ -455,7 +455,7 @@ class _JobCard extends StatelessWidget {
 
               const Divider(height: 20, thickness: 0.5),
 
-              // ── Korisnik ──
+              // -- User --
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
@@ -474,7 +474,7 @@ class _JobCard extends StatelessWidget {
 
               const Divider(height: 20, thickness: 0.5),
 
-              // ── Adresa ──
+              // -- Address --
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
@@ -498,7 +498,7 @@ class _JobCard extends StatelessWidget {
 
               const Divider(height: 20, thickness: 0.5),
 
-              // ── Prikaži više ──
+              // -- Show more --
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 14),
                 child: Center(

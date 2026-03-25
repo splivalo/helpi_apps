@@ -7,11 +7,11 @@ import 'package:helpi_app/core/providers/jobs_provider.dart';
 import 'package:helpi_app/core/providers/signalr_provider.dart';
 import 'package:helpi_app/core/services/app_api_service.dart';
 
-/// Sluša SignalR evente i automatski osvježava podatke.
+/// Listens to SignalR events and auto-refreshes data.
 ///
 /// Backend šalje "ReceiveNotification" s HNotificationDto koji sadrži
-/// tip notifikacije. Na svaki relevantni event, refreshamo podatke
-/// za trenutnog korisnika.
+/// notification type. On every relevant event, we refresh data
+/// for the current user.
 class RealTimeSyncService {
   RealTimeSyncService(this._ref) {
     _init();
@@ -91,7 +91,7 @@ class RealTimeSyncService {
   }
 }
 
-/// Eager provider — inicijalizira se čim ga netko čita.
+/// Eager provider - initializes as soon as someone reads it.
 final realTimeSyncProvider = Provider<RealTimeSyncService>((ref) {
   return RealTimeSyncService(ref);
 });

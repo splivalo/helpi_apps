@@ -10,7 +10,7 @@ void main() async {
 
   await dotenv.load();
 
-  // Status bar stil — tamni ikoni na svijetloj pozadini.
+  // Status bar stil - tamni ikoni na svijetloj pozadini.
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,

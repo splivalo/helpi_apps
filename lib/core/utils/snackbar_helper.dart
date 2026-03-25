@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:helpi_app/app/theme.dart';
 
-/// Centralizirani snackbar helper — eliminira duplicirane SnackBar pozive s hardkodiranim bojama.
+/// Centralized snackbar helper - eliminates duplicate SnackBar calls with hardcoded colors.
 void showHelpiSnackBar(
   BuildContext context,
   String message, {

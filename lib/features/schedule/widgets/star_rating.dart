@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:helpi_app/app/theme.dart';
 
-/// Zvjezdice za prikaz ocjene (read-only) ili interaktivni odabir.
+/// Stars for rating display (read-only) or interactive selection.
 class StarRating extends StatelessWidget {
   const StarRating({
     super.key,
@@ -11,7 +11,7 @@ class StarRating extends StatelessWidget {
     this.onTap,
   });
 
-  /// Trenutna ocjena (0-5).
+  /// Current rating (0-5).
   final int rating;
 
   /// Veličina zvjezdice.

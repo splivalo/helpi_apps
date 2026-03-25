@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/network/api_endpoints.dart';
 
-/// Full-screen prikazuje se kad backend ne odgovara.
+/// Full-screen shown when backend is not responding.
 ///
-/// Auto-retry svakih 10 sekundi + ručni retry gumb.
-/// Kad server odgovori, poziva [onServerBack].
+/// Auto-retry every 10 seconds + manual retry button.
+/// When server responds, calls [onServerBack].
 class ServerUnavailableScreen extends StatefulWidget {
   final VoidCallback onServerBack;
 

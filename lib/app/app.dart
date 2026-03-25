@@ -16,7 +16,7 @@ import 'package:helpi_app/features/auth/presentation/suspended_screen.dart';
 import 'package:helpi_app/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:helpi_app/features/onboarding/presentation/registration_data_screen.dart';
 
-/// Root widget — role-based routing između Customer i Student shella.
+/// Root widget - role-based routing between Customer and Student shell.
 class HelpiApp extends ConsumerStatefulWidget {
   const HelpiApp({super.key});
 
@@ -45,7 +45,7 @@ class _HelpiAppState extends ConsumerState<HelpiApp>
     if (state == AppLifecycleState.resumed) {
       final auth = ref.read(authProvider);
       if (auth.isLoggedIn) {
-        // Re-fetch data — if user was suspended, 403 interceptor will handle it.
+        // Re-fetch data - if user was suspended, 403 interceptor will handle it.
         // If user was activated, data refreshes and suspension clears.
         ref.read(authProvider.notifier).refreshAfterResume();
       }
@@ -85,7 +85,7 @@ class _HelpiAppState extends ConsumerState<HelpiApp>
   Widget _buildHome(AuthState auth) {
     final authNotifier = ref.read(authProvider.notifier);
 
-    // 0. Suspendiran → SuspendedScreen
+    // 0. Suspendiran -> SuspendedScreen
     if (auth.isSuspended) {
       return SuspendedScreen(
         reason: auth.suspendReason,
@@ -93,14 +93,14 @@ class _HelpiAppState extends ConsumerState<HelpiApp>
       );
     }
 
-    // 0.5 Server nedostupan → ServerUnavailableScreen
+    // 0.5 Server unavailable -> ServerUnavailableScreen
     if (auth.isServerUnavailable) {
       return ServerUnavailableScreen(
         onServerBack: authNotifier.handleServerBack,
       );
     }
 
-    // 1. Nije logiran → LoginScreen
+    // 1. Nije logiran -> LoginScreen
     if (!auth.isLoggedIn) {
       return LoginScreen(
         localeNotifier: _localeNotifier,
@@ -110,7 +110,7 @@ class _HelpiAppState extends ConsumerState<HelpiApp>
       );
     }
 
-    // 2. Student: registracija → RegistrationData → Onboarding → Shell
+    // 2. Student: registration -> RegistrationData -> Onboarding -> Shell
     if (auth.userType == 'Student') {
       if (auth.needsRegistrationData) {
         return RegistrationDataScreen(
@@ -136,7 +136,7 @@ class _HelpiAppState extends ConsumerState<HelpiApp>
       );
     }
 
-    // 3. Customer (Senior) → SeniorShell
+    // 3. Customer (Senior) -> SeniorShell
     return SeniorShell(
       localeNotifier: _localeNotifier,
       onLogout: authNotifier.handleLogout,

@@ -4,7 +4,7 @@ import 'package:helpi_app/core/constants/colors.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/features/booking/data/order_model.dart';
 
-/// Chip koji prikazuje status narudžbe (processing / active / completed).
+/// Chip displaying order status (processing / active / completed).
 class StatusChip extends StatelessWidget {
   const StatusChip({super.key, required this.status});
 

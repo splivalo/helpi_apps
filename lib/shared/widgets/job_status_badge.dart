@@ -4,7 +4,7 @@ import 'package:helpi_app/core/constants/colors.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/features/booking/data/order_model.dart';
 
-/// Badge koji prikazuje status posla/termina (completed / scheduled / cancelled).
+/// Badge displaying job/session status (completed / scheduled / cancelled).
 class JobStatusBadge extends StatelessWidget {
   const JobStatusBadge({super.key, required this.status});
 

@@ -9,7 +9,7 @@ import 'package:helpi_app/features/booking/presentation/orders_screen.dart';
 import 'package:helpi_app/features/chat/presentation/senior_chat_list_screen.dart';
 import 'package:helpi_app/features/profile/presentation/senior_profile_screen.dart';
 
-/// Senior shell — 4 taba: Naruči, Narudžbe, Poruke, Profil.
+/// Senior shell - 4 tabs: Order, Orders, Messages, Profile.
 class SeniorShell extends StatefulWidget {
   const SeniorShell({
     super.key,

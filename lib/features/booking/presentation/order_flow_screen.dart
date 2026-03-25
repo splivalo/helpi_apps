@@ -15,7 +15,7 @@ import 'package:helpi_app/shared/widgets/summary_row.dart';
 import 'package:helpi_app/shared/widgets/tab_bar_selector.dart';
 import 'package:helpi_app/shared/widgets/helpi_switch.dart';
 
-// ─── Model za jednu stavku dana s vremenom ──────────────────────
+// -- Model for a single day entry with time --
 class _DayEntry {
   _DayEntry({required this.day});
 
@@ -25,13 +25,13 @@ class _DayEntry {
   int? duration; // 1–4
 }
 
-// ─── Booking mode enum ──────────────────────────────────────────
+// -- Booking mode enum --
 enum _BookingMode { oneTime, recurring }
 
 /// 3-step order flow:
-///   1) Kada?       — frekvencija, datum, dani + vrijeme
-///   2) Što vam treba?  — usluge (placeholder)
-///   3) Pregled         — summary + poruka (placeholder)
+///   1) When?       - frequency, date, days + time
+///   2) What do you need?  - services (placeholder)
+///   3) Summary         - summary + message (placeholder)
 class OrderFlowScreen extends StatefulWidget {
   const OrderFlowScreen({super.key, required this.ordersNotifier});
 
@@ -44,10 +44,10 @@ class OrderFlowScreen extends StatefulWidget {
 class _OrderFlowScreenState extends State<OrderFlowScreen> {
   int _currentStep = 0;
 
-  // ── Scroll controller for auto-focus ──────────
+  // -- Scroll controller for auto-focus --
   final ScrollController _step1Scroll = ScrollController();
 
-  // ── Step 1 state ──────────────────────────────
+  // -- Step 1 state --
   _BookingMode _bookingMode = _BookingMode.oneTime;
 
   // One-time
@@ -63,22 +63,22 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
   final List<_DayEntry> _dayEntries = [];
   bool _showingDayPicker = false;
 
-  // ── Step 2 state ──────────────────────────────
+  // -- Step 2 state --
   final Set<String> _selectedServices = {};
   final TextEditingController _serviceNoteController = TextEditingController();
 
-  // ── Step 3 state ──────────────────────────────
+  // -- Step 3 state --
   final TextEditingController _promoCodeController = TextEditingController();
   String? _appliedPromoCode;
   bool _promoValidating = false;
   double? _promoDiscount;
   String? _promoError;
 
-  // Kartice iz API-ja
+  // Cards from API
   List<Map<String, dynamic>> _cards = [];
   int _selectedCardIndex = 0;
 
-  // ── Constants ─────────────────────────────────
+  // -- Constants --
   static const _timeHours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
   static const _timeMinutes = [0, 15, 30, 45];
   static const _durations = [1, 2, 3, 4];
@@ -109,7 +109,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     super.dispose();
   }
 
-  // ── Auto-scroll helper ────────────────────────
+  // -- Auto-scroll helper --
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_step1Scroll.hasClients) {
@@ -122,7 +122,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     });
   }
 
-  // ── Helpers ───────────────────────────────────
+  // -- Helpers --
   Set<int> get _usedDays => _dayEntries.map((e) => e.day).toSet();
 
   List<int> get _availableDays {
@@ -296,7 +296,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     );
   }
 
-  // ── Step indicator (3 bars) ───────────────────
+  // -- Step indicator (3 bars) --
   Widget _buildStepIndicator() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
@@ -319,7 +319,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
   }
 
   // ═════════════════════════════════════════════════════════════════
-  //  STEP 1 — KADA?
+  //  STEP 1 - KADA?
   // ═════════════════════════════════════════════════════════════════
   Widget _buildStep1(ThemeData theme) {
     return SingleChildScrollView(
@@ -335,7 +335,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
           ),
           const SizedBox(height: 20),
 
-          // ── Frequency ──
+          // -- Frequency --
           Text(
             AppStrings.frequency,
             style: theme.textTheme.bodyLarge?.copyWith(
@@ -346,7 +346,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
           _buildFrequencyChips(),
           const SizedBox(height: 24),
 
-          // ── Mode-specific content ──
+          // -- Mode-specific content --
           if (_bookingMode == _BookingMode.oneTime)
             _buildOneTimeContent(theme)
           else
@@ -371,12 +371,12 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     );
   }
 
-  // ── One-time: datum + Od + Trajanje ───────────
+  // -- One-time: date + From + Duration --
   Widget _buildOneTimeContent(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Datum
+        // Date
         Text(
           AppStrings.selectDate,
           style: theme.textTheme.bodyLarge?.copyWith(
@@ -389,7 +389,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
         if (_oneTimeDate != null) ...[
           const SizedBox(height: 16),
 
-          // ── Card container (matches recurring day card) ──
+          // -- Card container (matches recurring day card) --
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -497,12 +497,12 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     );
   }
 
-  // ── Recurring: start date + end date (if untilDate) + day entries + add day ──
+  // -- Recurring: start date + end date (if untilDate) + day entries + add day --
   Widget _buildRecurringContent(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Start date — always shown
+        // Start date - always shown
         Text(
           AppStrings.selectStartDate,
           style: theme.textTheme.bodyLarge?.copyWith(
@@ -516,7 +516,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
         if (_startDate != null) ...[
           const SizedBox(height: 16),
 
-          // Switch: Do određenog datuma
+          // Switch: Until specific date
           Row(
             children: [
               Expanded(
@@ -540,7 +540,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
             ],
           ),
 
-          // End date — only when switch is ON
+          // End date - only when switch is ON
           if (_hasEndDate) ...[
             const SizedBox(height: 8),
             _buildDateButton(date: _endDate, onTap: _pickEndDate),
@@ -553,12 +553,12 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
             return _buildDayCard(theme, mapEntry.value, mapEntry.key);
           }),
 
-          // Day picker — auto-show when no days yet, or after "+" tap
+          // Day picker - auto-show when no days yet, or after "+" tap
           if ((_dayEntries.isEmpty || _showingDayPicker) &&
               _availableDays.isNotEmpty)
             _buildDayPickerSection(theme),
 
-          // "+ Dodaj dan" button — only when all existing entries are complete
+          // "+ Add day" button - only when all existing entries are complete
           if (_dayEntries.isNotEmpty &&
               !_showingDayPicker &&
               _availableDays.isNotEmpty &&
@@ -574,7 +574,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     );
   }
 
-  // ── Date button ──────────────────────────────
+  // -- Date button --
   Widget _buildDateButton({
     required DateTime? date,
     required VoidCallback onTap,
@@ -610,12 +610,12 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     );
   }
 
-  // ── Time chips (08:00 – 19:00) ───────────────
+  // -- Time chips (08:00 - 19:00) --
   Widget _buildTimeChips({
     required int? selectedHour,
     required ValueChanged<int> onSelected,
   }) {
-    // 12 hours → rows of 4: 4+4+4
+    // 12 hours -> rows of 4: 4+4+4
     const perRow = 4;
     final rows = <List<int>>[
       for (int s = 0; s < _timeHours.length; s += perRow)
@@ -650,7 +650,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     );
   }
 
-  // ── Duration chips (1–4 h) ───────────────────
+  // -- Duration chips (1-4 h) --
   Widget _buildMinuteChips({
     required int? selectedMinute,
     required ValueChanged<int> onSelected,
@@ -674,7 +674,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     );
   }
 
-  // ── Duration chips (1–4 h) ───────────────────
+  // -- Duration chips (1-4 h) --
   Widget _buildDurationChips({
     required int? selectedDuration,
     required ValueChanged<int> onSelected,
@@ -698,7 +698,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     );
   }
 
-  // ── Day card (one per added day) ─────────────
+  // -- Day card (one per added day) --
   Widget _buildDayCard(ThemeData theme, _DayEntry entry, int index) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -813,7 +813,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     );
   }
 
-  // ── Day picker (shown after "+" tap) ─────────
+  // -- Day picker (shown after "+" tap) --
   Widget _buildDayPickerSection(ThemeData theme) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -878,7 +878,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     );
   }
 
-  // ── "+ Dodaj dan" button ──────────────────────
+  // -- "+ Add day" button --
   Widget _buildAddDayButton() {
     return GestureDetector(
       onTap: () {
@@ -919,10 +919,10 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
   }
 
   // ═════════════════════════════════════════════════════════════════
-  //  STEP 2 — ŠTO VAM TREBA?
+  //  STEP 2 - ŠTO VAM TREBA?
   // ═════════════════════════════════════════════════════════════════
 
-  // Service chip definitions: key → label getter
+  // Service chip definitions: key -> label getter
   static final _serviceChips = <String, String Function()>{
     'shopping': () => AppStrings.bookingChipShopping,
     'house_help': () => AppStrings.bookingChipCleaning,
@@ -934,7 +934,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
 
   Widget _buildStep2(ThemeData theme) {
     final entries = _serviceChips.entries.toList();
-    // 2 per row → 4 rows (7 items + 1 empty slot)
+    // 2 per row -> 4 rows (7 items + 1 empty slot)
     const perRow = 2;
     final rows = <List<MapEntry<String, String Function()>>>[];
     for (var i = 0; i < entries.length; i += perRow) {
@@ -957,7 +957,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
           ),
           const SizedBox(height: 20),
 
-          // Service chips — 2 per row, edge-to-edge
+          // Service chips - 2 per row, edge-to-edge
           for (int r = 0; r < rows.length; r++) ...[
             if (r > 0) const SizedBox(height: 8),
             Row(
@@ -994,7 +994,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
 
           const SizedBox(height: 24),
 
-          // ── Escort info card (shown when Pratnja is selected) ──
+          // -- Escort info card (shown when Escort is selected) --
           if (_selectedServices.contains('escort')) ...[
             InfoCard(text: AppStrings.escortInfo),
             const SizedBox(height: 24),
@@ -1017,7 +1017,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
   }
 
   // ═════════════════════════════════════════════════════════════════
-  //  STEP 3 — PREGLED
+  //  STEP 3 - SUMMARY
   // ═════════════════════════════════════════════════════════════════
   Widget _buildStep3(ThemeData theme) {
     return SingleChildScrollView(
@@ -1031,7 +1031,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
           ),
           const SizedBox(height: 20),
 
-          // ── Summary card ──
+          // -- Summary card --
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
@@ -1223,7 +1223,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
 
           const SizedBox(height: 20),
 
-          // ── Payment method section ──
+          // -- Payment method section --
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
@@ -1295,7 +1295,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                 const SizedBox(height: 4),
                 GestureDetector(
                   onTap: () {
-                    // Prototype — would open dedicated PaymentMethodScreen
+                    // Prototype - would open dedicated PaymentMethodScreen
                   },
                   child: Row(
                     children: [
@@ -1317,7 +1317,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                   ),
                 ),
 
-                // ── Promo code ──
+                // -- Promo code --
                 const Divider(height: 24),
                 Text(
                   AppStrings.promoCode,
@@ -1522,14 +1522,14 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
 
           const SizedBox(height: 20),
 
-          // ── General overtime disclaimer ──
+          // -- General overtime disclaimer --
           InfoCard(text: AppStrings.overtimeDisclaimer),
         ],
       ),
     );
   }
 
-  // ── Service chip key → backend ServiceId ──
+  // -- Service chip key -> backend ServiceId --
   static const _serviceKeyToId = <String, int>{
     'companionship': 1, // Razgovor i slušanje (Category 1)
     'walking': 4, // Šetnje u parku (Category 1)
@@ -1539,7 +1539,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     'other': 41, // Savjetovanje (Category 5)
   };
 
-  // ── Submit order ─────────────────────────────────
+  // -- Submit order --
   Future<void> _submitOrder() async {
     final bool isOneTime = _bookingMode == _BookingMode.oneTime;
 
@@ -1568,7 +1568,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
       }
     }
 
-    // ── Build API payload ──
+    // -- Build API payload --
     final storage = TokenStorage();
     final seniorId = await storage.getSeniorId();
 
@@ -1580,7 +1580,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
       return;
     }
 
-    // Services → backend ServiceIds
+    // Services -> backend ServiceIds
     final services = _selectedServices
         .map((key) => _serviceKeyToId[key])
         .where((id) => id != null)
@@ -1619,7 +1619,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     String fmtDate(DateTime d) =>
         '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
-    // EndDate: recurring without explicit end → +1 year
+    // EndDate: recurring without explicit end -> +1 year
     final apiEndDate =
         endDate ?? (isOneTime ? date : date.add(const Duration(days: 365)));
 
@@ -1636,7 +1636,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
         'paymentMethodId': (_cards[_selectedCardIndex]['id'] as num?)?.toInt(),
     };
 
-    // ── Call API ──
+    // -- Call API --
     final api = AppApiService();
     final result = await api.createOrder(payload);
 
@@ -1700,7 +1700,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                 if (_currentStep < 2) {
                   setState(() => _currentStep++);
                 } else {
-                  // Final submit — send to API and go back
+                  // Final submit - send to API and go back
                   _submitOrder();
                 }
               }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:helpi_app/features/schedule/data/review_model.dart';
 
-/// Tip usluge koju student obavlja.
+/// Service type that student performs.
 enum ServiceType { shopping, houseHelp, companionship, walking, escort, other }
 
 /// Status dodijeljenog posla.
@@ -65,7 +65,7 @@ class MockJobs {
 
   static final List<Job> all = [];
 
-  /// Vrati poslove za određeni datum.
+  /// Return jobs for specific date.
   static List<Job> forDate(DateTime date) {
     return all
         .where(
@@ -82,7 +82,7 @@ class MockJobs {
       );
   }
 
-  /// Datumi koji imaju barem 1 posao.
+  /// Dates that have at least 1 job.
   static Set<DateTime> get datesWithJobs {
     return all
         .map((j) => DateTime(j.date.year, j.date.month, j.date.day))

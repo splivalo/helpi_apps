@@ -11,7 +11,7 @@ class AppFormatters {
     return '$d.$m.${date.year}';
   }
 
-  /// DateTime.weekday (1-7) → puno ime: "Ponedjeljak", "Utorak" ...
+  /// DateTime.weekday (1-7) -> puno ime: "Ponedjeljak", "Utorak" ...
   static String dayFullName(int weekday) {
     switch (weekday) {
       case 1:
@@ -33,7 +33,7 @@ class AppFormatters {
     }
   }
 
-  /// DateTime.weekday → 3 slova: "Pon", "Uto", "Sri" ...
+  /// DateTime.weekday -> 3 slova: "Pon", "Uto", "Sri" ...
   static String dayMediumName(int weekday) {
     switch (weekday) {
       case 1:
@@ -55,7 +55,7 @@ class AppFormatters {
     }
   }
 
-  /// DateTime.weekday → 2 slova: "Po", "Ut", "Sr" ...
+  /// DateTime.weekday -> 2 slova: "Po", "Ut", "Sr" ...
   static String dayShortName(int weekday) {
     switch (weekday) {
       case 1:

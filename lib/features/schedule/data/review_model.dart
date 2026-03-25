@@ -1,4 +1,4 @@
-/// Model jedne recenzije (student ocjenjuje seniora).
+/// Model for one review (student rates senior).
 class ReviewModel {
   ReviewModel({
     this.id,
@@ -8,18 +8,18 @@ class ReviewModel {
     required this.date,
   });
 
-  /// ID recenzije (potreban za submit).
+  /// Review ID (needed for submit).
   final int? id;
 
   /// ID job instance (sesija) na koju se odnosi.
   final int? jobInstanceId;
 
-  /// Ocjena 1-5.
+  /// Rating 1-5.
   final int rating;
 
   /// Opcionalni komentar.
   final String comment;
 
-  /// Datum recenzije (dd.MM.yyyy format).
+  /// Review date (dd.MM.yyyy format).
   final String date;
 }

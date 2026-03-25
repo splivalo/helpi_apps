@@ -18,7 +18,7 @@ import 'package:helpi_app/shared/widgets/star_rating.dart';
 import 'package:helpi_app/shared/widgets/status_chip.dart';
 import 'package:helpi_app/shared/widgets/summary_row.dart';
 
-/// Detalji narudžbe — puni ekran s podacima + sekcija Studenti + ocjene.
+/// Order details - full screen with data + Students section + reviews.
 class OrderDetailScreen extends StatefulWidget {
   const OrderDetailScreen({
     super.key,
@@ -44,7 +44,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     _loadPendingReviews();
   }
 
-  /// Dohvati pending reviews za ovog seniora.
+  /// Fetch pending reviews for this senior.
   Future<void> _loadPendingReviews() async {
     final seniorId = await TokenStorage().getSeniorId();
     if (seniorId == null || !mounted) return;
@@ -100,7 +100,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Header ──
+              // -- Header --
               Row(
                 children: [
                   Expanded(
@@ -116,17 +116,17 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               ),
               const SizedBox(height: 20),
 
-              // ── Summary card ──
+              // -- Summary card --
               _summaryCard(theme, order),
               const SizedBox(height: 20),
 
-              // ── Jobs / sessions (recurring only, not processing) ──
+              // -- Jobs / sessions (recurring only, not processing) --
               if (order.status != OrderStatus.processing && !order.isOneTime)
                 _jobsSection(theme, order),
               if (order.status != OrderStatus.processing && !order.isOneTime)
                 const SizedBox(height: 20),
 
-              // ── Action buttons ──
+              // -- Action buttons --
               if (order.status == OrderStatus.processing ||
                   order.status == OrderStatus.active)
                 OutlinedButton.icon(
@@ -151,7 +151,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-  // ── Summary card (like Pregled) ──
+  // -- Summary card (like Preview) --
   Widget _summaryCard(ThemeData theme, OrderModel order) {
     return Container(
       width: double.infinity,
@@ -368,7 +368,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-  // ── Jobs / sessions section ──
+  // -- Jobs / sessions section --
   Widget _jobsSection(ThemeData theme, OrderModel order) {
     if (order.jobs.isEmpty) return const SizedBox.shrink();
 
@@ -589,7 +589,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     DateTime? startDate;
     DateTime? endDate;
 
-    // Recurring with end date → date range picker
+    // Recurring with end date -> date range picker
     if (!order.isOneTime && order.endDate != null) {
       final range = await showDateRangePicker(
         context: context,
@@ -605,7 +605,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       startDate = range.start;
       endDate = range.end;
     } else {
-      // One-time or recurring without end date → single date picker
+      // One-time or recurring without end date -> single date picker
       final picked = await showDatePicker(
         context: context,
         initialDate: now,

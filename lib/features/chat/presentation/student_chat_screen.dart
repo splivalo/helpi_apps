@@ -14,7 +14,7 @@ class _ChatMessage {
   final String time;
 }
 
-/// Direktni chat s Helpi podrškom — nema liste razgovora.
+/// Direct chat with Helpi support - no conversation list.
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
 
@@ -78,7 +78,7 @@ class _ChatScreenState extends State<ChatScreen> {
         top: false,
         child: Column(
           children: [
-            // Poruke
+            // Messages
             Expanded(
               child: ListView.builder(
                 controller: _scrollController,

@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
-/// Centralizirane boje za Helpi app.
+/// Centralized colors for Helpi app.
 class AppColors {
   AppColors._();
 
-  // ── Primary palette ───────────────────────────────────────────
+  // -- Primary palette --
   static const Color coral = Color(0xFFEF5B5B);
   static const Color teal = Color(0xFF009D9D);
 
-  // ── Semantic ──────────────────────────────────────────────────
+  // -- Semantic --
   static const Color error = Color(0xFFC62828);
   static const Color success = Color(0xFF4CAF50);
   static const Color info = Color(0xFF1976D2);
 
-  // ── Neutrals ─────────────────────────────────────────────────
+  // -- Neutrals --
   static const Color textPrimary = Color(0xFF2D2D2D);
   static const Color textSecondary = Color(0xFF757575);
   static const Color border = Color(0xFFE0E0E0);
@@ -21,15 +21,15 @@ class AppColors {
   static const Color background = Color(0xFFF9F7F4);
   static const Color surface = Colors.white;
 
-  // ── Status backgrounds ────────────────────────────────────────
+  // -- Status backgrounds --
   static const Color statusGreenBg = Color(0xFFE8F5E9);
   static const Color statusBlueBg = Color(0xFFE8F1FB);
   static const Color statusRedBg = Color(0xFFFFEBEE);
 
-  // ── Chip / selection ──────────────────────────────────────────
+  // -- Chip / selection --
   static const Color selectedChipBg = Color(0xFFE0F5F5);
 
-  // ── Reusable button styles ────────────────────────────────────
+  // -- Reusable button styles --
   static final ButtonStyle coralOutlinedStyle = OutlinedButton.styleFrom(
     foregroundColor: coral,
     side: const BorderSide(color: coral, width: 2),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/constants/colors.dart';
 
-/// Informacijska kartica s ikonom i tekstom (plava pozadina).
+/// Info card with icon and text (blue background).
 class InfoCard extends StatelessWidget {
   const InfoCard({
     super.key,

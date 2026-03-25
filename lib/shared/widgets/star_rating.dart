@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Prikaz zvjezdica za ocjenu — display-only ili interactive.
+/// Star display for rating - display-only or interactive.
 class StarRating extends StatelessWidget {
   const StarRating({
     super.key,
@@ -12,7 +12,7 @@ class StarRating extends StatelessWidget {
   final int rating;
   final double size;
 
-  /// Ako je null → display-only. Inače → interaktivan (tap na zvijezdu).
+  /// Ako je null -> display-only. Inače -> interaktivan (tap na zvijezdu).
   final ValueChanged<int>? onTap;
 
   static const _starColor = Color(0xFFFFC107);

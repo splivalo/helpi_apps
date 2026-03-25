@@ -139,7 +139,7 @@ class SignalRService {
   }
 }
 
-/// Singleton SignalR provider — živi dok je app aktivan.
+/// Singleton SignalR provider - lives while app is active.
 final signalRProvider = Provider<SignalRService>((ref) {
   final service = SignalRService(TokenStorage());
 

@@ -9,7 +9,7 @@ import 'package:helpi_app/features/profile/presentation/student_profile_screen.d
 import 'package:helpi_app/features/schedule/presentation/schedule_screen.dart';
 import 'package:helpi_app/features/statistics/presentation/statistics_screen.dart';
 
-/// Student shell — 4 taba: Raspored, Poruke, Statistika, Profil.
+/// Student shell - 4 tabs: Schedule, Messages, Statistics, Profile.
 class StudentShell extends StatefulWidget {
   const StudentShell({
     super.key,

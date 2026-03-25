@@ -23,7 +23,7 @@ class HelpiSectionHeader extends StatelessWidget {
   }
 }
 
-/// Standardno tekstualno polje s labelom.
+/// Standard text field with label.
 class HelpiTextField extends StatelessWidget {
   const HelpiTextField({
     super.key,
@@ -127,7 +127,7 @@ class HelpiGenderPicker extends StatelessWidget {
   }
 }
 
-/// Date picker polje za datum rođenja.
+/// Date picker field for date of birth.
 class HelpiDatePicker extends StatelessWidget {
   const HelpiDatePicker({
     super.key,

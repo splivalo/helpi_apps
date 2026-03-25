@@ -4,7 +4,7 @@ import 'package:helpi_app/core/constants/colors.dart';
 import 'package:helpi_app/core/utils/formatters.dart';
 import 'package:helpi_app/shared/widgets/star_rating.dart';
 
-/// Inline review card — grey background with stars, date, and optional comment.
+/// Inline review card - grey background with stars, date, and optional comment.
 class ReviewInlineCard extends StatelessWidget {
   const ReviewInlineCard({
     super.key,

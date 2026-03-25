@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:helpi_app/app/theme.dart';
 
-/// White card container with border — reusable section wrapper.
+/// White card container with border - reusable section wrapper.
 class HelpiCard extends StatelessWidget {
   const HelpiCard({super.key, required this.child, this.padding});
 

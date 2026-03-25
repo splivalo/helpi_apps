@@ -5,7 +5,7 @@ import 'package:helpi_app/core/network/token_storage.dart';
 import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/features/schedule/data/job_model.dart';
 
-/// Stanje studenskih poslova.
+/// Student jobs state.
 class JobsState {
   const JobsState({this.jobs = const [], this.isLoading = true});
 
@@ -45,7 +45,7 @@ class JobsNotifier extends StateNotifier<JobsState> {
     }
   }
 
-  /// Zamijeni sve poslove (poziva RealTimeSyncService).
+  /// Replace all jobs (called by RealTimeSyncService).
   void replaceAll(List<Job> jobs) {
     MockJobs.all
       ..clear()

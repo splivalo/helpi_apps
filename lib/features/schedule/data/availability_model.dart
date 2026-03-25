@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Model dostupnosti za jedan dan u tjednu.
+/// Availability model for one day of the week.
 class DayAvailability {
   DayAvailability({
     required this.dayKey,
@@ -17,7 +17,7 @@ class DayAvailability {
   TimeOfDay to;
 }
 
-/// Drži listu dostupnosti po danima — dijeli se između onboardinga i profila.
+/// Holds availability list by day - shared between onboarding and profile.
 class AvailabilityNotifier extends ValueNotifier<List<DayAvailability>> {
   AvailabilityNotifier() : super(_defaultAvailability());
 
@@ -59,7 +59,7 @@ class AvailabilityNotifier extends ValueNotifier<List<DayAvailability>> {
     ),
   ];
 
-  /// Day key → DayOfWeek (1=Pon, 2=Uto, ... 7=Ned).
+  /// Day key -> DayOfWeek (1=Pon, 2=Uto, ... 7=Ned).
   static int _dayKeyToWeekday(String dayKey) {
     switch (dayKey) {
       case 'dayMonFull':
@@ -81,7 +81,7 @@ class AvailabilityNotifier extends ValueNotifier<List<DayAvailability>> {
     }
   }
 
-  /// DayOfWeek → day key.
+  /// DayOfWeek -> day key.
   static String _weekdayToDayKey(int weekday) {
     switch (weekday) {
       case 1:
@@ -103,7 +103,7 @@ class AvailabilityNotifier extends ValueNotifier<List<DayAvailability>> {
     }
   }
 
-  /// Učitaj dostupnost iz backend JSON-a.
+  /// Load availability from backend JSON.
   void loadFromBackend(List<Map<String, dynamic>> slots) {
     // Resetiraj na default (sve disabled)
     final days = _defaultAvailability();
@@ -134,7 +134,7 @@ class AvailabilityNotifier extends ValueNotifier<List<DayAvailability>> {
     return TimeOfDay(hour: hour, minute: minute);
   }
 
-  /// Pretvori trenutnu dostupnost u format za backend API.
+  /// Convert current availability to backend API format.
   List<Map<String, dynamic>> toBackendPayload(int studentId) {
     return value
         .where((d) => d.enabled)

@@ -8,13 +8,13 @@ import 'package:helpi_app/features/booking/data/order_model.dart';
 import 'package:helpi_app/features/schedule/data/availability_model.dart';
 import 'package:helpi_app/features/schedule/data/job_model.dart';
 
-/// Učitava podatke s backenda prema ulozi korisnika.
+/// Loads data from backend based on user role.
 ///
 /// Za Senior: narudžbe iz `/api/orders/senior/{id}`.
 /// Za Student: sesije iz `/api/sessions/student/{id}`.
 ///
-/// Poziva se nakon uspješnog logina.  Ako backend ne odgovori,
-/// postojeći mock podaci ostaju kao fallback.
+/// Called after successful login.  Ako backend ne odgovori,
+/// existing mock data remains as fallback.
 class DataLoader {
   DataLoader._();
 
@@ -23,11 +23,11 @@ class DataLoader {
 
   static const _timeout = Duration(seconds: 8);
 
-  /// Učitaj podatke za trenutnog korisnika.
+  /// Učitaj podatke for the current user.
   ///
-  /// [ordersNotifier] je potreban samo za Senior (Customer) — ako je null,
+  /// [ordersNotifier] is needed only for Senior (Customer) - if null,
   /// senior narudžbe se preskaču.
-  /// [availabilityNotifier] je potreban samo za Student — ako je null,
+  /// [availabilityNotifier] is needed only for Student - if null,
   /// student availability se preskače.
   static Future<bool> loadAll({
     OrdersNotifier? ordersNotifier,
@@ -68,7 +68,7 @@ class DataLoader {
       int? seniorId = await storage.getSeniorId();
 
       if (seniorId == null) {
-        // First load — fetch profile to discover seniorId
+        // First load - fetch profile to discover seniorId
         final profileResult = await api.getCustomerProfile(userId);
         if (profileResult.success && profileResult.data != null) {
           final seniors =
@@ -102,7 +102,7 @@ class DataLoader {
         allOk = false;
       }
     } else if (userType == 'Student') {
-      // Student: load sessions → MockJobs
+      // Student: load sessions -> MockJobs
       final sessionsResult = await api.getSessionsByStudent(userId);
       if (sessionsResult.success && sessionsResult.data != null) {
         MockJobs.all
@@ -134,7 +134,7 @@ class DataLoader {
           debugPrint(
             '[DataLoader] student availability failed: ${availResult.error}',
           );
-          // Availability nije kritična — ne fail-amo allOk
+          // Availability nije kritična - ne fail-amo allOk
         }
       }
     }

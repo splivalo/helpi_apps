@@ -1,6 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-/// Sigurno spremanje JWT tokena i korisničkih podataka.
+/// Secure storage of JWT token and user data.
 class TokenStorage {
   final FlutterSecureStorage _storage;
 
@@ -12,7 +12,7 @@ class TokenStorage {
   static const _keyUserType = 'user_type';
   static const _keySeniorId = 'senior_id';
 
-  // ── Token ──
+  // -- Token --
   Future<void> saveToken(String token) =>
       _storage.write(key: _keyToken, value: token);
 
@@ -20,7 +20,7 @@ class TokenStorage {
 
   Future<bool> hasToken() async => (await getToken()) != null;
 
-  // ── User ID ──
+  // -- User ID --
   Future<void> saveUserId(int userId) =>
       _storage.write(key: _keyUserId, value: userId.toString());
 
@@ -29,13 +29,13 @@ class TokenStorage {
     return value != null ? int.tryParse(value) : null;
   }
 
-  // ── User Type ──
+  // -- User Type --
   Future<void> saveUserType(String userType) =>
       _storage.write(key: _keyUserType, value: userType);
 
   Future<String?> getUserType() => _storage.read(key: _keyUserType);
 
-  // ── Senior ID ──
+  // -- Senior ID --
   Future<void> saveSeniorId(int seniorId) =>
       _storage.write(key: _keySeniorId, value: seniorId.toString());
 
@@ -44,6 +44,6 @@ class TokenStorage {
     return value != null ? int.tryParse(value) : null;
   }
 
-  // ── Clear ──
+  // -- Clear --
   Future<void> clearAll() => _storage.deleteAll();
 }

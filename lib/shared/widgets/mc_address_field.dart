@@ -7,7 +7,7 @@ import 'package:helpi_app/core/constants/colors.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/shared/models/selected_address_info.dart';
 
-/// Google Places autocomplete polje za unos adrese.
+/// Google Places autocomplete field for address input.
 /// Vraća [SelectedAddressInfo] kroz [onAddressSelected] callback.
 class McAddressField extends StatefulWidget {
   const McAddressField({

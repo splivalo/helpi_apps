@@ -4,7 +4,7 @@ import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/features/schedule/data/review_model.dart';
 import 'package:helpi_app/features/schedule/widgets/star_rating.dart';
 
-/// Kartica jedne recenzije — koristi se u statistics i job_detail ekranima.
+/// Single review card - used in statistics and job_detail screens.
 class ReviewCard extends StatelessWidget {
   const ReviewCard({super.key, required this.seniorName, required this.review});
 

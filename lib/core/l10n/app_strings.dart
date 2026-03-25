@@ -1,11 +1,11 @@
-/// Gemini Hybrid i18n — centralizirani stringovi za Helpi app (Senior + Student).
+/// Gemini Hybrid i18n - centralized strings for Helpi app (Senior + Student).
 ///
-/// Svaki tekst koji se prikazuje korisniku MORA ići kroz ovu klasu.
+/// Every text shown to user MUST go through this class.
 /// Backend šalje labelKey/placeholderKey, Flutter mapira na AppStrings getters.
 class AppStrings {
   AppStrings._();
 
-  // ─── Trenutni jezik ─────────────────────────────────────────────
+  // -- Current language --
   static String _currentLocale = 'hr';
 
   static String get currentLocale => _currentLocale;
@@ -16,16 +16,16 @@ class AppStrings {
     }
   }
 
-  // ─── Lokalizirane vrijednosti ───────────────────────────────────
+  // -- Localized values --
   static final Map<String, Map<String, String>> _localizedValues = {
     'hr': {
-      // ── App ───────────────────────────────────
+      // -- App --
       'appName': 'Helpi',
       'appTagline': 'Pomoć na dlanu',
       'quickActionsTitle': 'Što vam treba?',
       'topBadge': 'Top',
 
-      // ── Navigacija ────────────────────────────
+      // -- Navigation --
       'navHome': 'Pomoć',
       'navOrder': 'Naruči',
       'navStudents': 'Studenti',
@@ -35,12 +35,12 @@ class AppStrings {
       'navSchedule': 'Raspored',
       'navStatistics': 'Statistika',
 
-      // ── Naruči ekran ─────────────────────────
+      // -- Order screen --
       'orderTitle': 'Naruči pomoć',
       'orderSubtitle':
           'Odaberite što vam treba i mi ćemo vam poslati najboljeg pomoćnika.',
 
-      // ── Order flow ─────────────────────────────
+      // -- Order flow --
       'newOrder': 'Nova narudžba',
       'orderFlowStep1': 'Kada?',
       'orderFlowStep2': 'Što vam treba?',
@@ -91,7 +91,7 @@ class AppStrings {
       'orderMessage': 'Poruka (neobavezno)',
       'orderMessageHint': 'Napišite poruku ili dodatne informacije...',
 
-      // ── Općenito ──────────────────────────────
+      // -- General --
       'loading': 'Učitavanje...',
       'error': 'Greška',
       'serverError': 'Greška na serveru. Pokušajte ponovo.',
@@ -109,7 +109,7 @@ class AppStrings {
       'noResults': 'Nema rezultata',
       'ok': 'U redu',
 
-      // ── Auth ──────────────────────────────────
+      // -- Auth --
       'login': 'Prijava',
       'register': 'Registracija',
       'email': 'E-mail adresa',
@@ -155,7 +155,7 @@ class AppStrings {
       'completeRegistration': 'Završi registraciju',
       'orderingForOther': 'Naručujem za drugog',
 
-      // ── Marketplace ───────────────────────────
+      // -- Marketplace --
       'marketplace': 'Studenti',
       'filterTitle': 'Filtriraj',
       'filterService': 'Vrsta usluge',
@@ -169,7 +169,7 @@ class AppStrings {
       'available': 'Dostupan',
       'unavailable': 'Nedostupan',
 
-      // ── Vrste usluga ─────────────────────────
+      // -- Service types --
       'serviceActivities': 'Aktivnosti',
       'serviceShopping': 'Kupovina',
       'serviceHousehold': 'Kućanstvo',
@@ -177,7 +177,7 @@ class AppStrings {
       'serviceTechHelp': 'Tehnologija',
       'servicePets': 'Ljubimci',
 
-      // ── Time picker ──────────────────────────
+      // -- Time picker --
       'availableWindow': 'Dostupan: {start} – {end}',
       'startTimeLabel': 'Početak',
       'durationLabel': 'Trajanje',
@@ -185,7 +185,7 @@ class AppStrings {
       'hourPlural': 'sata',
       'aboutStudent': 'O studentu',
 
-      // ── Ponavljanje ──────────────────────────
+      // -- Recurrence --
       'oneTime': 'Jednom',
       'recurring': 'Ponavljajuće',
       'continuous': 'Stalno',
@@ -219,7 +219,7 @@ class AppStrings {
       'configureAllDays': 'Odaberite vrijeme za sve dane',
       'notConfigured': 'Nije postavljeno',
 
-      // ── Booking ───────────────────────────────
+      // -- Booking --
       'availability': 'Dostupnost',
       'booking': 'Narudžba',
       'selectSlot': 'Odaberi termin',
@@ -239,14 +239,14 @@ class AppStrings {
       'bookingNotesHint': 'Npr. "Mlijeko i kruh iz Konzuma"',
       'bookNow': 'Rezerviraj',
 
-      // ── Payment ───────────────────────────────
+      // -- Payment --
       'payment': 'Plaćanje',
       'paymentMethod': 'Način plaćanja',
       'payNow': 'Plati sada',
       'paymentSuccess': 'Plaćanje uspješno!',
       'paymentFailed': 'Plaćanje neuspješno',
 
-      // ── Chat ──────────────────────────────────
+      // -- Chat --
       'chat': 'Poruke',
       'chatHelpiSupport': 'Helpi podrška',
       'chatWelcome': 'Dobrodošli! Ovdje možete razgovarati s Helpi timom.',
@@ -256,7 +256,7 @@ class AppStrings {
       'sendMessage': 'Pošalji',
       'noMessages': 'Nema poruka',
 
-      // ── Profil ────────────────────────────────
+      // -- Profile --
       'profile': 'Moj profil',
       'editProfile': 'Uredi profil',
       'myOrders': 'Moje narudžbe',
@@ -340,7 +340,7 @@ class AppStrings {
       'termsOfUseLink': 'uvjete korištenja',
       'cardEndingIn': 'Kartica završava na {digits}',
 
-      // ── Raspored (student) ────────────────────
+      // -- Schedule (student) --
       'scheduleTitle': 'Raspored',
       'scheduleToday': 'Danas',
       'scheduleTomorrow': 'Sutra',
@@ -371,7 +371,7 @@ class AppStrings {
       'serviceEscort2': 'Pratnja',
       'serviceOther2': 'Ostalo',
 
-      // ── Statistika ───────────────────────────
+      // -- Statistics --
       'statsTitle': 'Statistika',
       'statsTotalJobs': 'Ukupno poslova',
       'statsTotalHours': 'Odrađeno sati',
@@ -396,7 +396,7 @@ class AppStrings {
       'statsDaySat': 'S',
       'statsDaySun': 'N',
 
-      // ── Dostupnost (student) ──────────────────
+      // -- Availability (student) --
       'availabilitySection': 'Dostupnost',
       'availabilityDescription':
           'Odaberite dane i vrijeme kada ste dostupni za pomoć.',
@@ -420,7 +420,7 @@ class AppStrings {
       'onboardingFinish': 'Završi',
       'onboardingMinDay': 'Odaberite barem 1 dan s postavljenim vremenom.',
 
-      // ── Parametrizirani ───────────────────────
+      // -- Parameterized --
       'deleteConfirm': 'Obriši {item}?',
       'distanceKm': '{km} km',
       'pricePerHour': '{price} €/sat',
@@ -430,7 +430,7 @@ class AppStrings {
       'orderForStudent': 'Narudžba za {student}',
       'slotTime': '{start} - {end}',
 
-      // ── Kalendar ───────────────────────────
+      // -- Calendar --
       'month1': 'Siječanj',
       'month2': 'Veljača',
       'month3': 'Ožujak',
@@ -466,7 +466,7 @@ class AppStrings {
           'Automatski se obnavlja sljedeći mjesec ako student '
           'produži dostupnost. Možete otkazati bilo kada.',
 
-      // ── Suspenzija ────────────────────────────────────
+      // -- Suspension --
       'suspendedTitle': 'Račun suspendiran',
       'suspendedMessage': 'Vaš račun je privremeno suspendiran.',
       'suspendedReason': 'Razlog: {reason}',
@@ -474,7 +474,7 @@ class AppStrings {
       'suspendedEmail': 'podrska@helpi.hr',
       'suspendedLogout': 'Odjavi se',
 
-      // ── Server nedostupan ────────────────────────
+      // -- Server unavailable --
       'serverUnavailableTitle': 'Server nedostupan',
       'serverUnavailableMessage':
           'Nije moguće spojiti se na server. Provjerite internetsku vezu i pokušajte ponovo.',
@@ -482,13 +482,13 @@ class AppStrings {
       'serverUnavailableRetry': 'Pokušaj ponovo',
     },
     'en': {
-      // ── App ───────────────────────────────────
+      // -- App --
       'appName': 'Helpi',
       'appTagline': 'Help at your fingertips',
       'quickActionsTitle': 'What do you need?',
       'topBadge': 'Top',
 
-      // ── Navigacija ────────────────────────────
+      // -- Navigation --
       'navHome': 'Help',
       'navOrder': 'Order',
       'navStudents': 'Students',
@@ -498,12 +498,12 @@ class AppStrings {
       'navSchedule': 'Schedule',
       'navStatistics': 'Statistics',
 
-      // ── Order screen ─────────────────────────
+      // -- Order screen --
       'orderTitle': 'Order help',
       'orderSubtitle':
           'Choose what you need and we will send you the best helper.',
 
-      // ── Order flow ─────────────────────────────
+      // -- Order flow --
       'newOrder': 'New order',
       'orderFlowStep1': 'When?',
       'orderFlowStep2': 'What do you need?',
@@ -554,7 +554,7 @@ class AppStrings {
       'orderMessage': 'Message (optional)',
       'orderMessageHint': 'Write a message or additional information...',
 
-      // ── Općenito ──────────────────────────────
+      // -- General --
       'loading': 'Loading...',
       'error': 'Error',
       'serverError': 'Server error. Please try again.',
@@ -572,7 +572,7 @@ class AppStrings {
       'noResults': 'No results',
       'ok': 'OK',
 
-      // ── Auth ──────────────────────────────────
+      // -- Auth --
       'login': 'Login',
       'register': 'Register',
       'email': 'Email address',
@@ -618,7 +618,7 @@ class AppStrings {
       'completeRegistration': 'Complete registration',
       'orderingForOther': 'Ordering for someone else',
 
-      // ── Marketplace ───────────────────────────
+      // -- Marketplace --
       'marketplace': 'Students',
       'filterTitle': 'Filter',
       'filterService': 'Service type',
@@ -632,7 +632,7 @@ class AppStrings {
       'available': 'Available',
       'unavailable': 'Unavailable',
 
-      // ── Vrste usluga ─────────────────────────
+      // -- Service types --
       'serviceActivities': 'Activities',
       'serviceShopping': 'Shopping',
       'serviceHousehold': 'Household',
@@ -640,7 +640,7 @@ class AppStrings {
       'serviceTechHelp': 'Technology',
       'servicePets': 'Pets',
 
-      // ── Time picker ──────────────────────────
+      // -- Time picker --
       'availableWindow': 'Available: {start} – {end}',
       'startTimeLabel': 'Start time',
       'durationLabel': 'Duration',
@@ -648,7 +648,7 @@ class AppStrings {
       'hourPlural': 'hours',
       'aboutStudent': 'About student',
 
-      // ── Ponavljanje ──────────────────────────
+      // -- Recurrence --
       'oneTime': 'Once',
       'recurring': 'Recurring',
       'continuous': 'Weekly',
@@ -682,7 +682,7 @@ class AppStrings {
       'configureAllDays': 'Select time for all days',
       'notConfigured': 'Not configured',
 
-      // ── Booking ───────────────────────────────
+      // -- Booking --
       'availability': 'Availability',
       'booking': 'Booking',
       'selectSlot': 'Select time slot',
@@ -702,14 +702,14 @@ class AppStrings {
       'bookingNotesHint': 'E.g. "Milk and bread from the store"',
       'bookNow': 'Book now',
 
-      // ── Payment ───────────────────────────────
+      // -- Payment --
       'payment': 'Payment',
       'paymentMethod': 'Payment method',
       'payNow': 'Pay now',
       'paymentSuccess': 'Payment successful!',
       'paymentFailed': 'Payment failed',
 
-      // ── Chat ──────────────────────────────────
+      // -- Chat --
       'chat': 'Messages',
       'chatHelpiSupport': 'Helpi Support',
       'chatWelcome': 'Welcome! You can chat with the Helpi team here.',
@@ -719,7 +719,7 @@ class AppStrings {
       'sendMessage': 'Send',
       'noMessages': 'No messages',
 
-      // ── Profil ────────────────────────────────
+      // -- Profile --
       'profile': 'My profile',
       'editProfile': 'Edit profile',
       'myOrders': 'My orders',
@@ -804,7 +804,7 @@ class AppStrings {
       'termsOfUseLink': 'terms of use',
       'cardEndingIn': 'Card ending in {digits}',
 
-      // ── Schedule (student) ────────────────────
+      // -- Schedule (student) --
       'scheduleTitle': 'Schedule',
       'scheduleToday': 'Today',
       'scheduleTomorrow': 'Tomorrow',
@@ -835,7 +835,7 @@ class AppStrings {
       'serviceEscort2': 'Escort',
       'serviceOther2': 'Other',
 
-      // ── Statistics ────────────────────────────
+      // -- Statistics --
       'statsTitle': 'Statistics',
       'statsTotalJobs': 'Total jobs',
       'statsTotalHours': 'Hours worked',
@@ -862,7 +862,7 @@ class AppStrings {
       'statsDaySat': 'S',
       'statsDaySun': 'S',
 
-      // ── Availability (student) ────────────────
+      // -- Availability (student) --
       'availabilitySection': 'Availability',
       'availabilityDescription':
           'Select the days and times when you are available to help.',
@@ -886,7 +886,7 @@ class AppStrings {
       'onboardingFinish': 'Finish',
       'onboardingMinDay': 'Select at least 1 day with a time range.',
 
-      // ── Parametrizirani ───────────────────────
+      // -- Parameterized --
       'deleteConfirm': 'Delete {item}?',
       'distanceKm': '{km} km',
       'pricePerHour': '€{price}/hour',
@@ -896,7 +896,7 @@ class AppStrings {
       'orderForStudent': 'Order for {student}',
       'slotTime': '{start} - {end}',
 
-      // ── Calendar ───────────────────────────
+      // -- Calendar --
       'month1': 'January',
       'month2': 'February',
       'month3': 'March',
@@ -932,7 +932,7 @@ class AppStrings {
           'It auto-renews next month if the student extends '
           'availability. You can cancel anytime.',
 
-      // ── Suspension ────────────────────────────────────
+      // -- Suspension --
       'suspendedTitle': 'Account Suspended',
       'suspendedMessage': 'Your account has been temporarily suspended.',
       'suspendedReason': 'Reason: {reason}',
@@ -940,7 +940,7 @@ class AppStrings {
       'suspendedEmail': 'support@helpi.hr',
       'suspendedLogout': 'Log out',
 
-      // ── Server Unavailable ────────────────────────
+      // -- Server Unavailable --
       'serverUnavailableTitle': 'Server Unavailable',
       'serverUnavailableMessage':
           'Unable to connect to server. Please check your internet connection and try again.',
@@ -949,7 +949,7 @@ class AppStrings {
     },
   };
 
-  // ─── Interni getter s parametrima ───────────────────────────────
+  // -- Internal getter with parameters --
   static String _t(String key, {Map<String, String>? params}) {
     String value = _localizedValues[_currentLocale]?[key] ?? key;
     if (params != null) {
@@ -961,14 +961,14 @@ class AppStrings {
   }
 
   // ═══════════════════════════════════════════════════════════════
-  //  STATIC GETTERS — koriste se u UI-ju: AppStrings.appName
+  //  STATIC GETTERS - koriste se u UI-ju: AppStrings.appName
   // ═══════════════════════════════════════════════════════════════
 
-  // ── App ───────────────────────────────────────
+  // -- App --
   static String get appName => _t('appName');
   static String get appTagline => _t('appTagline');
 
-  // ── Suspenzija ──
+  // -- Suspension --
   static String get suspendedTitle => _t('suspendedTitle');
   static String get suspendedMessage => _t('suspendedMessage');
   static String suspendedReason(String reason) =>
@@ -979,7 +979,7 @@ class AppStrings {
   static String get quickActionsTitle => _t('quickActionsTitle');
   static String get topBadge => _t('topBadge');
 
-  // ── Navigacija ────────────────────────────────
+  // -- Navigation --
   static String get navHome => _t('navHome');
   static String get navOrder => _t('navOrder');
   static String get navStudents => _t('navStudents');
@@ -989,11 +989,11 @@ class AppStrings {
   static String get navSchedule => _t('navSchedule');
   static String get navStatistics => _t('navStatistics');
 
-  // ── Naruči ekran ──────────────────────────────
+  // -- Order screen --
   static String get orderTitle => _t('orderTitle');
   static String get orderSubtitle => _t('orderSubtitle');
 
-  // ── Order flow ────────────────────────────
+  // -- Order flow --
   static String get newOrder => _t('newOrder');
   static String get orderFlowStep1 => _t('orderFlowStep1');
   static String get orderFlowStep2 => _t('orderFlowStep2');
@@ -1048,7 +1048,7 @@ class AppStrings {
   static String get orderMessage => _t('orderMessage');
   static String get orderMessageHint => _t('orderMessageHint');
 
-  // ── Općenito ──────────────────────────────────
+  // -- General --
   static String get loading => _t('loading');
   static String get error => _t('error');
   static String get serverError => _t('serverError');
@@ -1066,7 +1066,7 @@ class AppStrings {
   static String get noResults => _t('noResults');
   static String get ok => _t('ok');
 
-  // ── Auth ──────────────────────────────────────
+  // -- Auth --
   static String get login => _t('login');
   static String get register => _t('register');
   static String get email => _t('email');
@@ -1112,7 +1112,7 @@ class AppStrings {
   static String get completeRegistration => _t('completeRegistration');
   static String get orderingForOther => _t('orderingForOther');
 
-  // ── Marketplace ───────────────────────────────
+  // -- Marketplace --
   static String get marketplace => _t('marketplace');
   static String get filterTitle => _t('filterTitle');
   static String get filterService => _t('filterService');
@@ -1126,7 +1126,7 @@ class AppStrings {
   static String get available => _t('available');
   static String get unavailable => _t('unavailable');
 
-  // ── Vrste usluga ─────────────────────────────
+  // -- Service types --
   static String get serviceActivities => _t('serviceActivities');
   static String get serviceShopping => _t('serviceShopping');
   static String get serviceHousehold => _t('serviceHousehold');
@@ -1134,7 +1134,7 @@ class AppStrings {
   static String get serviceTechHelp => _t('serviceTechHelp');
   static String get servicePets => _t('servicePets');
 
-  // ── Time picker ──────────────────────────────
+  // -- Time picker --
   static String availableWindow(String start, String end) =>
       _t('availableWindow', params: {'start': start, 'end': end});
   static String get startTimeLabel => _t('startTimeLabel');
@@ -1143,7 +1143,7 @@ class AppStrings {
   static String get hourPlural => _t('hourPlural');
   static String get aboutStudent => _t('aboutStudent');
 
-  // ── Ponavljanje ──────────────────────────────
+  // -- Recurrence --
   static String get oneTime => _t('oneTime');
   static String get recurring => _t('recurring');
   static String get continuous => _t('continuous');
@@ -1176,7 +1176,7 @@ class AppStrings {
   static String recurringLabel(String days, String end) =>
       _t('recurringLabel', params: {'days': end});
 
-  // ── Booking ───────────────────────────────────
+  // -- Booking --
   static String get availability => _t('availability');
   static String get booking => _t('booking');
   static String get selectSlot => _t('selectSlot');
@@ -1196,14 +1196,14 @@ class AppStrings {
   static String get bookingNotesHint => _t('bookingNotesHint');
   static String get bookNow => _t('bookNow');
 
-  // ── Payment ───────────────────────────────────
+  // -- Payment --
   static String get payment => _t('payment');
   static String get paymentMethod => _t('paymentMethod');
   static String get payNow => _t('payNow');
   static String get paymentSuccess => _t('paymentSuccess');
   static String get paymentFailed => _t('paymentFailed');
 
-  // ── Chat ──────────────────────────────────────
+  // -- Chat --
   static String get chat => _t('chat');
   static String get chatHelpiSupport => _t('chatHelpiSupport');
   static String get chatWelcome => _t('chatWelcome');
@@ -1212,7 +1212,7 @@ class AppStrings {
   static String get sendMessage => _t('sendMessage');
   static String get noMessages => _t('noMessages');
 
-  // ── Profil ────────────────────────────────────
+  // -- Profile --
   static String get profile => _t('profile');
   static String get editProfile => _t('editProfile');
   static String get myOrders => _t('myOrders');
@@ -1300,7 +1300,7 @@ class AppStrings {
   static String cardEndingIn(String digits) =>
       _t('cardEndingIn', params: {'digits': digits});
 
-  // ── Raspored (schedule) ───────────────────────
+  // -- Schedule --
   static String get scheduleTitle => _t('scheduleTitle');
   static String get scheduleToday => _t('scheduleToday');
   static String get scheduleTomorrow => _t('scheduleTomorrow');
@@ -1331,7 +1331,7 @@ class AppStrings {
   static String get serviceEscort2 => _t('serviceEscort2');
   static String get serviceOther2 => _t('serviceOther2');
 
-  // ── Statistika ────────────────────────────────
+  // -- Statistics --
   static String get statsTitle => _t('statsTitle');
   static String get statsTotalJobs => _t('statsTotalJobs');
   static String get statsTotalHours => _t('statsTotalHours');
@@ -1369,7 +1369,7 @@ class AppStrings {
     statsDaySun,
   ];
 
-  // ── Dostupnost (student) ──────────────────────
+  // -- Availability (student) --
   static String get availabilitySection => _t('availabilitySection');
   static String get availabilityDescription => _t('availabilityDescription');
   static String get toTime => _t('toTime');
@@ -1390,7 +1390,7 @@ class AppStrings {
   static String get onboardingFinish => _t('onboardingFinish');
   static String get onboardingMinDay => _t('onboardingMinDay');
 
-  // ── Parametrizirani stringovi ─────────────────
+  // -- Parameterized strings --
   static String deleteConfirm(String item) =>
       _t('deleteConfirm', params: {'item': item});
   static String distanceKm(String km) => _t('distanceKm', params: {'km': km});
@@ -1406,7 +1406,7 @@ class AppStrings {
   static String slotTime(String start, String end) =>
       _t('slotTime', params: {'start': start, 'end': end});
 
-  // ── Kalendar ───────────────────────────
+  // -- Calendar --
   static String monthName(int month) => _t('month$month');
   static String get calendarFree => _t('calendarFree');
   static String get calendarPartial => _t('calendarPartial');
@@ -1436,7 +1436,7 @@ class AppStrings {
   static String recurringAutoRenew(String month) =>
       _t('recurringAutoRenew', params: {'month': month});
 
-  // ── Server nedostupan ──
+  // -- Server unavailable --
   static String get serverUnavailableTitle => _t('serverUnavailableTitle');
   static String get serverUnavailableMessage => _t('serverUnavailableMessage');
   static String get serverUnavailableRetrying =>

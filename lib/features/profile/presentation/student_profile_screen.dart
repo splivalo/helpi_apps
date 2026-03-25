@@ -16,7 +16,7 @@ import 'package:helpi_app/features/schedule/utils/formatters.dart';
 import 'package:helpi_app/features/schedule/widgets/availability_day_row.dart';
 import 'package:helpi_app/features/schedule/widgets/faculty_picker.dart';
 
-/// Profil ekran â€” pristupni podaci, dostupnost, jezik, uvjeti, odjava.
+/// Profile screen - credentials, availability, language, terms, logout.
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({
     super.key,
@@ -34,10 +34,10 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // â”€â”€ Pristupni podaci â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- Access credentials --
   final _emailCtrl = TextEditingController();
 
-  // â”€â”€ Osobni podaci studenta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- Student personal data --
   final _firstNameCtrl = TextEditingController();
   final _lastNameCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
@@ -47,16 +47,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _gender = 'F';
   DateTime _dob = DateTime(2002, 1, 1);
 
-  // â”€â”€ Ostalo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- Other --
   late String _selectedLang = AppStrings.currentLocale.toUpperCase();
   bool _isEditing = false;
   bool _agreedToTerms = true;
   bool _isLoading = true;
   List<Faculty> _faculties = [];
-  // Contact ID za spremanje
+  // Contact ID for saving
   int? _contactId;
   int? _studentUserId;
-  // â”€â”€ Dostupnost â€” Äita/piÅ¡e iz dijeljenog notifiera â”€â”€â”€â”€â”€
+  // -- Availability - reads/writes from shared notifier --
   List<DayAvailability> get _availability => widget.availabilityNotifier.value;
   final _apiClient = ApiClient();
 
@@ -155,7 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  /// Spremi dostupnost na backend.
+  /// Save availability to backend.
   Future<void> _saveAvailability() async {
     final storage = TokenStorage();
     final userId = await storage.getUserId();
@@ -171,14 +171,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       debugPrint('[ProfileScreen] availability saved: ${payload.length} slots');
     } else {
       debugPrint('[ProfileScreen] availability save failed: ${result.error}');
-      // Opcionalno: prikaži grešku
+      // Optional: prikaži grešku
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result.error ?? 'Failed to save availability')),
       );
     }
   }
 
-  /// Spremi osobne podatke na backend.
+  /// Save personal data to backend.
   Future<void> _savePersonalData() async {
     if (_contactId == null) return;
 
@@ -234,7 +234,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                // â”€â”€ PRISTUPNI PODACI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // -- ACCESS CREDENTIALS --
                 _sectionHeader(AppStrings.accessData),
                 const SizedBox(height: 12),
                 _buildField(
@@ -256,7 +256,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // â”€â”€ OSOBNI PODACI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // -- PERSONAL DATA --
                 _sectionHeader(AppStrings.studentData),
                 const SizedBox(height: 12),
                 _buildField(AppStrings.firstName, _firstNameCtrl),
@@ -284,7 +284,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _buildField(AppStrings.studentIdCard, _studentIdCardCtrl),
                 const SizedBox(height: 32),
 
-                // â”€â”€ DOSTUPNOST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // -- AVAILABILITY --
                 _sectionHeader(AppStrings.availabilitySection),
                 const SizedBox(height: 4),
                 Text(
@@ -306,7 +306,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 8),
 
-                // â”€â”€ UVJETI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // -- TERMS --
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -349,7 +349,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // â”€â”€ UREDI / SPREMI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // -- EDIT / SAVE --
                 SizedBox(
                   width: double.infinity,
                   child: _isEditing
@@ -382,7 +382,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // â”€â”€ JEZIK â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // -- LANGUAGE --
                 InputDecorator(
                   decoration: InputDecoration(
                     labelText: AppStrings.language,
@@ -429,7 +429,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // â”€â”€ ODJAVA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // -- LOGOUT --
                 OutlinedButton.icon(
                   onPressed: widget.onLogout,
                   icon: const Icon(Icons.logout),
@@ -438,7 +438,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // ── IZBRIŠI RAČUN ───────────────────────────
+                // -- DELETE ACCOUNT --
                 TextButton(
                   onPressed: () => _showDeleteAccountDialog(context),
                   style: TextButton.styleFrom(
@@ -451,7 +451,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // â”€â”€ Verzija â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // -- Version --
                 Center(
                   child: Text(
                     AppStrings.appVersion,

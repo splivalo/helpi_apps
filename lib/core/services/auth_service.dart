@@ -303,7 +303,7 @@ class AuthService {
         },
       );
 
-      // Backend vraća novi TokenResponseDto — spremi novi JWT
+      // Backend returns new TokenResponseDto - save new JWT
       final body = response.data as Map<String, dynamic>;
       final newToken = body['accessToken'] as String?;
       if (newToken != null && newToken.isNotEmpty) {

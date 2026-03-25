@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'api_endpoints.dart';
 import 'token_storage.dart';
 
-/// Callback za suspenziju — poziva se iz interceptora.
+/// Callback for suspension - called from interceptor.
 typedef SuspensionCallback = void Function(String? reason);
 
 /// Dio HTTP klijent s automatskim JWT umetanjem.

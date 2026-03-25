@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:helpi_app/features/schedule/data/availability_model.dart';
 import 'package:helpi_app/features/schedule/widgets/time_slot_picker.dart';
 
-/// Prikazuje time picker i ažurira [day.from] ili [day.to].
-/// Vraća `true` ako je korisnik promijenio vrijednost.
+/// Shows time picker and updates [day.from] ili [day.to].
+/// Returns `true` if user changed the value.
 Future<bool> pickAvailabilityTime({
   required BuildContext context,
   required DayAvailability day,

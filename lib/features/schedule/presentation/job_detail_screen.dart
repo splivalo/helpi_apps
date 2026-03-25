@@ -13,7 +13,7 @@ import 'package:helpi_app/core/utils/snackbar_helper.dart';
 import 'package:helpi_app/features/schedule/widgets/job_status_badge.dart';
 import 'package:helpi_app/features/schedule/widgets/star_rating.dart';
 
-/// Detalji jednog posla — prikazuje sve info + sekcija za ocjenu seniora.
+/// Job details - displays all info + section for rating senior.
 class JobDetailScreen extends StatefulWidget {
   const JobDetailScreen({
     super.key,
@@ -173,7 +173,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       }
     }
 
-    // Lokalno ažuriraj prikaz
+    // Locally update display
     final updatedJob = Job(
       id: _job.id,
       date: _job.date,
@@ -217,7 +217,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ── Datum + status chip ──
+                  // -- Date + status chip --
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                     child: Row(
@@ -242,7 +242,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
                   const SizedBox(height: 12),
 
-                  // ── Vrijeme ──
+                  // -- Time --
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
@@ -263,7 +263,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
                   const SizedBox(height: 8),
 
-                  // ── Adresa ──
+                  // -- Address --
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
@@ -286,7 +286,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
                   const SizedBox(height: 8),
 
-                  // ── Usluge (ikona + chipovi) ──
+                  // -- Services (icon + chips) --
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
@@ -328,7 +328,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     ),
                   ),
 
-                  // ── Napomene ──
+                  // -- Notes --
                   if (_job.notes != null) ...[
                     const SizedBox(height: 8),
                     Padding(
@@ -360,7 +360,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
             const SizedBox(height: 16),
 
-            // ═══ CARD 2: Korisnik (Senior) + Review ═══
+            // ═══ CARD 2: User (Senior) + Review ═══
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -380,7 +380,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   ),
                   const SizedBox(height: 12),
 
-                  // ── Ime seniora + Ocijeni gumb ──
+                  // -- Senior name + Rate button --
                   Row(
                     children: [
                       // Circle avatar
@@ -406,7 +406,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                           ),
                         ),
                       ),
-                      // Ocijeni gumb — samo za completed bez reviewova
+                      // Rate button - only for completed without reviews
                       if (_job.status == JobStatus.completed &&
                           _job.review == null)
                         SizedBox(
@@ -440,7 +440,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     ],
                   ),
 
-                  // ── Prikaz recenzije (ako postoji) ──
+                  // -- Review display (if exists) --
                   if (_job.review != null) ...[
                     const SizedBox(height: 12),
                     Text(
@@ -495,7 +495,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
             const SizedBox(height: 24),
 
-            // ── Ne mogu gumb (za assigned, >24h) ──
+            // -- Can't attend button (for assigned, >24h) --
             if (_job.canDecline) ...[
               SizedBox(
                 width: double.infinity,

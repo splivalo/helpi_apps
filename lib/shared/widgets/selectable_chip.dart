@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:helpi_app/core/constants/colors.dart';
 
-/// Soft selection chip — teal border kad je selektiran, sivi inače.
+/// Soft selection chip - teal border when selected, grey otherwise.
 class SelectableChip extends StatelessWidget {
   const SelectableChip({
     super.key,

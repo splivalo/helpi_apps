@@ -6,8 +6,8 @@ import 'package:helpi_app/features/schedule/data/availability_model.dart';
 import 'package:helpi_app/features/schedule/utils/formatters.dart';
 import 'package:helpi_app/features/schedule/utils/job_helpers.dart';
 
-/// Red dostupnosti za jedan dan — checkbox + naziv + od/do chipovi.
-/// Koristi se u onboarding_screen i profile_screen.
+/// Availability row for one day - checkbox + name + from/to chips.
+/// Used in onboarding_screen and profile_screen.
 class AvailabilityDayRow extends StatelessWidget {
   const AvailabilityDayRow({
     super.key,
@@ -23,7 +23,7 @@ class AvailabilityDayRow extends StatelessWidget {
   final VoidCallback onPickFrom;
   final VoidCallback onPickTo;
 
-  /// Ako false, checkbox je disabled (profile kad nije u edit modu).
+  /// If false, checkbox is disabled (profile when not in edit mode).
   final bool enabled;
 
   @override
