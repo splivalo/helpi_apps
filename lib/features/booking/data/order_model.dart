@@ -161,13 +161,14 @@ class OrdersNotifier extends ChangeNotifier {
       _orders.where((o) => o.status == OrderStatus.cancelled).toList()
         ..sort((a, b) => b.id.compareTo(a.id));
 
-  List<OrderModel> get inactive => _orders
-      .where(
-        (o) =>
-            o.status == OrderStatus.completed ||
-            o.status == OrderStatus.cancelled,
-      )
-      .toList()
+  List<OrderModel> get inactive =>
+      _orders
+          .where(
+            (o) =>
+                o.status == OrderStatus.completed ||
+                o.status == OrderStatus.cancelled,
+          )
+          .toList()
         ..sort((a, b) => b.id.compareTo(a.id));
 
   List<OrderModel> get archived =>

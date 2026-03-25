@@ -10,7 +10,7 @@ import 'package:helpi_app/features/schedule/data/job_model.dart';
 import 'package:helpi_app/features/schedule/data/review_model.dart'
     as schedule_review;
 
-/// Wrapper za API rezultat â€” uspjeh ili greÅ¡ka.
+/// Wrapper za API rezultat â€” uspjeh ili greška.
 class ApiResult<T> {
   ApiResult.success(this.data) : _success = true, error = null;
 
@@ -26,7 +26,7 @@ class ApiResult<T> {
 class AppApiService {
   final ApiClient _client = ApiClient();
 
-  /// Pretvara iznimku u user-friendly poruku greÅ¡ke.
+  /// Pretvara iznimku u user-friendly poruku greške.
   static String _friendlyError(Object e) {
     if (e is DioException) {
       final statusCode = e.response?.statusCode;
@@ -274,7 +274,7 @@ class AppApiService {
     }
   }
 
-  /// PoÅ¡alji recenziju (senior ocjenjuje studenta).
+  /// Pošalji recenziju (senior ocjenjuje studenta).
   Future<ApiResult<bool>> submitReview(Map<String, dynamic> reviewData) async {
     try {
       await _client.put(ApiEndpoints.reviews, data: reviewData);
