@@ -47,7 +47,7 @@ class AppApiService {
   // SENIOR: Orders
   // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-  /// Dohvati narudÅ¾be za seniora po [seniorId].
+  /// Dohvati narudžbe za seniora po [seniorId].
   Future<ApiResult<List<OrderModel>>> getOrdersBySenior(int seniorId) async {
     try {
       final response = await _client.get(ApiEndpoints.ordersBySenior(seniorId));
@@ -62,7 +62,7 @@ class AppApiService {
     }
   }
 
-  /// Kreiraj novu narudÅ¾bu.
+  /// Kreiraj novu narudžbu.
   Future<ApiResult<OrderModel>> createOrder(
     Map<String, dynamic> orderData,
   ) async {
@@ -76,7 +76,7 @@ class AppApiService {
     }
   }
 
-  /// OtkaÅ¾i narudÅ¾bu.
+  /// Otkaži narudžbu.
   Future<ApiResult<bool>> cancelOrder(int orderId, {String? reason}) async {
     try {
       await _client.post(
@@ -90,7 +90,7 @@ class AppApiService {
     }
   }
 
-  /// OtkaÅ¾i pojedinu sesiju (job instance) â€” student cancel.
+  /// Otkaži pojedinu sesiju (job instance) â€” student cancel.
   Future<ApiResult<bool>> cancelSession(int sessionId) async {
     try {
       await _client.post(ApiEndpoints.sessionCancel(sessionId));
@@ -101,9 +101,7 @@ class AppApiService {
     }
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // PROMO CODES
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /// Validate promo code â€” returns validation result from backend.
   Future<ApiResult<Map<String, dynamic>>> validatePromoCode({
@@ -151,11 +149,9 @@ class AppApiService {
     }
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // PROFILE
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-  /// Dohvati profil kupca (Customer) â€” sadrÅ¾i Contact + Seniors[].
+  /// Dohvati profil kupca (Customer) â€” sadrži Contact + Seniors[].
   Future<ApiResult<Map<String, dynamic>>> getCustomerProfile(
     int customerId,
   ) async {
@@ -187,9 +183,7 @@ class AppApiService {
     }
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // STUDENT: Sessions / Jobs
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /// Dohvati sve sesije za studenta.
   Future<ApiResult<List<Job>>> getSessionsByStudent(int studentId) async {
@@ -223,9 +217,7 @@ class AppApiService {
     }
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // REVIEWS
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /// Dohvati recenzije za seniora.
   Future<ApiResult<List<schedule_review.ReviewModel>>> getReviewsBySenior(
@@ -293,9 +285,7 @@ class AppApiService {
     }
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // PAYMENT METHODS
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /// Dohvati kartice (payment methods) za korisnika.
   Future<ApiResult<List<Map<String, dynamic>>>> getPaymentMethods(
@@ -314,9 +304,7 @@ class AppApiService {
     }
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // STUDENT AVAILABILITY
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /// Dohvati dostupnost za studenta.
   Future<ApiResult<List<Map<String, dynamic>>>> getStudentAvailability(
@@ -348,9 +336,7 @@ class AppApiService {
     }
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // CONTACT INFO
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /// Update contact info (profile data: name, phone, address, etc.)
   Future<ApiResult<bool>> updateContactInfo({
@@ -405,9 +391,7 @@ class AppApiService {
     }
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // MAPPERS
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   /// Backend OrderDto â†’ App OrderModel.
   OrderModel _mapOrder(Map<String, dynamic> json) {
@@ -566,9 +550,7 @@ class AppApiService {
     );
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // ENUM MAPPERS
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   OrderStatus _mapOrderStatus(dynamic status) {
     if (status is int) {

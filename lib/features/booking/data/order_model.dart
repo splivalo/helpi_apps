@@ -146,16 +146,20 @@ class OrdersNotifier extends ChangeNotifier {
   List<OrderModel> get orders => List.unmodifiable(_orders);
 
   List<OrderModel> get processing =>
-      _orders.where((o) => o.status == OrderStatus.processing).toList();
+      _orders.where((o) => o.status == OrderStatus.processing).toList()
+        ..sort((a, b) => b.id.compareTo(a.id));
 
   List<OrderModel> get active =>
-      _orders.where((o) => o.status == OrderStatus.active).toList();
+      _orders.where((o) => o.status == OrderStatus.active).toList()
+        ..sort((a, b) => b.id.compareTo(a.id));
 
   List<OrderModel> get completed =>
-      _orders.where((o) => o.status == OrderStatus.completed).toList();
+      _orders.where((o) => o.status == OrderStatus.completed).toList()
+        ..sort((a, b) => b.id.compareTo(a.id));
 
   List<OrderModel> get cancelled =>
-      _orders.where((o) => o.status == OrderStatus.cancelled).toList();
+      _orders.where((o) => o.status == OrderStatus.cancelled).toList()
+        ..sort((a, b) => b.id.compareTo(a.id));
 
   List<OrderModel> get inactive => _orders
       .where(
@@ -163,10 +167,12 @@ class OrdersNotifier extends ChangeNotifier {
             o.status == OrderStatus.completed ||
             o.status == OrderStatus.cancelled,
       )
-      .toList();
+      .toList()
+        ..sort((a, b) => b.id.compareTo(a.id));
 
   List<OrderModel> get archived =>
-      _orders.where((o) => o.status == OrderStatus.archived).toList();
+      _orders.where((o) => o.status == OrderStatus.archived).toList()
+        ..sort((a, b) => b.id.compareTo(a.id));
 
   int _nextId = 1;
 
