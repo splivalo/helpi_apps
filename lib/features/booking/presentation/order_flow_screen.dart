@@ -186,10 +186,11 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
 
   Future<void> _pickOneTimeDate() async {
     final now = DateTime.now();
+    final tomorrow = DateTime(now.year, now.month, now.day + 1);
     final picked = await showDatePicker(
       context: context,
-      initialDate: _oneTimeDate ?? now,
-      firstDate: now,
+      initialDate: _oneTimeDate ?? tomorrow,
+      firstDate: tomorrow,
       lastDate: DateTime(now.year + 2),
       locale: const Locale('hr'),
       confirmText: AppStrings.confirm,
@@ -225,10 +226,11 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
 
   Future<void> _pickStartDate() async {
     final now = DateTime.now();
+    final tomorrow = DateTime(now.year, now.month, now.day + 1);
     final picked = await showDatePicker(
       context: context,
-      initialDate: _startDate ?? now,
-      firstDate: now,
+      initialDate: _startDate ?? tomorrow,
+      firstDate: tomorrow,
       lastDate: DateTime(now.year + 2),
       locale: const Locale('hr'),
       confirmText: AppStrings.confirm,
