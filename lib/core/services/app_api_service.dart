@@ -32,8 +32,9 @@ class AppApiService {
       final statusCode = e.response?.statusCode;
       if (statusCode == 403) return AppStrings.suspendedMessage;
       if (statusCode == 404) return AppStrings.error;
-      if (statusCode != null && statusCode >= 500)
+      if (statusCode != null && statusCode >= 500) {
         return AppStrings.serverError;
+      }
       if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.receiveTimeout ||
           e.type == DioExceptionType.connectionError) {
