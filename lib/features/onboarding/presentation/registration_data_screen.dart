@@ -38,7 +38,6 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
   final _lastNameCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
-  final _studentIdCardCtrl = TextEditingController();
 
   String _gender = 'M';
   DateTime? _dob;
@@ -54,7 +53,6 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
     _firstNameCtrl.addListener(_onFieldChanged);
     _lastNameCtrl.addListener(_onFieldChanged);
     _phoneCtrl.addListener(_onFieldChanged);
-    _studentIdCardCtrl.addListener(_onFieldChanged);
     _loadFaculties();
   }
 
@@ -79,7 +77,6 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
     _lastNameCtrl.dispose();
     _phoneCtrl.dispose();
     _addressCtrl.dispose();
-    _studentIdCardCtrl.dispose();
     super.dispose();
   }
 
@@ -89,7 +86,6 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
       _phoneCtrl.text.trim().isNotEmpty &&
       _selectedAddress != null &&
       _selectedFaculty != null &&
-      _studentIdCardCtrl.text.trim().isNotEmpty &&
       _dob != null;
 
   @override
@@ -176,16 +172,6 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
 
                     // -- Faculty --
                     _buildFacultyPicker(theme),
-                    const SizedBox(height: 12),
-
-                    // -- Student ID number --
-                    _buildField(
-                      label: AppStrings.studentIdCard,
-                      controller: _studentIdCardCtrl,
-                      theme: theme,
-                      hint: AppStrings.studentIdCardHint,
-                      keyboardType: TextInputType.number,
-                    ),
                     const SizedBox(height: 32),
 
                     // -- Error message --
@@ -277,7 +263,6 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
       googlePlaceId: _selectedAddress!.placeId,
       lat: _selectedAddress!.lat,
       lng: _selectedAddress!.lng,
-      studentNumber: _studentIdCardCtrl.text.trim(),
       facultyId: _selectedFaculty!.id,
     );
 

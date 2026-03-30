@@ -43,7 +43,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _phoneCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
   Faculty? _selectedFaculty;
-  final _studentIdCardCtrl = TextEditingController();
   String _gender = 'F';
   DateTime _dob = DateTime(2002, 1, 1);
 
@@ -98,7 +97,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           : '';
       _phoneCtrl.text = contact['phone'] as String? ?? '';
       _addressCtrl.text = contact['fullAddress'] as String? ?? '';
-      _studentIdCardCtrl.text = data['studentNumber'] as String? ?? '';
       final genderVal = contact['gender'];
       _gender = (genderVal == 0 || genderVal == 'Male') ? 'M' : 'F';
       final dobStr = contact['dateOfBirth'] as String?;
@@ -136,7 +134,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _lastNameCtrl.dispose();
     _phoneCtrl.dispose();
     _addressCtrl.dispose();
-    _studentIdCardCtrl.dispose();
     super.dispose();
   }
 
@@ -208,9 +205,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         await api.updateStudent(
           studentId: _studentUserId!,
           facultyId: _selectedFaculty?.id,
-          studentNumber: _studentIdCardCtrl.text.trim().isNotEmpty
-              ? _studentIdCardCtrl.text.trim()
-              : null,
         );
       }
       if (!mounted) return;
@@ -280,8 +274,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _buildField(AppStrings.address, _addressCtrl),
                 const SizedBox(height: 12),
                 _buildFacultyField(),
-                const SizedBox(height: 12),
-                _buildField(AppStrings.studentIdCard, _studentIdCardCtrl),
                 const SizedBox(height: 32),
 
                 // -- AVAILABILITY --

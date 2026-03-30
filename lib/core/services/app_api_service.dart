@@ -373,16 +373,14 @@ class AppApiService {
     }
   }
 
-  /// Update student-specific fields (facultyId, studentNumber).
+  /// Update student-specific fields (facultyId).
   Future<ApiResult<bool>> updateStudent({
     required int studentId,
     int? facultyId,
-    String? studentNumber,
   }) async {
     try {
       final data = <String, dynamic>{};
       if (facultyId != null) data['facultyId'] = facultyId;
-      if (studentNumber != null) data['studentNumber'] = studentNumber;
       if (data.isEmpty) return ApiResult.success(true);
       await _client.put(ApiEndpoints.studentById(studentId), data: data);
       return ApiResult.success(true);

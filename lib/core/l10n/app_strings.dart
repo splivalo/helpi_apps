@@ -408,8 +408,6 @@ class AppStrings {
       'facultyPickerTitle': 'Odaberite fakultet',
       'facultySearchHint': 'Pretraži po akronimu ili nazivu',
       'facultyNoResults': 'Nema rezultata',
-      'studentIdCard': 'Broj studentske iskaznice',
-      'studentIdCardHint': 'Npr. 0036512345',
       'registrationDataTitle': 'Vaši podaci',
       'registrationDataSubtitle':
           'Ispunite svoje podatke kako bismo mogli kreirati vaš profil.',
@@ -874,8 +872,6 @@ class AppStrings {
       'facultyPickerTitle': 'Select faculty',
       'facultySearchHint': 'Search by acronym or name',
       'facultyNoResults': 'No results',
-      'studentIdCard': 'Student ID card number',
-      'studentIdCardHint': 'E.g. 0036512345',
       'registrationDataTitle': 'Your details',
       'registrationDataSubtitle':
           'Fill in your details so we can create your profile.',
@@ -1380,8 +1376,6 @@ class AppStrings {
   static String get facultyPickerTitle => _t('facultyPickerTitle');
   static String get facultySearchHint => _t('facultySearchHint');
   static String get facultyNoResults => _t('facultyNoResults');
-  static String get studentIdCard => _t('studentIdCard');
-  static String get studentIdCardHint => _t('studentIdCardHint');
   static String get registrationDataTitle => _t('registrationDataTitle');
   static String get registrationDataSubtitle => _t('registrationDataSubtitle');
   static String get registrationDataNext => _t('registrationDataNext');

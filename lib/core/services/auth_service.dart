@@ -201,7 +201,6 @@ class AuthService {
     required String googlePlaceId,
     required double lat,
     required double lng,
-    String? studentNumber,
     int? facultyId,
   }) async {
     try {
@@ -226,9 +225,6 @@ class AuthService {
         'contactInfo': contactInfo,
       };
 
-      if (studentNumber != null && studentNumber.isNotEmpty) {
-        body['studentNumber'] = studentNumber;
-      }
       if (facultyId != null) {
         body['facultyId'] = facultyId;
       }
