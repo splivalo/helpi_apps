@@ -4,6 +4,30 @@
 
 ---
 
+## 2026-04-01 — Realtime refresh sužen na relevantne notifikacije
+
+**Problem:** Unified app je radio refresh orders/jobs na svaku SignalR notifikaciju, što je bilo sigurno ali pregrubo i nepotrebno bučno.
+
+**Odluka:** `RealTimeSyncService` sada prvo parsira `ReceiveNotification` payload i refresha samo na known state-changing tipove. `SystemNotification` ostaje fallback koji i dalje radi puni refresh.
+
+**Rezultat:** Manje nepotrebnih API refresh poziva, ali bez gubitka sigurnosti za reschedule/reassignment tokove.
+
+---
+
+## 2026-04-01 — Lokalni fallback za payment kartice u order flowu
+
+**Problem:** Testiranje kreiranja narudžbe na pravom uređaju je blokirano kad backend nema spremljene payment metode, a pravi Stripe add-card flow još nije spreman za v2.
+
+**Odluka:** `order_flow_screen.dart` i `senior_profile_screen.dart` koriste postojeći backend `payment-methods` endpoint za spremanje dummy test kartica bez `processorToken`. Ako backend nije dostupan, order flow i dalje pada na lokalni fallback kako checkout ne bi bio blokiran.
+
+**Granica rješenja:** Ovo nije Stripe integracija. Dummy kartice služe za razvoj i testiranje, a create-order ih i dalje tretira kao test kartice pa ne šalje `paymentMethodId` ako kartica nema pravi `processorToken`.
+
+**Rezultat:** Profil sada stvarno sprema i briše test kartice kroz backend, order flow može dodati karticu bez izlaska iz checkouta, a testiranje ostaje moguće bez diranja live Stripe v1 konfiguracije.
+
+**Dodatno:** `order_flow_screen.dart` više ne ovisi samo o fiksnim service ID brojevima. App sada pokušava dohvatiti `service-categories` i iz backend DTO-a razriješiti odgovarajuće service ID-jeve, uz postojeći fallback ako backend odgovor nije dostupan.
+
+---
+
 ## 2026-03-14 — Odluka: Merge 2 appa u 1
 
 **Problem:** helpi_senior (32 fajla) i helpi_student (31 fajl) su odvojene Flutter aplikacije s identičnim UI identitetom (boje, tipografija, widgeti). Duplicirali smo ~60% koda.

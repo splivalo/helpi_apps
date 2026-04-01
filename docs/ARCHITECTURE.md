@@ -27,6 +27,12 @@
 > `app.dart`, `schedule_screen.dart`, `statistics_screen.dart` su sada `ConsumerStatefulWidget`.
 > SignalR se automatski spaja na `/hubs/notifications` pri loginu i osvježava podatke u real-time.
 
+> **Refinement 2026-04-01:** `realtime_sync_provider.dart` parsira `ReceiveNotification` payload i refresha samo na known state-changing notification tipove; `SystemNotification` ostaje sigurnosni full-refresh fallback.
+
+> **Payment Methods Test Mode 2026-04-01:** `senior_profile_screen.dart` i `order_flow_screen.dart` koriste postojeći backend `payment-methods` endpoint za spremanje dummy test kartica bez Stripe paywalla. Ako backend nije dostupan, order flow i dalje ima lokalni fallback da checkout ne stane. Kartice bez `processorToken` tretiraju se kao test kartice i create-order ih ne šalje kao pravi `paymentMethodId`.
+
+> **Service Mapping Fallback 2026-04-01:** `order_flow_screen.dart` pokušava dohvatiti `service-categories` preko `AppApiService` i iz backend DTO-a razriješiti service ID-jeve za create-order payload. Ako backend lookup nije dostupan, app ostaje kompatibilan preko postojećeg lokalnog fallback mappinga.
+
 ## Direktorij Struktura
 
 ```

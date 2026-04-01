@@ -42,10 +42,20 @@ class OrderFlowScreen extends StatefulWidget {
 }
 
 class _OrderFlowScreenState extends State<OrderFlowScreen> {
+  static const _serviceKeyFallbackIds = <String, int>{
+    'companionship': 1,
+    'walking': 4,
+    'shopping': 11,
+    'house_help': 21,
+    'escort': 31,
+    'other': 41,
+  };
+
   int _currentStep = 0;
 
   // -- Scroll controller for auto-focus --
   final ScrollController _step1Scroll = ScrollController();
+  final ScrollController _step3Scroll = ScrollController();
 
   // -- Step 1 state --
   _BookingMode _bookingMode = _BookingMode.oneTime;
@@ -65,6 +75,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
 
   // -- Step 2 state --
   final Set<String> _selectedServices = {};
+  Map<String, int> _serviceKeyToId = Map.of(_serviceKeyFallbackIds);
   final TextEditingController _serviceNoteController = TextEditingController();
 
   // -- Step 3 state --
@@ -77,6 +88,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
   // Cards from API
   List<Map<String, dynamic>> _cards = [];
   int _selectedCardIndex = 0;
+  int _dummyCardCounter = 0;
 
   // -- Constants --
   static const _timeHours = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
@@ -87,18 +99,173 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
   void initState() {
     super.initState();
     _loadCards();
+    _loadServiceMappings();
+  }
+
+  Future<void> _loadServiceMappings() async {
+    final result = await AppApiService().getServiceCategories();
+    if (!mounted || !result.success || result.data == null) {
+      return;
+    }
+
+    final resolved = <String, int>{};
+    for (final category in result.data!) {
+      final services = category['services'] as List<dynamic>? ?? [];
+      for (final service in services) {
+        final serviceMap = service as Map<String, dynamic>;
+        final serviceId = (serviceMap['id'] as num?)?.toInt();
+        if (serviceId == null) continue;
+
+        final key = _inferServiceKey(serviceMap);
+        if (key != null && !resolved.containsKey(key)) {
+          resolved[key] = serviceId;
+        }
+      }
+    }
+
+    if (resolved.isEmpty) {
+      return;
+    }
+
+    setState(() {
+      _serviceKeyToId = {..._serviceKeyFallbackIds, ...resolved};
+    });
+  }
+
+  String? _inferServiceKey(Map<String, dynamic> serviceMap) {
+    final translations =
+        serviceMap['translations'] as Map<String, dynamic>? ?? {};
+    final hr = translations['hr'] as Map<String, dynamic>? ?? {};
+    final en = translations['en'] as Map<String, dynamic>? ?? {};
+    final raw = '${hr['name'] ?? ''} ${en['name'] ?? ''}'.trim();
+    final text = _normalizeServiceText(raw);
+
+    if (text.contains('kup') || text.contains('shop')) return 'shopping';
+    if (text.contains('cisc') ||
+        text.contains('clean') ||
+        text.contains('house') ||
+        text.contains('home help')) {
+      return 'house_help';
+    }
+    if (text.contains('razgov') ||
+        text.contains('compan') ||
+        text.contains('social') ||
+        text.contains('druze')) {
+      return 'companionship';
+    }
+    if (text.contains('set') || text.contains('walk')) return 'walking';
+    if (text.contains('prat') ||
+        text.contains('escort') ||
+        text.contains('doctor') ||
+        text.contains('lijec')) {
+      return 'escort';
+    }
+    if (text.contains('savjet') ||
+        text.contains('other') ||
+        text.contains('ostal')) {
+      return 'other';
+    }
+
+    return null;
+  }
+
+  String _normalizeServiceText(String value) {
+    return value
+        .toLowerCase()
+        .replaceAll('č', 'c')
+        .replaceAll('ć', 'c')
+        .replaceAll('š', 's')
+        .replaceAll('ž', 'z')
+        .replaceAll('đ', 'd');
   }
 
   Future<void> _loadCards() async {
     final userId = await TokenStorage().getUserId();
-    if (userId == null || !mounted) return;
+    if (userId == null || !mounted) {
+      setState(() => _cards = _buildInitialDummyCards());
+      return;
+    }
 
     final result = await AppApiService().getPaymentMethods(userId);
     if (!mounted) return;
 
     if (result.success && result.data != null) {
-      setState(() => _cards = result.data!);
+      setState(() {
+        _cards = result.data!.isEmpty
+            ? _buildInitialDummyCards()
+            : result.data!;
+        _selectedCardIndex = 0;
+      });
+    } else {
+      setState(() {
+        _cards = _buildInitialDummyCards();
+        _selectedCardIndex = 0;
+      });
     }
+  }
+
+  List<Map<String, dynamic>> _buildInitialDummyCards() {
+    _dummyCardCounter = 2;
+    return [
+      _buildDummyCard(id: -1, brand: 'Visa', last4: '4242'),
+      _buildDummyCard(id: -2, brand: 'Mastercard', last4: '4444'),
+    ];
+  }
+
+  Map<String, dynamic> _buildDummyCard({
+    required int id,
+    required String brand,
+    required String last4,
+  }) {
+    return {'id': id, 'brand': brand, 'last4': last4, 'isDummy': true};
+  }
+
+  bool _isCardPersistedTestCard(Map<String, dynamic> card) {
+    final processorToken = card['processorToken'] as String?;
+    return (card['isDummy'] as bool? ?? false) ||
+        processorToken == null ||
+        processorToken.isEmpty;
+  }
+
+  Future<void> _addDummyCard() async {
+    final userId = await TokenStorage().getUserId();
+    final brands = ['Visa', 'Mastercard', 'Maestro'];
+    final nextBrand = brands[_dummyCardCounter % brands.length];
+    final nextLast4 = (4242 + _dummyCardCounter).toString().padLeft(4, '0');
+
+    if (userId != null) {
+      final result = await AppApiService().createPaymentMethod({
+        'userId': userId,
+        'processor': 0,
+        'brand': nextBrand,
+        'last4': nextLast4.substring(nextLast4.length - 4),
+        'isDefault': _cards.isEmpty,
+      });
+
+      if (!mounted) return;
+
+      if (result.success && result.data != null) {
+        setState(() {
+          _cards = [..._cards, result.data!];
+          _selectedCardIndex = _cards.length - 1;
+          _dummyCardCounter++;
+        });
+        return;
+      }
+    }
+
+    setState(() {
+      _cards = [
+        ..._cards,
+        _buildDummyCard(
+          id: -100 - _dummyCardCounter,
+          brand: nextBrand,
+          last4: nextLast4.substring(nextLast4.length - 4),
+        ),
+      ];
+      _selectedCardIndex = _cards.length - 1;
+      _dummyCardCounter++;
+    });
   }
 
   @override
@@ -106,6 +273,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     _promoCodeController.dispose();
     _serviceNoteController.dispose();
     _step1Scroll.dispose();
+    _step3Scroll.dispose();
     super.dispose();
   }
 
@@ -120,6 +288,49 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
         );
       }
     });
+  }
+
+  void _scrollStep3ToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_step3Scroll.hasClients) {
+        _step3Scroll.animateTo(
+          _step3Scroll.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  Future<int?> _resolveSeniorId() async {
+    final storage = TokenStorage();
+    final savedSeniorId = await storage.getSeniorId();
+    if (savedSeniorId != null) {
+      return savedSeniorId;
+    }
+
+    final userId = await storage.getUserId();
+    if (userId == null) {
+      return null;
+    }
+
+    final profileResult = await AppApiService().getCustomerProfile(userId);
+    if (!profileResult.success || profileResult.data == null) {
+      return null;
+    }
+
+    final seniors = profileResult.data!['seniors'] as List<dynamic>? ?? [];
+    if (seniors.isEmpty) {
+      return null;
+    }
+
+    final firstSenior = seniors.first as Map<String, dynamic>;
+    final seniorId = (firstSenior['id'] as num?)?.toInt();
+    if (seniorId != null) {
+      await storage.saveSeniorId(seniorId);
+    }
+
+    return seniorId;
   }
 
   // -- Helpers --
@@ -258,7 +469,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(AppStrings.newOrder),
         leading: IconButton(
@@ -1020,8 +1231,11 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
   //  STEP 3 - SUMMARY
   // ═════════════════════════════════════════════════════════════════
   Widget _buildStep3(ThemeData theme) {
+    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+      controller: _step3Scroll,
+      padding: EdgeInsets.fromLTRB(20, 8, 20, keyboardInset + 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1294,9 +1508,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                 }),
                 const SizedBox(height: 4),
                 GestureDetector(
-                  onTap: () {
-                    // Prototype - would open dedicated PaymentMethodScreen
-                  },
+                  onTap: _addDummyCard,
                   child: Row(
                     children: [
                       const Icon(
@@ -1307,7 +1519,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                       const SizedBox(width: 8),
                       Text(
                         AppStrings.addCard,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: AppColors.teal,
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
@@ -1377,6 +1589,8 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                       Expanded(
                         child: TextField(
                           controller: _promoCodeController,
+                          scrollPadding: const EdgeInsets.only(bottom: 160),
+                          onTap: _scrollStep3ToBottom,
                           decoration: InputDecoration(
                             hintText: AppStrings.promoCodeHint,
                             contentPadding: const EdgeInsets.symmetric(
@@ -1529,16 +1743,6 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     );
   }
 
-  // -- Service chip key -> backend ServiceId --
-  static const _serviceKeyToId = <String, int>{
-    'companionship': 1, // Razgovor i slušanje (Category 1)
-    'walking': 4, // Šetnje u parku (Category 1)
-    'shopping': 11, // Kupovina namirnica (Category 2)
-    'house_help': 21, // Čišćenje kuće (Category 3)
-    'escort': 31, // Posjeti liječniku (Category 4)
-    'other': 41, // Savjetovanje (Category 5)
-  };
-
   // -- Submit order --
   Future<void> _submitOrder() async {
     final bool isOneTime = _bookingMode == _BookingMode.oneTime;
@@ -1570,7 +1774,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
 
     // -- Build API payload --
     final storage = TokenStorage();
-    final seniorId = await storage.getSeniorId();
+    final seniorId = await _resolveSeniorId();
 
     if (seniorId == null) {
       if (!mounted) return;
@@ -1632,7 +1836,8 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
       'services': services,
       'schedules': schedules,
       if (!isOneTime) 'recurrencePattern': 0, // 0 = Weekly
-      if (_cards.isNotEmpty)
+      if (_cards.isNotEmpty &&
+          !_isCardPersistedTestCard(_cards[_selectedCardIndex]))
         'paymentMethodId': (_cards[_selectedCardIndex]['id'] as num?)?.toInt(),
     };
 

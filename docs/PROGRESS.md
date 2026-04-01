@@ -131,3 +131,22 @@
 - [ ] Student job list s API-ja
 - [ ] Push notifikacije (Firebase FCM)
 - [ ] Real-time chat (SignalR)
+
+---
+
+## 2026-04-01 — Realtime refresh refinement
+
+- [x] `realtime_sync_provider.dart` više ne refresha slijepo na svaku SignalR notifikaciju
+- [x] Dodano tolerantno parsiranje `ReceiveNotification` payloada za `String` i `Map`
+- [x] Refresh ostaje aktivan za state-changing tipove poput `jobRescheduled`, `jobCancelled`, `orderCancelled`, `reassignmentStarted` i `reassignmentCompleted`
+- [x] `SystemNotification` i dalje radi full fallback refresh
+- [x] Verifikacija: `flutter analyze` = 0 issues
+
+## 2026-04-01 — Order flow lokalni fallback za kartice
+
+- [x] `order_flow_screen.dart` sada pokaže 2 lokalne fallback kartice kad backend vrati praznu listu ili ne uspije dohvat payment methods
+- [x] Gumb `Dodaj karticu` u order flowu prvo pokušava spremiti dummy karticu preko postojećeg backend `payment-methods` endpointa, a tek na backend grešci pada na lokalnu fallback karticu
+- [x] `senior_profile_screen.dart` sada koristi backend `createPaymentMethod` i `deletePaymentMethod` za dummy test kartice, bez Stripe paywall flowa
+- [x] Slanje narudžbe i dalje ne šalje `paymentMethodId` za fallback ili backend-persisted test kartice bez `processorToken`, pa testni flow ne glumi stvarni Stripe charge
+- [x] `order_flow_screen.dart` sada pokušava razriješiti service ID-jeve preko backend `service-categories` endpointa, uz fallback na postojeće lokalne ID mappinge ako backend ne vrati podatke
+- [x] Verifikacija: `flutter analyze` = 0 issues

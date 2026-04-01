@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,6 +18,22 @@ class RealTimeSyncService {
   RealTimeSyncService(this._ref) {
     _init();
   }
+
+  static const _refreshingNotificationTypes = {
+    1, // paymentSuccess
+    2, // paymentFailed
+    4, // jobRequest
+    7, // jobCompleted
+    8, // jobCancelled
+    9, // jobRescheduled
+    12, // orderCancelled
+    15, // contractAdded
+    16, // contractUpdated
+    17, // contractDeleted
+    22, // reassignmentStarted
+    23, // reassignmentCompleted
+    30, // newOrderAdded
+  };
 
   final Ref _ref;
   final _api = AppApiService();
@@ -42,13 +60,61 @@ class RealTimeSyncService {
 
     signalR.on('ReceiveNotification', (args) {
       debugPrint('[RealTimeSync] ReceiveNotification: $args');
-      _refreshData();
+      if (_shouldRefreshForNotification(args)) {
+        _refreshData();
+      }
     });
 
     signalR.on('SystemNotification', (args) {
       debugPrint('[RealTimeSync] SystemNotification: $args');
       _refreshData();
     });
+  }
+
+  bool _shouldRefreshForNotification(List<Object?>? args) {
+    final type = _extractNotificationType(args);
+    if (type == null) {
+      return true;
+    }
+
+    return _refreshingNotificationTypes.contains(type);
+  }
+
+  int? _extractNotificationType(List<Object?>? args) {
+    if (args == null || args.isEmpty) {
+      return null;
+    }
+
+    final raw = args.first;
+    if (raw is Map<Object?, Object?>) {
+      final json = Map<String, dynamic>.from(raw);
+      return _parseNotificationTypeValue(json['type']);
+    }
+
+    if (raw is String) {
+      try {
+        final decoded = jsonDecode(raw);
+        if (decoded is Map<String, dynamic>) {
+          return _parseNotificationTypeValue(decoded['type']);
+        }
+      } catch (error) {
+        debugPrint('[RealTimeSync] notification parse fallback: $error');
+      }
+    }
+
+    return null;
+  }
+
+  int? _parseNotificationTypeValue(Object? value) {
+    if (value is int) {
+      return value;
+    }
+
+    if (value is String) {
+      return int.tryParse(value);
+    }
+
+    return null;
   }
 
   Future<void> _refreshData() async {

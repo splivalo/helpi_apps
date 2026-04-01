@@ -91,6 +91,18 @@ class AppApiService {
     }
   }
 
+  /// Fetch single order by [orderId].
+  Future<ApiResult<OrderModel>> getOrderById(int orderId) async {
+    try {
+      final response = await _client.get(ApiEndpoints.orderById(orderId));
+      final order = _mapOrder(response.data as Map<String, dynamic>);
+      return ApiResult.success(order);
+    } catch (e) {
+      debugPrint('[AppApiService] getOrderById error: $e');
+      return ApiResult.failure(_friendlyError(e));
+    }
+  }
+
   /// Otkaži pojedinu sesiju (job instance) - student cancel.
   Future<ApiResult<bool>> cancelSession(int sessionId) async {
     try {
@@ -301,6 +313,207 @@ class AppApiService {
       return ApiResult.success(methods);
     } catch (e) {
       debugPrint('[AppApiService] getPaymentMethods error: $e');
+      return ApiResult.failure(_friendlyError(e));
+    }
+  }
+
+  /// Create payment method without forcing Stripe flow in the app layer.
+  Future<ApiResult<Map<String, dynamic>>> createPaymentMethod(
+    Map<String, dynamic> paymentMethodData,
+  ) async {
+    try {
+      final response = await _client.post(
+        ApiEndpoints.paymentMethodsCreate,
+        data: paymentMethodData,
+      );
+      return ApiResult.success(response.data as Map<String, dynamic>);
+    } catch (e) {
+      debugPrint('[AppApiService] createPaymentMethod error: $e');
+      return ApiResult.failure(_friendlyError(e));
+    }
+  }
+
+  /// Delete payment method by its local backend ID.
+  Future<ApiResult<bool>> deletePaymentMethod(int paymentMethodId) async {
+    try {
+      await _client.delete(ApiEndpoints.paymentMethodDelete(paymentMethodId));
+      return ApiResult.success(true);
+    } catch (e) {
+      debugPrint('[AppApiService] deletePaymentMethod error: $e');
+      return ApiResult.failure(_friendlyError(e));
+    }
+  }
+
+  // NOTIFICATIONS
+
+  /// Fetch all notifications for user.
+  Future<ApiResult<List<Map<String, dynamic>>>> getNotificationsByUser(
+    int userId, {
+    String languageCode = 'hr',
+  }) async {
+    try {
+      final response = await _client.get(
+        ApiEndpoints.notificationsByUser(userId),
+        queryParameters: {'languageCode': languageCode},
+      );
+      final list = response.data as List<dynamic>;
+      final notifications = list.map((e) => e as Map<String, dynamic>).toList();
+      return ApiResult.success(notifications);
+    } catch (e) {
+      debugPrint('[AppApiService] getNotificationsByUser error: $e');
+      return ApiResult.failure(_friendlyError(e));
+    }
+  }
+
+  /// Fetch unread notifications for user.
+  Future<ApiResult<List<Map<String, dynamic>>>> getUnreadNotificationsByUser(
+    int userId, {
+    String languageCode = 'hr',
+  }) async {
+    try {
+      final response = await _client.get(
+        ApiEndpoints.notificationsUnread(userId),
+        queryParameters: {'languageCode': languageCode},
+      );
+      final list = response.data as List<dynamic>;
+      final notifications = list.map((e) => e as Map<String, dynamic>).toList();
+      return ApiResult.success(notifications);
+    } catch (e) {
+      debugPrint('[AppApiService] getUnreadNotificationsByUser error: $e');
+      return ApiResult.failure(_friendlyError(e));
+    }
+  }
+
+  /// Fetch unread notification count for user.
+  Future<ApiResult<int>> getUnreadNotificationCount(int userId) async {
+    try {
+      final response = await _client.get(
+        ApiEndpoints.notificationsUnreadCount(userId),
+      );
+      final count = (response.data as num?)?.toInt() ?? 0;
+      return ApiResult.success(count);
+    } catch (e) {
+      debugPrint('[AppApiService] getUnreadNotificationCount error: $e');
+      return ApiResult.failure(_friendlyError(e));
+    }
+  }
+
+  /// Mark notification as read.
+  Future<ApiResult<bool>> markNotificationAsRead(int notificationId) async {
+    try {
+      await _client.put('/api/HNotifications/$notificationId/mark-read');
+      return ApiResult.success(true);
+    } catch (e) {
+      debugPrint('[AppApiService] markNotificationAsRead error: $e');
+      return ApiResult.failure(_friendlyError(e));
+    }
+  }
+
+  /// Mark all user notifications as read.
+  Future<ApiResult<bool>> markAllNotificationsAsRead(int userId) async {
+    try {
+      await _client.put('/api/HNotifications/user/$userId/mark-all-read');
+      return ApiResult.success(true);
+    } catch (e) {
+      debugPrint('[AppApiService] markAllNotificationsAsRead error: $e');
+      return ApiResult.failure(_friendlyError(e));
+    }
+  }
+
+  // LOOKUPS
+
+  /// Fetch all cities.
+  Future<ApiResult<List<Map<String, dynamic>>>> getCities() async {
+    try {
+      final response = await _client.get(ApiEndpoints.cities);
+      final list = response.data as List<dynamic>;
+      final cities = list.map((e) => e as Map<String, dynamic>).toList();
+      return ApiResult.success(cities);
+    } catch (e) {
+      debugPrint('[AppApiService] getCities error: $e');
+      return ApiResult.failure(_friendlyError(e));
+    }
+  }
+
+  /// Fetch all service categories.
+  Future<ApiResult<List<Map<String, dynamic>>>> getServiceCategories() async {
+    try {
+      final response = await _client.get(ApiEndpoints.services);
+      final list = response.data as List<dynamic>;
+      final categories = list.map((e) => e as Map<String, dynamic>).toList();
+      return ApiResult.success(categories);
+    } catch (e) {
+      debugPrint('[AppApiService] getServiceCategories error: $e');
+      return ApiResult.failure(_friendlyError(e));
+    }
+  }
+
+  // DASHBOARD
+
+  /// Fetch senior dashboard tiles.
+  Future<ApiResult<List<Map<String, dynamic>>>> getSeniorDashboard(
+    int seniorId,
+  ) async {
+    try {
+      final response = await _client.get(
+        ApiEndpoints.dashboardSenior(seniorId),
+      );
+      final list = response.data as List<dynamic>;
+      final tiles = list.map((e) => e as Map<String, dynamic>).toList();
+      return ApiResult.success(tiles);
+    } catch (e) {
+      debugPrint('[AppApiService] getSeniorDashboard error: $e');
+      return ApiResult.failure(_friendlyError(e));
+    }
+  }
+
+  /// Fetch student dashboard tiles.
+  Future<ApiResult<List<Map<String, dynamic>>>> getStudentDashboard(
+    int studentId,
+  ) async {
+    try {
+      final response = await _client.get(
+        ApiEndpoints.dashboardStudent(studentId),
+      );
+      final list = response.data as List<dynamic>;
+      final tiles = list.map((e) => e as Map<String, dynamic>).toList();
+      return ApiResult.success(tiles);
+    } catch (e) {
+      debugPrint('[AppApiService] getStudentDashboard error: $e');
+      return ApiResult.failure(_friendlyError(e));
+    }
+  }
+
+  /// Fetch completed sessions for student.
+  Future<ApiResult<List<Job>>> getCompletedSessionsByStudent(
+    int studentId,
+  ) async {
+    try {
+      final response = await _client.get(
+        ApiEndpoints.sessionsCompletedByStudent(studentId),
+      );
+      final list = response.data as List<dynamic>;
+      final jobs = list.map((e) => _mapJob(e as Map<String, dynamic>)).toList();
+      return ApiResult.success(jobs);
+    } catch (e) {
+      debugPrint('[AppApiService] getCompletedSessionsByStudent error: $e');
+      return ApiResult.failure(_friendlyError(e));
+    }
+  }
+
+  /// Fetch completed sessions for senior.
+  Future<ApiResult<List<Job>>> getCompletedSessionsBySenior(
+    int seniorId,
+  ) async {
+    try {
+      final response = await _client.get(
+        ApiEndpoints.sessionsCompletedBySenior(seniorId),
+      );
+      final list = response.data as List<dynamic>;
+      final jobs = list.map((e) => _mapJob(e as Map<String, dynamic>)).toList();
+      return ApiResult.success(jobs);
+    } catch (e) {
+      debugPrint('[AppApiService] getCompletedSessionsBySenior error: $e');
       return ApiResult.failure(_friendlyError(e));
     }
   }

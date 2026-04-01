@@ -25,6 +25,8 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  static const _dummyCardBrands = ['Visa', 'Mastercard', 'Maestro'];
+
   // -- Access credentials --
   final _emailCtrl = TextEditingController();
 
@@ -48,6 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isEditing = false;
   bool _agreedToTerms = true;
   bool _isLoading = true;
+  bool _isSavingCard = false;
 
   // Cards from API
   List<Map<String, dynamic>> _cards = [];
@@ -129,6 +132,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     setState(() => _isLoading = false);
+  }
+
+  Future<void> _addDummyCard() async {
+    final userId = await TokenStorage().getUserId();
+    if (userId == null) return;
+
+    final nextIndex = _cards.length;
+    final brand = _dummyCardBrands[nextIndex % _dummyCardBrands.length];
+    final last4 = (4242 + nextIndex).toString().padLeft(4, '0');
+
+    setState(() => _isSavingCard = true);
+
+    final result = await AppApiService().createPaymentMethod({
+      'userId': userId,
+      'processor': 0,
+      'brand': brand,
+      'last4': last4.substring(last4.length - 4),
+      'isDefault': _cards.isEmpty,
+    });
+
+    if (!mounted) return;
+
+    setState(() {
+      _isSavingCard = false;
+      if (result.success && result.data != null) {
+        _cards = [..._cards, result.data!];
+      }
+    });
+
+    if (!result.success) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result.error ?? AppStrings.error)));
+    }
+  }
+
+  Future<void> _deleteCard(Map<String, dynamic> card) async {
+    final cardId = (card['id'] as num?)?.toInt();
+    if (cardId == null) {
+      return;
+    }
+
+    final result = await AppApiService().deletePaymentMethod(cardId);
+    if (!mounted) return;
+
+    if (!result.success) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result.error ?? AppStrings.error)));
+      return;
+    }
+
+    setState(() {
+      _cards = _cards.where((item) => item['id'] != card['id']).toList();
+    });
   }
 
   @override
@@ -364,9 +422,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           suffixIcon: _isEditing
                               ? GestureDetector(
-                                  onTap: () {
-                                    setState(() => _cards.remove(card));
-                                  },
+                                  onTap: () => _deleteCard(card),
                                   child: Icon(
                                     Icons.delete_outline,
                                     color: theme.colorScheme.error,
@@ -390,8 +446,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 if (_isEditing) ...[
                   const SizedBox(height: 8),
                   OutlinedButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.add, size: 20),
+                    onPressed: _isSavingCard ? null : _addDummyCard,
+                    icon: _isSavingCard
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.add, size: 20),
                     label: Text(AppStrings.addCard),
                   ),
                 ],
