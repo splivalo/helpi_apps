@@ -28,6 +28,16 @@
 
 ---
 
+## 2026-04-01 — Notifications više nisu samo servisni TODO
+
+**Problem:** Unified app je već imao backend metode za notifications, ali korisnik nije imao gotov ekran koji te podatke stvarno koristi.
+
+**Odluka:** Dodan je `NotificationsScreen` kao backend-driven ekran s unread/all prikazom i mark-as-read akcijama, bez diranja postojećeg home UI-ja mobilne aplikacije.
+
+**Rezultat:** Notifications više nisu samo “servis postoji”, nego su stvarno vidljive i dostupne korisniku bez razbijanja postojećeg UX-a.
+
+---
+
 ## 2026-03-14 — Odluka: Merge 2 appa u 1
 
 **Problem:** helpi_senior (32 fajla) i helpi_student (31 fajl) su odvojene Flutter aplikacije s identičnim UI identitetom (boje, tipografija, widgeti). Duplicirali smo ~60% koda.

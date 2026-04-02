@@ -9,6 +9,7 @@ import 'package:helpi_app/core/network/api_endpoints.dart';
 import 'package:helpi_app/core/network/token_storage.dart';
 import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/core/services/auth_service.dart';
+import 'package:helpi_app/features/notifications/presentation/notifications_screen.dart';
 import 'package:helpi_app/features/schedule/data/availability_model.dart';
 import 'package:helpi_app/shared/models/faculty.dart';
 import 'package:helpi_app/features/schedule/utils/availability_helpers.dart';
@@ -222,7 +223,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(AppStrings.profile)),
+      appBar: AppBar(
+        title: Text(AppStrings.profile),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+              );
+            },
+            icon: const Icon(Icons.notifications_outlined),
+            tooltip: AppStrings.notificationsTitle,
+          ),
+        ],
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(

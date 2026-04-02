@@ -7,6 +7,7 @@ import 'package:helpi_app/core/l10n/locale_notifier.dart';
 import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/core/services/auth_service.dart';
 import 'package:helpi_app/core/network/token_storage.dart';
+import 'package:helpi_app/features/notifications/presentation/notifications_screen.dart';
 import 'package:helpi_app/shared/widgets/helpi_form_fields.dart';
 
 /// Profile screen - credentials, customer, senior, cards, terms.
@@ -265,7 +266,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: Text(AppStrings.profile)),
+      appBar: AppBar(
+        title: Text(AppStrings.profile),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+              );
+            },
+            icon: const Icon(Icons.notifications_outlined),
+            tooltip: AppStrings.notificationsTitle,
+          ),
+        ],
+      ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(

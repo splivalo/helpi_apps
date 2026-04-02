@@ -255,6 +255,26 @@ class AppStrings {
       'typeMessage': 'Upiši poruku...',
       'sendMessage': 'Pošalji',
       'noMessages': 'Nema poruka',
+      'notificationsTitle': 'Obavijesti',
+      'notificationsUnreadTab': 'Nepročitane',
+      'notificationsAllTab': 'Sve',
+      'notificationsMarkAllRead': 'Označi sve pročitanim',
+      'notificationsEmpty': 'Nema obavijesti',
+      'notificationsEmptySubtitle':
+          'Kad se dogodi nešto važno, obavijest će se pojaviti ovdje.',
+      'notificationsLoadError': 'Greška pri dohvaćanju obavijesti.',
+      'notificationsMarkedAllRead': 'Sve obavijesti su označene kao pročitane.',
+      'notificationsTryAgain': 'Pokušaj ponovno',
+      'dashboardTitle': 'Pregled',
+      'dashboardNoData': 'Podaci pregleda trenutno nisu dostupni.',
+      'dashboardActiveOrders': 'Aktivne narudžbe',
+      'dashboardUpcomingSessions': 'Nadolazeći termini',
+      'dashboardCompletedSessions': 'Završeni termini',
+      'dashboardTotalSpent': 'Ukupno potrošeno',
+      'dashboardTotalEarnings': 'Ukupna zarada',
+      'dashboardAverageRating': 'Prosječna ocjena',
+      'dashboardContractDaysRemaining': 'Dana do isteka ugovora',
+      'dashboardWorkedHours': 'Odrađeni sati',
 
       // -- Profile --
       'profile': 'Moj profil',
@@ -716,6 +736,26 @@ class AppStrings {
       'typeMessage': 'Type a message...',
       'sendMessage': 'Send',
       'noMessages': 'No messages',
+      'notificationsTitle': 'Notifications',
+      'notificationsUnreadTab': 'Unread',
+      'notificationsAllTab': 'All',
+      'notificationsMarkAllRead': 'Mark all as read',
+      'notificationsEmpty': 'No notifications',
+      'notificationsEmptySubtitle':
+          'When something important happens, it will appear here.',
+      'notificationsLoadError': 'Failed to load notifications.',
+      'notificationsMarkedAllRead': 'All notifications were marked as read.',
+      'notificationsTryAgain': 'Try again',
+      'dashboardTitle': 'Overview',
+      'dashboardNoData': 'Overview data is currently unavailable.',
+      'dashboardActiveOrders': 'Active orders',
+      'dashboardUpcomingSessions': 'Upcoming sessions',
+      'dashboardCompletedSessions': 'Completed sessions',
+      'dashboardTotalSpent': 'Total spent',
+      'dashboardTotalEarnings': 'Total earnings',
+      'dashboardAverageRating': 'Average rating',
+      'dashboardContractDaysRemaining': 'Days until contract expiry',
+      'dashboardWorkedHours': 'Worked hours',
 
       // -- Profile --
       'profile': 'My profile',
@@ -1207,6 +1247,30 @@ class AppStrings {
   static String get typeMessage => _t('typeMessage');
   static String get sendMessage => _t('sendMessage');
   static String get noMessages => _t('noMessages');
+  static String get notificationsTitle => _t('notificationsTitle');
+  static String get notificationsUnreadTab => _t('notificationsUnreadTab');
+  static String get notificationsAllTab => _t('notificationsAllTab');
+  static String get notificationsMarkAllRead => _t('notificationsMarkAllRead');
+  static String get notificationsEmpty => _t('notificationsEmpty');
+  static String get notificationsEmptySubtitle =>
+      _t('notificationsEmptySubtitle');
+  static String get notificationsLoadError => _t('notificationsLoadError');
+  static String get notificationsMarkedAllRead =>
+      _t('notificationsMarkedAllRead');
+  static String get notificationsTryAgain => _t('notificationsTryAgain');
+  static String get dashboardTitle => _t('dashboardTitle');
+  static String get dashboardNoData => _t('dashboardNoData');
+  static String get dashboardActiveOrders => _t('dashboardActiveOrders');
+  static String get dashboardUpcomingSessions =>
+      _t('dashboardUpcomingSessions');
+  static String get dashboardCompletedSessions =>
+      _t('dashboardCompletedSessions');
+  static String get dashboardTotalSpent => _t('dashboardTotalSpent');
+  static String get dashboardTotalEarnings => _t('dashboardTotalEarnings');
+  static String get dashboardAverageRating => _t('dashboardAverageRating');
+  static String get dashboardContractDaysRemaining =>
+      _t('dashboardContractDaysRemaining');
+  static String get dashboardWorkedHours => _t('dashboardWorkedHours');
 
   // -- Profile --
   static String get profile => _t('profile');

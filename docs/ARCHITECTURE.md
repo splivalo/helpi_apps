@@ -33,6 +33,10 @@
 
 > **Service Mapping Fallback 2026-04-01:** `order_flow_screen.dart` pokušava dohvatiti `service-categories` preko `AppApiService` i iz backend DTO-a razriješiti service ID-jeve za create-order payload. Ako backend lookup nije dostupan, app ostaje kompatibilan preko postojećeg lokalnog fallback mappinga.
 
+> **Notifications UI 2026-04-01:** `features/notifications/presentation/notifications_screen.dart` koristi REST notification endpointove za unread/all prikaz i mark-read akcije. Entry point je trenutno kroz profile app bar za obje uloge, bez mijenjanja bottom navigation strukture.
+
+> **Dashboard UI 2026-04-01:** Backend dashboard tileovi se prikazuju inline na postojećim home ekranima: customer u `order_screen.dart`, student u `schedule_screen.dart`. Time dashboard ostaje dio primarnog toka, bez dodatnog taba.
+
 ## Direktorij Struktura
 
 ```

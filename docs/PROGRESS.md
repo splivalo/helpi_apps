@@ -150,3 +150,9 @@
 - [x] Slanje narudžbe i dalje ne šalje `paymentMethodId` za fallback ili backend-persisted test kartice bez `processorToken`, pa testni flow ne glumi stvarni Stripe charge
 - [x] `order_flow_screen.dart` sada pokušava razriješiti service ID-jeve preko backend `service-categories` endpointa, uz fallback na postojeće lokalne ID mappinge ako backend ne vrati podatke
 - [x] Verifikacija: `flutter analyze` = 0 issues
+
+## 2026-04-01 — Notifications UI wiring
+
+- [x] Dodan backend-driven `NotificationsScreen` s tabovima `Nepročitane` i `Sve`, pull-to-refresh i `Označi sve pročitanim`
+- [x] Notifications screen je dostupan iz customer i student profile app bara
+- [x] Verifikacija: `flutter analyze` = 0 issues
