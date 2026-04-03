@@ -33,6 +33,7 @@ class RealTimeSyncService {
     22, // reassignmentStarted
     23, // reassignmentCompleted
     30, // newOrderAdded
+    32, // orderBackToProcessing
   };
 
   final Ref _ref;

@@ -45,7 +45,7 @@ class Job {
   final String? notes;
   final ReviewModel? review;
 
-  /// Može li student otkazati ovaj posao (>24h do početka i status scheduled)?
+  /// Može li student otkazati ovaj posao (>6h do početka i status scheduled)?
   bool get canDecline {
     if (status != JobStatus.scheduled) return false;
     final jobStart = DateTime(
@@ -55,7 +55,7 @@ class Job {
       from.hour,
       from.minute,
     );
-    return jobStart.difference(DateTime.now()).inHours > 24;
+    return jobStart.difference(DateTime.now()).inHours > 6;
   }
 }
 
