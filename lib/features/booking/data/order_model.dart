@@ -82,7 +82,7 @@ class StudentAssignment {
   final List<ReviewModel> reviews = [];
 }
 
-/// Simplified order model (mock - without backend).
+/// Simplified order model (maps backend DTO to UI).
 class OrderModel {
   OrderModel({
     required this.id,

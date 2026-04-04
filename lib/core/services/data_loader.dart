@@ -14,7 +14,7 @@ import 'package:helpi_app/features/schedule/data/job_model.dart';
 /// Za Student: sesije iz `/api/sessions/student/{id}`.
 ///
 /// Called after successful login.  Ako backend ne odgovori,
-/// existing mock data remains as fallback.
+/// existing cached data remains as fallback.
 class DataLoader {
   DataLoader._();
 
@@ -39,10 +39,10 @@ class DataLoader {
         availabilityNotifier: availabilityNotifier,
       ).timeout(_timeout);
     } on TimeoutException {
-      debugPrint('[DataLoader] loadAll TIMEOUT — using mock data');
+      debugPrint('[DataLoader] loadAll TIMEOUT — using cached data');
       return false;
     } catch (e) {
-      debugPrint('[DataLoader] loadAll ERROR: $e — using mock data');
+      debugPrint('[DataLoader] loadAll ERROR: $e — using cached data');
       return false;
     }
   }
@@ -102,10 +102,10 @@ class DataLoader {
         allOk = false;
       }
     } else if (userType == 'Student') {
-      // Student: load sessions -> MockJobs
+      // Student: load sessions -> JobsCache
       final sessionsResult = await api.getSessionsByStudent(userId);
       if (sessionsResult.success && sessionsResult.data != null) {
-        MockJobs.all
+        JobsCache.all
           ..clear()
           ..addAll(sessionsResult.data!);
         debugPrint(

@@ -687,7 +687,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     }
   }
 
-  /// Confirm cancel dialog for a job.
+  /// Confirm cancel dialog for a job — calls backend API then updates local.
   void _confirmCancelJob(OrderModel order, int jobIndex) {
     showDialog<void>(
       context: context,
@@ -701,9 +701,23 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             child: Text(AppStrings.cancel),
           ),
           TextButton(
-            onPressed: () {
-              widget.ordersNotifier.cancelJob(order.id, jobIndex);
+            onPressed: () async {
               Navigator.pop(ctx);
+              final job = order.jobs[jobIndex];
+              if (job.id != null) {
+                final result =
+                    await AppApiService().cancelSession(job.id!);
+                if (!mounted) return;
+                if (!result.success) {
+                  showHelpiSnackBar(
+                    context,
+                    result.error ?? AppStrings.error,
+                    isError: true,
+                  );
+                  return;
+                }
+              }
+              widget.ordersNotifier.cancelJob(order.id, jobIndex);
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.coral),
             child: Text(AppStrings.cancelJobLabel),

@@ -67,8 +67,8 @@ class Job {
 }
 
 /// Spremnik studenskih poslova. DataLoader puni listu iz API-ja.
-class MockJobs {
-  MockJobs._();
+class JobsCache {
+  JobsCache._();
 
   static final List<Job> all = [];
 

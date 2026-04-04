@@ -84,7 +84,7 @@ lib/
 │   │       └── order_detail_screen.dart # Detalji narudžbe + recenzije
 │   ├── schedule/                      # === STUDENT ONLY ===
 │   │   ├── data/
-│   │   │   ├── job_model.dart          # Job, JobStatus, ServiceType, MockJobs
+│   │   │   ├── job_model.dart          # Job, JobStatus, ServiceType, JobsCache
 │   │   │   ├── review_model.dart       # ReviewModel (student verzija)
 │   │   │   └── availability_model.dart # DayAvailability, AvailabilityNotifier
 │   │   ├── presentation/

@@ -33,21 +33,21 @@ class JobsNotifier extends StateNotifier<JobsState> {
 
     final result = await _api.getSessionsByStudent(userId);
     if (result.success && result.data != null) {
-      // Također osvježi MockJobs za kompatibilnost
-      MockJobs.all
+      // Također osvježi JobsCache za kompatibilnost
+      JobsCache.all
         ..clear()
         ..addAll(result.data!);
       state = JobsState(jobs: result.data!, isLoading: false);
       debugPrint('[JobsNotifier] loaded ${result.data!.length} jobs');
     } else {
-      // Koristi MockJobs kao fallback
-      state = JobsState(jobs: List.of(MockJobs.all), isLoading: false);
+      // Koristi JobsCache kao fallback
+      state = JobsState(jobs: List.of(JobsCache.all), isLoading: false);
     }
   }
 
   /// Replace all jobs (called by RealTimeSyncService).
   void replaceAll(List<Job> jobs) {
-    MockJobs.all
+    JobsCache.all
       ..clear()
       ..addAll(jobs);
     state = JobsState(jobs: jobs, isLoading: false);

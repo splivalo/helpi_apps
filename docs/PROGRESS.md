@@ -2,13 +2,15 @@
 
 > Merged Flutter app (Customer + Student) — zamjenjuje `helpi_senior` + `helpi_student`
 
-## Status: UI Prototype + Real-Time Architecture
+## Status: Backend-Connected App (API-first + fallback cache)
 
-**Datum:** 22.03.2026.  
+**Datum:** 04.04.2026.  
 **Analyze:** 0 errors, 0 warnings  
 **Fajlovi:** 64 .dart files  
 **State mgmt:** Riverpod (flutter_riverpod ^2.6.1)  
-**Real-time:** SignalR (signalr_netcore ^1.4.4)
+**Real-time:** SignalR (signalr_netcore ^1.4.4)  
+**API pokrivanje:** ~95% real API (auth, orders, sessions, reviews, pricing, dashboard, notifications, availability)  
+**Izuzeci:** Chat (demo UI — backend ne postoji), Stripe (dummy kartice — čeka integraciju), push notifikacije (čeka Firebase setup)
 
 ---
 
@@ -44,7 +46,7 @@
 ### Data Models (5/5) — 100%
 
 - [x] order_model.dart — OrderModel, OrdersNotifier, JobModel, ReviewModel (Customer)
-- [x] job_model.dart — Job, JobStatus, ServiceType, MockJobs (Student)
+- [x] job_model.dart — Job, JobStatus, ServiceType, JobsCache (Student)
 - [x] review_model.dart — ReviewModel (Student)
 - [x] availability_model.dart — DayAvailability, AvailabilityNotifier
 - [x] faculty.dart — 31 fakultetа (Zagreb)
@@ -121,16 +123,35 @@
 
 ---
 
-## Još nije spojeno na backend (Next Steps)
+## API Integration Status (ažurirano 2026-04-04)
 
-- [ ] Pravi API pozivi umjesto mock podataka
-- [ ] Customer registracija → POST /api/auth/register/customer
-- [ ] Student registracija → POST /api/auth/register/student
-- [ ] Login → POST /api/auth/login (radi, ali treba backend pokrenut)
-- [ ] GET /api/orders za Customer orders screen
-- [ ] Student job list s API-ja
-- [ ] Push notifikacije (Firebase FCM)
-- [ ] Real-time chat (SignalR)
+### Spojeno na backend ✅
+- [x] Auth (login, register, forgot/reset password) → pravi API
+- [x] Customer orders (CRUD, cancel) → pravi API
+- [x] Session cancel iz order_detail_screen → pravi API (popravljeno 2026-04-04)
+- [x] Student sessions (load, cancel) → pravi API
+- [x] Reviews (bidirectional, pending) → pravi API
+- [x] Notifications (SignalR real-time + REST) → pravi API
+- [x] Pricing configuration (backend-driven) → pravi API
+- [x] Dashboard tiles → pravi API
+- [x] Student availability → pravi API
+- [x] Student profile → pravi API
+- [x] Senior profile → pravi API
+- [x] Onboarding/registration → pravi API
+- [x] Service categories → pravi API (s fallback)
+- [x] Cities → pravi API
+- [x] SignalR real-time sync → pravi API
+- [x] DataLoader → API-first s cache fallback (MockJobs → JobsCache rename)
+
+### Čeka backend implementaciju ❌
+- [ ] Chat (demo UI — backend nema ChatController/ChatHub)
+- [ ] Push notifikacije (Firebase FCM — backend ima endpoint, nema setup)
+- [ ] Stripe plaćanje (dummy kartice dok se ne integrira pravi Stripe)
+
+### Očišćeno 2026-04-04
+- [x] `MockJobs` preimenovan u `JobsCache` (nije bio mock, nego API cache)
+- [x] Svi stale "mock" komentari uklonjeni iz koda
+- [x] `order_detail_screen.dart` session cancel sada poziva backend API
 
 ---
 
