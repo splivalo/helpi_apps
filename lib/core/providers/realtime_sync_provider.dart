@@ -79,6 +79,16 @@ class RealTimeSyncService {
       await AppPricing.loadFromApi(_api);
       _refreshData();
     });
+
+    signalR.on('EntityChanged', (args) {
+      final entityType = (args != null && args.isNotEmpty)
+          ? args.first?.toString() ?? 'unknown'
+          : 'unknown';
+      debugPrint(
+        '[RealTimeSync] EntityChanged ($entityType) — refreshing data',
+      );
+      _refreshData();
+    });
   }
 
   bool _shouldRefreshForNotification(List<Object?>? args) {

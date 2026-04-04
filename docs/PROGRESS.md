@@ -126,6 +126,7 @@
 ## API Integration Status (ažurirano 2026-04-04)
 
 ### Spojeno na backend ✅
+
 - [x] Auth (login, register, forgot/reset password) → pravi API
 - [x] Customer orders (CRUD, cancel) → pravi API
 - [x] Session cancel iz order_detail_screen → pravi API (popravljeno 2026-04-04)
@@ -144,11 +145,13 @@
 - [x] DataLoader → API-first s cache fallback (MockJobs → JobsCache rename)
 
 ### Čeka backend implementaciju ❌
+
 - [ ] Chat (demo UI — backend nema ChatController/ChatHub)
 - [ ] Push notifikacije (Firebase FCM — backend ima endpoint, nema setup)
 - [ ] Stripe plaćanje (dummy kartice dok se ne integrira pravi Stripe)
 
 ### Očišćeno 2026-04-04
+
 - [x] `MockJobs` preimenovan u `JobsCache` (nije bio mock, nego API cache)
 - [x] Svi stale "mock" komentari uklonjeni iz koda
 - [x] `order_detail_screen.dart` session cancel sada poziva backend API

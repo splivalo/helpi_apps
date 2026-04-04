@@ -705,8 +705,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               Navigator.pop(ctx);
               final job = order.jobs[jobIndex];
               if (job.id != null) {
-                final result =
-                    await AppApiService().cancelSession(job.id!);
+                final result = await AppApiService().cancelSession(job.id!);
                 if (!mounted) return;
                 if (!result.success) {
                   showHelpiSnackBar(
