@@ -114,6 +114,19 @@ class AppApiService {
     }
   }
 
+  // PRICING CONFIGURATION
+
+  /// Fetch pricing configuration from backend.
+  Future<ApiResult<Map<String, dynamic>>> fetchPricingConfig() async {
+    try {
+      final response = await _client.get(ApiEndpoints.pricingConfig);
+      return ApiResult.success(response.data as Map<String, dynamic>);
+    } catch (e) {
+      debugPrint('[AppApiService] fetchPricingConfig error: $e');
+      return ApiResult.failure(_friendlyError(e));
+    }
+  }
+
   // PROMO CODES
 
   /// Validate promo code - returns validation result from backend.
@@ -739,6 +752,7 @@ class AppApiService {
       status: _mapJobStatus(json['status']),
       notes: json['notes'] as String?,
       review: review,
+      canCancel: json['canCancel'] as bool?,
     );
   }
 

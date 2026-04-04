@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:helpi_app/core/constants/pricing.dart';
 import 'package:helpi_app/core/network/token_storage.dart';
 import 'package:helpi_app/core/providers/auth_provider.dart';
 import 'package:helpi_app/core/providers/jobs_provider.dart';
@@ -45,6 +46,8 @@ class RealTimeSyncService {
     _ref.listen<AuthState>(authProvider, (prev, next) {
       if (next.isLoggedIn && !next.isSuspended && !_listening) {
         _startListening();
+        // Load dynamic pricing from backend
+        AppPricing.loadFromApi(_api);
         // Initial data load via provider
         if (next.userType == 'Student') {
           _ref.read(jobsProvider.notifier).loadJobs();
@@ -68,6 +71,12 @@ class RealTimeSyncService {
 
     signalR.on('SystemNotification', (args) {
       debugPrint('[RealTimeSync] SystemNotification: $args');
+      _refreshData();
+    });
+
+    signalR.on('SettingsChanged', (args) async {
+      debugPrint('[RealTimeSync] SettingsChanged — refreshing pricing + data');
+      await AppPricing.loadFromApi(_api);
       _refreshData();
     });
   }

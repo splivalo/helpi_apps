@@ -105,4 +105,7 @@ class ApiEndpoints {
   // Promo Codes
   static const String promoCodeValidate = '/api/promo-codes/validate';
   static const String promoCodeApply = '/api/promo-codes/apply';
+
+  // Pricing Configuration
+  static const String pricingConfig = '/api/PricingConfiguration/1';
 }

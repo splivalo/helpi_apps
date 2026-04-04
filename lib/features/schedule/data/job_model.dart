@@ -26,6 +26,7 @@ class Job {
     this.status = JobStatus.scheduled,
     this.notes,
     this.review,
+    this.canCancel,
   });
 
   final String id;
@@ -45,8 +46,14 @@ class Job {
   final String? notes;
   final ReviewModel? review;
 
-  /// Može li student otkazati ovaj posao (>6h do početka i status scheduled)?
+  /// Backend-computed flag: can the current user cancel this session?
+  /// Null when not yet fetched from API (fallback to local computation).
+  final bool? canCancel;
+
+  /// Može li student otkazati ovaj posao?
+  /// Preferira backend-computed `canCancel`; fallback na lokalnu provjeru.
   bool get canDecline {
+    if (canCancel != null) return canCancel!;
     if (status != JobStatus.scheduled) return false;
     final jobStart = DateTime(
       date.year,
@@ -55,7 +62,7 @@ class Job {
       from.hour,
       from.minute,
     );
-    return jobStart.difference(DateTime.now()).inHours > 6;
+    return jobStart.difference(DateTime.now()).inMinutes > 360;
   }
 }
 
