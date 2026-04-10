@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:helpi_app/app/theme.dart';
+import 'package:helpi_app/core/constants/pricing.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/network/token_storage.dart';
 import 'package:helpi_app/core/services/app_api_service.dart';
@@ -495,7 +496,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
             const SizedBox(height: 24),
 
-            // -- Can't attend button (for assigned, >24h) --
+            // -- Can't attend button (for assigned, >cutoff hours) --
             if (_job.canDecline) ...[
               SizedBox(
                 width: double.infinity,
@@ -511,6 +512,20 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
+                ),
+              ),
+            ] else if (_job.status == JobStatus.scheduled) ...[
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Text(
+                  AppStrings.jobDeclineTooLate(
+                    AppPricing.studentCancelCutoffHours,
+                  ),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                    fontSize: 13,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ],

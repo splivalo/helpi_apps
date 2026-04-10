@@ -21,7 +21,6 @@ class AppStrings {
     'hr': {
       // -- App --
       'appName': 'Helpi',
-      'appTagline': 'Pomoć na dlanu',
       'quickActionsTitle': 'Što vam treba?',
       'topBadge': 'Top',
 
@@ -155,51 +154,17 @@ class AppStrings {
       'completeRegistration': 'Završi registraciju',
       'orderingForOther': 'Naručujem za drugog',
 
-      // -- Marketplace --
-      'marketplace': 'Studenti',
-      'filterTitle': 'Filtriraj',
-      'filterService': 'Vrsta usluge',
-      'filterDate': 'Datum',
-      'filterDay': 'Dostupnost',
-      'filterAnyDay': 'Bilo koji dan',
-      'filterApply': 'Primijeni filtre',
-      'filterClear': 'Očisti filtre',
-      'perHour': '/sat',
-      'reviews': 'Recenzija',
-      'available': 'Dostupan',
-      'unavailable': 'Nedostupan',
-
-      // -- Service types --
-      'serviceActivities': 'Aktivnosti',
-      'serviceShopping': 'Kupovina',
-      'serviceHousehold': 'Kućanstvo',
-      'serviceCompanionship': 'Pratnja',
-      'serviceTechHelp': 'Tehnologija',
-      'servicePets': 'Ljubimci',
-
-      // -- Time picker --
-      'availableWindow': 'Dostupan: {start} – {end}',
-      'startTimeLabel': 'Početak',
-      'durationLabel': 'Trajanje',
-      'hourSingular': 'sat',
-      'hourPlural': 'sata',
-      'aboutStudent': 'O studentu',
-
       // -- Recurrence --
       'oneTime': 'Jednom',
       'recurring': 'Ponavljajuće',
-      'continuous': 'Stalno',
       'untilDate': 'Do datuma',
       'hasEndDate': 'Do određenog datuma',
-      'selectEndDate': 'Odaberite zadnji termin',
       'recurringNoEnd': 'Ponavljajuće',
       'recurringWithEnd': 'Do {date}',
-      'lastSessionLabel': 'Zadnji termin',
       'recurringUntilDateInfo':
           'Rezervacija traje do {date}. '
           'Nakon tog datuma automatski prestaje.',
       'noEndDate': 'Bez kraja',
-      'everyWeek': 'Svaki',
       'dayMon': 'Pon',
       'dayTue': 'Uto',
       'dayWed': 'Sri',
@@ -214,37 +179,16 @@ class AppStrings {
       'dayFriShort': 'Pe',
       'daySatShort': 'Su',
       'daySunShort': 'Ne',
-      'perSession': '/termin',
-      'recurringLabel': '{days} — {end}',
-      'configureAllDays': 'Odaberite vrijeme za sve dane',
-      'notConfigured': 'Nije postavljeno',
 
       // -- Booking --
-      'availability': 'Dostupnost',
-      'booking': 'Narudžba',
-      'selectSlot': 'Odaberi termin',
-      'orderSummary': 'Pregled narudžbe',
       'placeOrder': 'Naruči',
-      'orderConfirmed': 'Narudžba potvrđena!',
-      'orderNotes': 'Dodatne napomene',
-      'totalPrice': 'Ukupna cijena',
-      'bookingServiceHeader': 'Što vam treba?',
+      'paymentMethod': 'Način plaćanja',
       'bookingChipShopping': 'Kupovina',
       'bookingChipCleaning': 'Pomoć u kući',
       'bookingChipCompanionship': 'Društvo',
       'bookingChipWalk': 'Šetnja',
       'bookingChipEscort': 'Pratnja',
       'bookingChipOther': 'Ostalo',
-      'bookingDisclaimer': 'Studenti ne pružaju medicinsku njegu.',
-      'bookingNotesHint': 'Npr. "Mlijeko i kruh iz Konzuma"',
-      'bookNow': 'Rezerviraj',
-
-      // -- Payment --
-      'payment': 'Plaćanje',
-      'paymentMethod': 'Način plaćanja',
-      'payNow': 'Plati sada',
-      'paymentSuccess': 'Plaćanje uspješno!',
-      'paymentFailed': 'Plaćanje neuspješno',
 
       // -- Chat --
       'chat': 'Poruke',
@@ -379,7 +323,8 @@ class AppStrings {
       'jobDeclineTitle': 'Otkažite posao',
       'jobDeclineHint': 'Napišite razlog otkazivanja...',
       'jobDeclineConfirm': 'Pošalji',
-      'jobDeclineTooLate': 'Nije moguće otkazati manje od 24h prije početka.',
+      'jobDeclineTooLate':
+          'Nije moguće otkazati manje od {hours}h prije početka.',
       'jobDeclineSuccess': 'Posao je otkazan.',
       'rateSenior': 'Ocijeni',
       'yourReview': 'Vaša ocjena',
@@ -393,11 +338,7 @@ class AppStrings {
 
       // -- Statistics --
       'statsTitle': 'Statistika',
-      'statsTotalJobs': 'Ukupno poslova',
-      'statsTotalHours': 'Odrađeno sati',
       'statsAvgRating': 'Prosječna ocjena',
-      'statsRecentReviews': 'Posljednje ocjene',
-      'statsNoReviews': 'Još nema ocjena.',
       'statsWeeklyReview': 'Tjedni pregled',
       'statsMonthlyReview': 'Mjesečni pregled',
       'statsTotalHoursValue': '{hours} odrađenih sati ukupno',
@@ -406,8 +347,6 @@ class AppStrings {
       'statsCompareSame': 'Jednako sati kao prošli {period}.',
       'statsPeriodWeek': 'tjedan',
       'statsPeriodMonth': 'mjesec',
-      'statsShowAllReviews': 'Prikaži sve ocjene',
-      'statsAllReviews': 'Sve ocjene',
       'statsDayMon': 'P',
       'statsDayTue': 'U',
       'statsDayWed': 'S',
@@ -461,28 +400,6 @@ class AppStrings {
       'month10': 'Listopad',
       'month11': 'Studeni',
       'month12': 'Prosinac',
-      'calendarFree': 'Slobodno',
-      'calendarPartial': 'Djelomično',
-      'calendarBooked': 'Zauzeto',
-      'selectDatePrompt': 'Odaberite datum za rezervaciju',
-      'freeHoursCount': '{free} od {total} sati slobodno',
-      'allHoursFree': 'Svi termini slobodni',
-      'recurringConfirmed': 'Potvrđeno: {count}',
-      'recurringSkipped': 'Preskočeno: {count}',
-      'sessionsLabel': 'Termini',
-      'recurringFree': 'Slobodno',
-      'recurringOccupied': 'Zauzeto',
-      'recurringPartial': '{start}-{end} slobodno',
-      'recurringTotalPrice': 'Ukupno ({count} termina)',
-      'recurringPerVisitPrice': '{price} €/termin',
-      'recurringBillingInfo': 'Naplata karticom 30 min prije svakog dolaska.',
-      'recurringMonthTitle': 'Svaki {day} u mjesecu {month}',
-      'recurringDaysLabel': 'Dani',
-      'recurringOutsideWindow': 'Izvan termina',
-      'recurringAutoRenew':
-          'Ova rezervacija vrijedi do kraja mjeseca {month}. '
-          'Automatski se obnavlja sljedeći mjesec ako student '
-          'produži dostupnost. Možete otkazati bilo kada.',
 
       // -- Suspension --
       'suspendedTitle': 'Račun suspendiran',
@@ -502,7 +419,6 @@ class AppStrings {
     'en': {
       // -- App --
       'appName': 'Helpi',
-      'appTagline': 'Help at your fingertips',
       'quickActionsTitle': 'What do you need?',
       'topBadge': 'Top',
 
@@ -636,51 +552,17 @@ class AppStrings {
       'completeRegistration': 'Complete registration',
       'orderingForOther': 'Ordering for someone else',
 
-      // -- Marketplace --
-      'marketplace': 'Students',
-      'filterTitle': 'Filter',
-      'filterService': 'Service type',
-      'filterDate': 'Date',
-      'filterDay': 'Availability',
-      'filterAnyDay': 'Any day',
-      'filterApply': 'Apply filters',
-      'filterClear': 'Clear filters',
-      'perHour': '/hour',
-      'reviews': 'Reviews',
-      'available': 'Available',
-      'unavailable': 'Unavailable',
-
-      // -- Service types --
-      'serviceActivities': 'Activities',
-      'serviceShopping': 'Shopping',
-      'serviceHousehold': 'Household',
-      'serviceCompanionship': 'Companionship',
-      'serviceTechHelp': 'Technology',
-      'servicePets': 'Pets',
-
-      // -- Time picker --
-      'availableWindow': 'Available: {start} – {end}',
-      'startTimeLabel': 'Start time',
-      'durationLabel': 'Duration',
-      'hourSingular': 'hour',
-      'hourPlural': 'hours',
-      'aboutStudent': 'About student',
-
       // -- Recurrence --
       'oneTime': 'Once',
       'recurring': 'Recurring',
-      'continuous': 'Weekly',
       'untilDate': 'Until date',
       'hasEndDate': 'Until a specific date',
-      'selectEndDate': 'Select last session',
       'recurringNoEnd': 'Recurring',
       'recurringWithEnd': 'Until {date}',
-      'lastSessionLabel': 'Last session',
       'recurringUntilDateInfo':
           'Booking runs until {date}. '
           'It stops automatically after that date.',
       'noEndDate': 'No end date',
-      'everyWeek': 'Every',
       'dayMon': 'Mon',
       'dayTue': 'Tue',
       'dayWed': 'Wed',
@@ -695,37 +577,16 @@ class AppStrings {
       'dayFriShort': 'Fr',
       'daySatShort': 'Sa',
       'daySunShort': 'Su',
-      'perSession': '/session',
-      'recurringLabel': '{days} — {end}',
-      'configureAllDays': 'Select time for all days',
-      'notConfigured': 'Not configured',
 
       // -- Booking --
-      'availability': 'Availability',
-      'booking': 'Booking',
-      'selectSlot': 'Select time slot',
-      'orderSummary': 'Order summary',
       'placeOrder': 'Place order',
-      'orderConfirmed': 'Order confirmed!',
-      'orderNotes': 'Additional notes',
-      'totalPrice': 'Total price',
-      'bookingServiceHeader': 'What do you need?',
+      'paymentMethod': 'Payment method',
       'bookingChipShopping': 'Errands',
       'bookingChipCleaning': 'Home help',
       'bookingChipCompanionship': 'Company',
       'bookingChipWalk': 'Walk',
       'bookingChipEscort': 'Escort',
       'bookingChipOther': 'Other',
-      'bookingDisclaimer': 'Students do not provide medical care.',
-      'bookingNotesHint': 'E.g. "Milk and bread from the store"',
-      'bookNow': 'Book now',
-
-      // -- Payment --
-      'payment': 'Payment',
-      'paymentMethod': 'Payment method',
-      'payNow': 'Pay now',
-      'paymentSuccess': 'Payment successful!',
-      'paymentFailed': 'Payment failed',
 
       // -- Chat --
       'chat': 'Messages',
@@ -861,7 +722,7 @@ class AppStrings {
       'jobDeclineTitle': 'Cancel job',
       'jobDeclineHint': 'Write the reason for cancellation...',
       'jobDeclineConfirm': 'Submit',
-      'jobDeclineTooLate': 'Cannot cancel less than 24h before the start.',
+      'jobDeclineTooLate': 'Cannot cancel less than {hours}h before the start.',
       'jobDeclineSuccess': 'Job cancelled.',
       'rateSenior': 'Rate',
       'yourReview': 'Your review',
@@ -875,11 +736,7 @@ class AppStrings {
 
       // -- Statistics --
       'statsTitle': 'Statistics',
-      'statsTotalJobs': 'Total jobs',
-      'statsTotalHours': 'Hours worked',
       'statsAvgRating': 'Average rating',
-      'statsRecentReviews': 'Recent reviews',
-      'statsNoReviews': 'No reviews yet.',
       'statsWeeklyReview': 'Weekly review',
       'statsMonthlyReview': 'Monthly review',
       'statsTotalHoursValue': '{hours} hours worked total',
@@ -890,8 +747,6 @@ class AppStrings {
       'statsCompareSame': 'Same hours as the previous {period}.',
       'statsPeriodWeek': 'week',
       'statsPeriodMonth': 'month',
-      'statsShowAllReviews': 'Show all reviews',
-      'statsAllReviews': 'All reviews',
       'statsDayMon': 'M',
       'statsDayTue': 'T',
       'statsDayWed': 'W',
@@ -945,28 +800,6 @@ class AppStrings {
       'month10': 'October',
       'month11': 'November',
       'month12': 'December',
-      'calendarFree': 'Available',
-      'calendarPartial': 'Partial',
-      'calendarBooked': 'Booked',
-      'selectDatePrompt': 'Select a date to book',
-      'freeHoursCount': '{free} of {total} hours available',
-      'allHoursFree': 'All hours available',
-      'recurringConfirmed': 'Confirmed: {count}',
-      'recurringSkipped': 'Skipped: {count}',
-      'sessionsLabel': 'Sessions',
-      'recurringFree': 'Available',
-      'recurringOccupied': 'Booked',
-      'recurringPartial': '{start}-{end} available',
-      'recurringTotalPrice': 'Total ({count} sessions)',
-      'recurringPerVisitPrice': '€{price}/session',
-      'recurringBillingInfo': 'Charged to your card 30 min before each visit.',
-      'recurringMonthTitle': 'Every {day} in {month}',
-      'recurringDaysLabel': 'Days',
-      'recurringOutsideWindow': 'Outside hours',
-      'recurringAutoRenew':
-          'This booking is valid until the end of {month}. '
-          'It auto-renews next month if the student extends '
-          'availability. You can cancel anytime.',
 
       // -- Suspension --
       'suspendedTitle': 'Account Suspended',
@@ -1002,7 +835,6 @@ class AppStrings {
 
   // -- App --
   static String get appName => _t('appName');
-  static String get appTagline => _t('appTagline');
 
   // -- Suspension --
   static String get suspendedTitle => _t('suspendedTitle');
@@ -1148,50 +980,15 @@ class AppStrings {
   static String get completeRegistration => _t('completeRegistration');
   static String get orderingForOther => _t('orderingForOther');
 
-  // -- Marketplace --
-  static String get marketplace => _t('marketplace');
-  static String get filterTitle => _t('filterTitle');
-  static String get filterService => _t('filterService');
-  static String get filterDate => _t('filterDate');
-  static String get filterDay => _t('filterDay');
-  static String get filterAnyDay => _t('filterAnyDay');
-  static String get filterApply => _t('filterApply');
-  static String get filterClear => _t('filterClear');
-  static String get perHour => _t('perHour');
-  static String get reviews => _t('reviews');
-  static String get available => _t('available');
-  static String get unavailable => _t('unavailable');
-
-  // -- Service types --
-  static String get serviceActivities => _t('serviceActivities');
-  static String get serviceShopping => _t('serviceShopping');
-  static String get serviceHousehold => _t('serviceHousehold');
-  static String get serviceCompanionship => _t('serviceCompanionship');
-  static String get serviceTechHelp => _t('serviceTechHelp');
-  static String get servicePets => _t('servicePets');
-
-  // -- Time picker --
-  static String availableWindow(String start, String end) =>
-      _t('availableWindow', params: {'start': start, 'end': end});
-  static String get startTimeLabel => _t('startTimeLabel');
-  static String get durationLabel => _t('durationLabel');
-  static String get hourSingular => _t('hourSingular');
-  static String get hourPlural => _t('hourPlural');
-  static String get aboutStudent => _t('aboutStudent');
-
   // -- Recurrence --
   static String get oneTime => _t('oneTime');
   static String get recurring => _t('recurring');
-  static String get continuous => _t('continuous');
   static String get untilDateLabel => _t('untilDate');
-  static String get selectEndDate => _t('selectEndDate');
-  static String get lastSessionLabel => _t('lastSessionLabel');
   static String recurringUntilDateInfo(String date) =>
       _t('recurringUntilDateInfo', params: {'date': date});
   static String get noEndDate => _t('noEndDate');
   static String untilDate(String date) =>
       _t('untilDate', params: {'date': date});
-  static String get everyWeek => _t('everyWeek');
   static String get dayMon => _t('dayMon');
   static String get dayTue => _t('dayTue');
   static String get dayWed => _t('dayWed');
@@ -1206,38 +1003,16 @@ class AppStrings {
   static String get dayFriShort => _t('dayFriShort');
   static String get daySatShort => _t('daySatShort');
   static String get daySunShort => _t('daySunShort');
-  static String get perSession => _t('perSession');
-  static String get configureAllDays => _t('configureAllDays');
-  static String get notConfigured => _t('notConfigured');
-  static String recurringLabel(String days, String end) =>
-      _t('recurringLabel', params: {'days': end});
 
   // -- Booking --
-  static String get availability => _t('availability');
-  static String get booking => _t('booking');
-  static String get selectSlot => _t('selectSlot');
-  static String get orderSummary => _t('orderSummary');
   static String get placeOrder => _t('placeOrder');
-  static String get orderConfirmed => _t('orderConfirmed');
-  static String get orderNotes => _t('orderNotes');
-  static String get totalPrice => _t('totalPrice');
-  static String get bookingServiceHeader => _t('bookingServiceHeader');
+  static String get paymentMethod => _t('paymentMethod');
   static String get bookingChipShopping => _t('bookingChipShopping');
   static String get bookingChipCleaning => _t('bookingChipCleaning');
   static String get bookingChipCompanionship => _t('bookingChipCompanionship');
   static String get bookingChipWalk => _t('bookingChipWalk');
   static String get bookingChipEscort => _t('bookingChipEscort');
   static String get bookingChipOther => _t('bookingChipOther');
-  static String get bookingDisclaimer => _t('bookingDisclaimer');
-  static String get bookingNotesHint => _t('bookingNotesHint');
-  static String get bookNow => _t('bookNow');
-
-  // -- Payment --
-  static String get payment => _t('payment');
-  static String get paymentMethod => _t('paymentMethod');
-  static String get payNow => _t('payNow');
-  static String get paymentSuccess => _t('paymentSuccess');
-  static String get paymentFailed => _t('paymentFailed');
 
   // -- Chat --
   static String get chat => _t('chat');
@@ -1379,7 +1154,8 @@ class AppStrings {
   static String get jobDeclineTitle => _t('jobDeclineTitle');
   static String get jobDeclineHint => _t('jobDeclineHint');
   static String get jobDeclineConfirm => _t('jobDeclineConfirm');
-  static String get jobDeclineTooLate => _t('jobDeclineTooLate');
+  static String jobDeclineTooLate(int hours) =>
+      _t('jobDeclineTooLate', params: {'hours': '$hours'});
   static String get jobDeclineSuccess => _t('jobDeclineSuccess');
   static String get rateSenior => _t('rateSenior');
   static String get yourReview => _t('yourReview');
@@ -1393,11 +1169,7 @@ class AppStrings {
 
   // -- Statistics --
   static String get statsTitle => _t('statsTitle');
-  static String get statsTotalJobs => _t('statsTotalJobs');
-  static String get statsTotalHours => _t('statsTotalHours');
   static String get statsAvgRating => _t('statsAvgRating');
-  static String get statsRecentReviews => _t('statsRecentReviews');
-  static String get statsNoReviews => _t('statsNoReviews');
   static String get statsWeeklyReview => _t('statsWeeklyReview');
   static String get statsMonthlyReview => _t('statsMonthlyReview');
   static String statsTotalHoursValue(String hours) =>
@@ -1410,8 +1182,6 @@ class AppStrings {
       _t('statsCompareSame', params: {'period': period});
   static String get statsPeriodWeek => _t('statsPeriodWeek');
   static String get statsPeriodMonth => _t('statsPeriodMonth');
-  static String get statsShowAllReviews => _t('statsShowAllReviews');
-  static String get statsAllReviews => _t('statsAllReviews');
   static String get statsDayMon => _t('statsDayMon');
   static String get statsDayTue => _t('statsDayTue');
   static String get statsDayWed => _t('statsDayWed');
@@ -1466,33 +1236,6 @@ class AppStrings {
 
   // -- Calendar --
   static String monthName(int month) => _t('month$month');
-  static String get calendarFree => _t('calendarFree');
-  static String get calendarPartial => _t('calendarPartial');
-  static String get calendarBooked => _t('calendarBooked');
-  static String get selectDatePrompt => _t('selectDatePrompt');
-  static String freeHoursCount(String free, String total) =>
-      _t('freeHoursCount', params: {'free': free, 'total': total});
-  static String get allHoursFree => _t('allHoursFree');
-  static String recurringConfirmed(String count) =>
-      _t('recurringConfirmed', params: {'count': count});
-  static String recurringSkipped(String count) =>
-      _t('recurringSkipped', params: {'count': count});
-  static String get sessionsLabel => _t('sessionsLabel');
-  static String get recurringFree => _t('recurringFree');
-  static String get recurringOccupied => _t('recurringOccupied');
-  static String recurringPartial(String start, String end) =>
-      _t('recurringPartial', params: {'start': start, 'end': end});
-  static String recurringTotalPrice(String count) =>
-      _t('recurringTotalPrice', params: {'count': count});
-  static String recurringPerVisitPrice(String price) =>
-      _t('recurringPerVisitPrice', params: {'price': price});
-  static String get recurringBillingInfo => _t('recurringBillingInfo');
-  static String recurringMonthTitle(String day, String month) =>
-      _t('recurringMonthTitle', params: {'day': day, 'month': month});
-  static String get recurringDaysLabel => _t('recurringDaysLabel');
-  static String get recurringOutsideWindow => _t('recurringOutsideWindow');
-  static String recurringAutoRenew(String month) =>
-      _t('recurringAutoRenew', params: {'month': month});
 
   // -- Server unavailable --
   static String get serverUnavailableTitle => _t('serverUnavailableTitle');

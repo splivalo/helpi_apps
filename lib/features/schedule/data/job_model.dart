@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:helpi_app/core/constants/pricing.dart';
 import 'package:helpi_app/features/schedule/data/review_model.dart';
 
 /// Service type that student performs.
@@ -62,7 +63,8 @@ class Job {
       from.hour,
       from.minute,
     );
-    return jobStart.difference(DateTime.now()).inMinutes > 360;
+    return jobStart.difference(DateTime.now()).inMinutes >
+        AppPricing.studentCancelCutoffHours * 60;
   }
 }
 
