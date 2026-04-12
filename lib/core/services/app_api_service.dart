@@ -685,6 +685,7 @@ class AppApiService {
 
     return OrderModel(
       id: (json['id'] as num?)?.toInt() ?? 0,
+      orderNumber: (json['orderNumber'] as num?)?.toInt() ?? 0,
       seniorId: (json['seniorId'] as num?)?.toInt().toString() ?? '',
       services: serviceNames,
       serviceIds: serviceIds,

@@ -156,7 +156,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
               children: [
                 Expanded(
                   child: Text(
-                    AppStrings.orderNumber(order.id.toString()),
+                    AppStrings.orderNumber(
+                      order.orderNumber > 0
+                          ? order.orderNumber.toString()
+                          : order.id.toString(),
+                    ),
                     style: theme.textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),

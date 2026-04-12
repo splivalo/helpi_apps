@@ -86,6 +86,7 @@ class StudentAssignment {
 class OrderModel {
   OrderModel({
     required this.id,
+    this.orderNumber = 0,
     required this.services,
     required this.date,
     required this.frequency,
@@ -111,6 +112,7 @@ class OrderModel {
        jobs = jobs ?? [];
 
   final int id;
+  final int orderNumber;
   final String seniorId;
   final List<String> services;
   final List<int> serviceIds;
