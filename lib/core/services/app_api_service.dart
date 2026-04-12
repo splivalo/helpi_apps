@@ -727,8 +727,17 @@ class AppApiService {
       address = contact?['fullAddress'] as String? ?? '';
     }
 
-    // Service types from order (if available) - fallback to empty
+    // Service types from order (via backend Services list)
     final serviceTypes = <ServiceType>[];
+    final servicesJson = json['services'] as List<dynamic>?;
+    if (servicesJson != null) {
+      for (final svc in servicesJson) {
+        final svcMap = svc as Map<String, dynamic>;
+        final id = (svcMap['id'] as num?)?.toInt();
+        final mapped = _mapServiceId(id);
+        if (mapped != null) serviceTypes.add(mapped);
+      }
+    }
 
     // Review iz nested data (if available)
     schedule_review.ReviewModel? review;
@@ -825,6 +834,27 @@ class AppApiService {
       return JobStatus.cancelled;
     }
     return JobStatus.scheduled;
+  }
+
+  /// Maps backend service ID to ServiceType enum.
+  /// IDs: 1=Companionship, 4=Walking, 11=Shopping, 21=HouseHelp, 31=Escort, 41=Other
+  ServiceType? _mapServiceId(int? id) {
+    switch (id) {
+      case 1:
+        return ServiceType.companionship;
+      case 4:
+        return ServiceType.walking;
+      case 11:
+        return ServiceType.shopping;
+      case 21:
+        return ServiceType.houseHelp;
+      case 31:
+        return ServiceType.escort;
+      case 41:
+        return ServiceType.other;
+      default:
+        return null;
+    }
   }
 
   // --

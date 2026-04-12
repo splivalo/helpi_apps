@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/l10n/locale_notifier.dart';
+import 'package:helpi_app/core/l10n/theme_notifier.dart';
 import 'package:helpi_app/features/schedule/data/availability_model.dart';
 import 'package:helpi_app/features/chat/presentation/student_chat_screen.dart';
 import 'package:helpi_app/features/profile/presentation/student_profile_screen.dart';
@@ -15,11 +16,13 @@ class StudentShell extends StatefulWidget {
     super.key,
     required this.onLogout,
     required this.localeNotifier,
+    required this.themeNotifier,
     required this.availabilityNotifier,
   });
 
   final VoidCallback onLogout;
   final LocaleNotifier localeNotifier;
+  final ThemeNotifier themeNotifier;
   final AvailabilityNotifier availabilityNotifier;
 
   @override
@@ -40,6 +43,7 @@ class _StudentShellState extends State<StudentShell> {
       const StatisticsScreen(),
       ProfileScreen(
         localeNotifier: widget.localeNotifier,
+        themeNotifier: widget.themeNotifier,
         onLogout: widget.onLogout,
         availabilityNotifier: widget.availabilityNotifier,
       ),

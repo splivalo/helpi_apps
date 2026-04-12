@@ -11,10 +11,11 @@ class JobStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: JobHelpers.statusBgColor(status),
+        color: JobHelpers.statusBgColor(status, brightness),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -22,7 +23,7 @@ class JobStatusBadge extends StatelessWidget {
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: JobHelpers.statusColor(status),
+          color: JobHelpers.statusColor(status, brightness),
         ),
       ),
     );

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/l10n/locale_notifier.dart';
+import 'package:helpi_app/core/l10n/theme_notifier.dart';
 import 'package:helpi_app/features/booking/data/order_model.dart';
 import 'package:helpi_app/features/booking/presentation/order_screen.dart';
 import 'package:helpi_app/features/booking/presentation/orders_screen.dart';
@@ -14,11 +15,13 @@ class SeniorShell extends StatefulWidget {
   const SeniorShell({
     super.key,
     required this.localeNotifier,
+    required this.themeNotifier,
     required this.onLogout,
     required this.ordersNotifier,
   });
 
   final LocaleNotifier localeNotifier;
+  final ThemeNotifier themeNotifier;
   final VoidCallback onLogout;
   final OrdersNotifier ordersNotifier;
 
@@ -43,6 +46,7 @@ class _SeniorShellState extends State<SeniorShell> {
       const ChatScreen(),
       ProfileScreen(
         localeNotifier: widget.localeNotifier,
+        themeNotifier: widget.themeNotifier,
         onLogout: widget.onLogout,
       ),
     ];

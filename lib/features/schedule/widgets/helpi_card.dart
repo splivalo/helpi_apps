@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:helpi_app/app/theme.dart';
-
 /// White card container with border - reusable section wrapper.
 class HelpiCard extends StatelessWidget {
   const HelpiCard({super.key, required this.child, this.padding});
@@ -11,12 +9,13 @@ class HelpiCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
       padding: padding ?? const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: HelpiTheme.border),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
       child: child,
     );

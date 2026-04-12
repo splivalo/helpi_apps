@@ -509,6 +509,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
 
   // -- Step indicator (3 bars) --
   Widget _buildStepIndicator() {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Row(
@@ -519,7 +520,9 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
               height: 4,
               margin: EdgeInsets.only(right: i < 2 ? 8 : 0),
               decoration: BoxDecoration(
-                color: isActive ? AppColors.coral : AppColors.border,
+                color: isActive
+                    ? AppColors.coral
+                    : theme.colorScheme.outlineVariant,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -604,9 +607,9 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: theme.colorScheme.outlineVariant),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -631,10 +634,10 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                           _oneTimeDuration = null;
                         });
                       },
-                      child: const Icon(
+                      child: Icon(
                         Icons.close,
                         size: 22,
-                        color: AppColors.textSecondary,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -643,7 +646,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                 Text(
                   AppFormatters.date(_oneTimeDate!),
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -790,6 +793,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     required DateTime? date,
     required VoidCallback onTap,
   }) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: () {
         HapticFeedback.selectionClick();
@@ -798,9 +802,9 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: theme.colorScheme.outlineVariant),
         ),
         child: Row(
           children: [
@@ -811,8 +815,8 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
               style: TextStyle(
                 fontSize: 16,
                 color: date != null
-                    ? AppColors.textPrimary
-                    : AppColors.inactive,
+                    ? theme.colorScheme.onSurface
+                    : theme.colorScheme.onSurface.withAlpha(100),
               ),
             ),
           ],
@@ -915,9 +919,9 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -937,10 +941,10 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                   HapticFeedback.selectionClick();
                   setState(() => _dayEntries.removeAt(index));
                 },
-                child: const Icon(
+                child: Icon(
                   Icons.close,
                   size: 22,
-                  color: AppColors.textSecondary,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -956,7 +960,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                 ),
               ),
               style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -1030,9 +1034,9 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1053,10 +1057,10 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                     HapticFeedback.selectionClick();
                     setState(() => _showingDayPicker = false);
                   },
-                  child: const Icon(
+                  child: Icon(
                     Icons.close,
                     size: 22,
-                    color: AppColors.textSecondary,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
             ],
@@ -1102,7 +1106,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: AppColors.teal, width: 2),
         ),
@@ -1250,9 +1254,9 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: theme.colorScheme.outlineVariant),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1335,7 +1339,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                   Text(
                     AppStrings.orderSummaryDays,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -1406,7 +1410,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                 Text(
                   AppStrings.orderSummaryServices,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -1422,7 +1426,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                   Text(
                     AppStrings.orderSummaryNotes,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -1442,9 +1446,9 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
             width: double.infinity,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: theme.colorScheme.outlineVariant),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1470,11 +1474,13 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? AppColors.selectedChipBg
-                            : Colors.white,
+                            ? AppColors.teal.withAlpha(30)
+                            : theme.colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isSelected ? AppColors.teal : AppColors.border,
+                          color: isSelected
+                              ? AppColors.teal
+                              : theme.colorScheme.outlineVariant,
                           width: isSelected ? 2 : 1,
                         ),
                       ),
@@ -1484,7 +1490,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                             Icons.credit_card,
                             color: isSelected
                                 ? AppColors.teal
-                                : AppColors.textSecondary,
+                                : theme.colorScheme.onSurfaceVariant,
                             size: 22,
                           ),
                           const SizedBox(width: 12),
@@ -1545,17 +1551,19 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                       vertical: 10,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF5F5F5),
+                      color: theme.colorScheme.surfaceContainerHighest,
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: AppColors.border),
+                      border: Border.all(
+                        color: theme.colorScheme.outlineVariant,
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.local_offer,
                           size: 18,
-                          color: AppColors.textSecondary,
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                         const SizedBox(width: 8),
                         Text(
@@ -1574,10 +1582,10 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                               _promoCodeController.clear();
                             });
                           },
-                          child: const Icon(
+                          child: Icon(
                             Icons.close,
                             size: 18,
-                            color: AppColors.textSecondary,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -1599,22 +1607,6 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: AppColors.border,
-                              ),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: AppColors.border,
-                              ),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(
-                                color: AppColors.teal,
-                                width: 2,
-                              ),
                             ),
                           ),
                         ),

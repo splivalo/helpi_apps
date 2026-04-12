@@ -20,25 +20,33 @@ class JobHelpers {
     }
   }
 
-  static Color statusColor(JobStatus status) {
+  static Color statusColor(JobStatus status, [Brightness? brightness]) {
+    final isDark = brightness == Brightness.dark;
     switch (status) {
       case JobStatus.scheduled:
-        return const Color(0xFF4CAF50);
+        return isDark ? const Color(0xFF81C784) : const Color(0xFF4CAF50);
       case JobStatus.completed:
-        return const Color(0xFF757575);
+        return isDark ? const Color(0xFFBDBDBD) : const Color(0xFF757575);
       case JobStatus.cancelled:
-        return const Color(0xFFEF5B5B);
+        return isDark ? const Color(0xFFEF9A9A) : const Color(0xFFEF5B5B);
     }
   }
 
-  static Color statusBgColor(JobStatus status) {
+  static Color statusBgColor(JobStatus status, [Brightness? brightness]) {
+    final isDark = brightness == Brightness.dark;
     switch (status) {
       case JobStatus.scheduled:
-        return const Color(0xFFE8F5E9);
+        return isDark
+            ? const Color(0xFF1B5E20).withAlpha(80)
+            : const Color(0xFFE8F5E9);
       case JobStatus.completed:
-        return const Color(0xFFF0F0F0);
+        return isDark
+            ? const Color(0xFF424242).withAlpha(80)
+            : const Color(0xFFF0F0F0);
       case JobStatus.cancelled:
-        return const Color(0xFFFFEBEE);
+        return isDark
+            ? const Color(0xFFB71C1C).withAlpha(80)
+            : const Color(0xFFFFEBEE);
     }
   }
 

@@ -157,9 +157,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,7 +214,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             Text(
               AppStrings.orderSummaryDays,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 8),
@@ -276,7 +276,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           Text(
             AppStrings.orderSummaryServices,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.textSecondary,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 8),
@@ -288,7 +288,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             Text(
               AppStrings.orderSummaryNotes,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 4),
@@ -304,7 +304,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             Text(
               AppStrings.studentName,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 6),
@@ -376,9 +376,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,7 +401,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   _jobsExpanded
                       ? Icons.keyboard_arrow_up
                       : Icons.keyboard_arrow_down,
-                  color: AppColors.textSecondary,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ],
             ),
@@ -411,7 +411,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             Text(
               AppStrings.jobsMonthlySubtitle,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -451,9 +451,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isCancelled ? const Color(0xFFFAFAFA) : Colors.white,
+        color: isCancelled
+            ? theme.colorScheme.surfaceContainerHighest
+            : theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -481,8 +483,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: isCancelled
-                        ? AppColors.textSecondary
-                        : const Color(0xFF212121),
+                        ? theme.colorScheme.onSurfaceVariant
+                        : theme.colorScheme.onSurface,
                     decoration: isCancelled ? TextDecoration.lineThrough : null,
                   ),
                 ),
@@ -498,7 +500,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             child: Text(
               '${job.time}  ·  ${job.durationHours}h  ·  ${AppPricing.formatPrice(price)}',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -784,7 +786,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   Text(
                     '${AppFormatters.dayMediumName(job.weekday)}, ${AppFormatters.date(job.date)}',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 20),

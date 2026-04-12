@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/l10n/locale_notifier.dart';
+import 'package:helpi_app/core/l10n/theme_notifier.dart';
 import 'package:helpi_app/core/network/api_client.dart';
 import 'package:helpi_app/core/network/api_endpoints.dart';
 import 'package:helpi_app/core/network/token_storage.dart';
@@ -22,11 +23,13 @@ class ProfileScreen extends StatefulWidget {
   const ProfileScreen({
     super.key,
     required this.localeNotifier,
+    required this.themeNotifier,
     required this.onLogout,
     required this.availabilityNotifier,
   });
 
   final LocaleNotifier localeNotifier;
+  final ThemeNotifier themeNotifier;
   final VoidCallback onLogout;
   final AvailabilityNotifier availabilityNotifier;
 
@@ -399,11 +402,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Icons.language,
                       color: theme.colorScheme.secondary,
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: theme.colorScheme.surface,
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
@@ -432,6 +432,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                   ),
+                ),
+                const SizedBox(height: 16),
+
+                // -- THEME MODE --
+                ValueListenableBuilder<ThemeMode>(
+                  valueListenable: widget.themeNotifier,
+                  builder: (context, themeMode, _) {
+                    return InputDecorator(
+                      decoration: InputDecoration(
+                        labelText: AppStrings.themeMode,
+                        labelStyle: TextStyle(
+                          color: theme.colorScheme.onSurface.withAlpha(180),
+                        ),
+                        prefixIcon: Icon(
+                          Icons.brightness_6,
+                          color: theme.colorScheme.secondary,
+                        ),
+                        filled: true,
+                        fillColor: theme.colorScheme.surface,
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<ThemeMode>(
+                          value: themeMode,
+                          isDense: true,
+                          isExpanded: true,
+                          onChanged: (v) {
+                            if (v != null) {
+                              widget.themeNotifier.setThemeMode(v);
+                            }
+                          },
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface,
+                            fontSize: 16,
+                          ),
+                          items: [
+                            DropdownMenuItem(
+                              value: ThemeMode.system,
+                              child: Text(AppStrings.themeSystem),
+                            ),
+                            DropdownMenuItem(
+                              value: ThemeMode.light,
+                              child: Text(AppStrings.themeLight),
+                            ),
+                            DropdownMenuItem(
+                              value: ThemeMode.dark,
+                              child: Text(AppStrings.themeDark),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 24),
 
@@ -542,12 +594,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           color: theme.colorScheme.onSurface.withAlpha(_isEditing ? 180 : 153),
         ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: HelpiTheme.border),
-        ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: theme.colorScheme.surface,
       ),
     );
   }
@@ -562,13 +610,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           color: theme.colorScheme.onSurface.withAlpha(_isEditing ? 180 : 153),
         ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: HelpiTheme.border),
-        ),
         enabled: _isEditing,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: theme.colorScheme.surface,
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -626,16 +670,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: _isEditing
-                  ? theme.colorScheme.onSurface.withAlpha(100)
-                  : HelpiTheme.border,
-            ),
-          ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: theme.colorScheme.surface,
           suffixIcon: _isEditing
               ? Icon(
                   Icons.calendar_today,
@@ -683,13 +719,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-          disabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: HelpiTheme.border),
-          ),
           enabled: _isEditing,
           filled: true,
-          fillColor: Colors.white,
+          fillColor: theme.colorScheme.surface,
           suffixIcon: _isEditing
               ? Icon(Icons.arrow_drop_down, color: theme.colorScheme.secondary)
               : null,
@@ -710,7 +742,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               )
             : Text(
                 AppStrings.facultyHint,
-                style: TextStyle(color: HelpiTheme.textSecondary, fontSize: 16),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 16,
+                ),
               ),
       ),
     );

@@ -18,6 +18,7 @@ class TabBarSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       children: [
         for (int i = 0; i < tabs.length; i++) ...[
@@ -37,7 +38,7 @@ class TabBarSelector extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                       color: selectedIndex == i
                           ? AppColors.coral
-                          : AppColors.inactive,
+                          : theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -46,7 +47,7 @@ class TabBarSelector extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: selectedIndex == i
                           ? AppColors.coral
-                          : AppColors.border,
+                          : theme.colorScheme.outlineVariant,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),

@@ -17,7 +17,7 @@ class ServiceChipsWrap extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: AppColors.selectedChipBg,
+            color: AppColors.teal.withAlpha(30),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(color: AppColors.teal),
           ),

@@ -87,11 +87,18 @@ class SignalRService {
 
   /// Registriraj handler za backend event (npr. "ReceiveNotification").
   void on(String eventName, void Function(List<Object?>?) handler) {
+    final isNewEvent = !_handlers.containsKey(eventName);
     _handlers.putIfAbsent(eventName, () => []).add(handler);
 
-    // Ako je connection već aktivan, registriraj odmah
-    if (_connection != null) {
-      _connection!.on(eventName, (args) => handler(args));
+    // Za NOVE event-ove na živoj konekciji, registriraj closure
+    // koja iterira _handlers listu (isti pattern kao u start()).
+    // Postojeći event-ovi su već pokriveni closure-om iz start().
+    if (_connection != null && isNewEvent) {
+      _connection!.on(eventName, (args) {
+        for (final listener in _handlers[eventName]!) {
+          listener(args);
+        }
+      });
     }
   }
 
@@ -150,7 +157,7 @@ final signalRProvider = Provider<SignalRService>((ref) {
     } else if (prev != null && prev.isLoggedIn && !next.isLoggedIn) {
       service.stop();
     }
-  });
+  }, fireImmediately: true);
 
   ref.onDispose(() {
     service.stop();

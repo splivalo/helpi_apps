@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:helpi_app/app/theme.dart';
-import 'package:helpi_app/core/constants/pricing.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/network/token_storage.dart';
 import 'package:helpi_app/core/services/app_api_service.dart';
@@ -73,7 +72,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -211,9 +210,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             // ═══ CARD 1: Detalji posla (isti layout kao _JobCard) ═══
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: HelpiTheme.border),
+                border: Border.all(color: theme.colorScheme.outlineVariant),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -248,10 +247,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.access_time,
                           size: 20,
-                          color: HelpiTheme.textSecondary,
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                         const SizedBox(width: 8),
                         Text(
@@ -269,10 +268,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.place_outlined,
                           size: 20,
-                          color: HelpiTheme.textSecondary,
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                         const SizedBox(width: 8),
                         Expanded(
@@ -288,46 +287,52 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   const SizedBox(height: 8),
 
                   // -- Services (icon + chips) --
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.work_outline,
-                          size: 20,
-                          color: HelpiTheme.textSecondary,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: _job.serviceTypes.map((type) {
-                              return Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: HelpiTheme.barBg,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  JobHelpers.serviceLabel(type),
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: HelpiTheme.textSecondary,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
+                  if (_job.serviceTypes.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.work_outline,
+                            size: 20,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: _job.serviceTypes.map((type) {
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: theme
+                                        .colorScheme
+                                        .surfaceContainerHighest,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: theme.colorScheme.outlineVariant,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    JobHelpers.serviceLabel(type),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: theme.colorScheme.onSurface,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
 
                   // -- Notes --
                   if (_job.notes != null) ...[
@@ -337,10 +342,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.notes_outlined,
                             size: 20,
-                            color: HelpiTheme.textSecondary,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: 8),
                           Expanded(
@@ -366,9 +371,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: HelpiTheme.border),
+                border: Border.all(color: theme.colorScheme.outlineVariant),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -388,8 +393,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       Container(
                         width: 44,
                         height: 44,
-                        decoration: const BoxDecoration(
-                          color: HelpiTheme.avatarBg,
+                        decoration: BoxDecoration(
+                          color: teal.withAlpha(25),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -447,7 +452,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     Text(
                       AppStrings.yourReview,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.grey,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -457,7 +462,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: HelpiTheme.offWhite,
+                        color: theme.colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Column(
@@ -470,7 +475,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                               Text(
                                 _job.review!.date,
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  color: Colors.grey,
+                                  color: theme.colorScheme.onSurfaceVariant,
                                   fontSize: 12,
                                 ),
                               ),
@@ -515,19 +520,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 ),
               ),
             ] else if (_job.status == JobStatus.scheduled) ...[
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: Text(
-                  AppStrings.jobDeclineTooLate(
-                    AppPricing.studentCancelCutoffHours,
-                  ),
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                    fontSize: 13,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
+              const SizedBox.shrink(),
             ],
           ],
         ),

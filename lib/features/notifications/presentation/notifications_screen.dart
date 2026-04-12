@@ -172,7 +172,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  Color _iconColorForType(int? type) {
+  Color _iconColorForType(int? type, ThemeData theme) {
     switch (type) {
       case 1:
         return AppColors.teal;
@@ -183,7 +183,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       case 9:
       case 22:
       case 23:
-        return const Color(0xFF1565C0);
+        return theme.colorScheme.primary;
       default:
         return AppColors.textSecondary;
     }
@@ -327,10 +327,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isRead ? Colors.white : const Color(0xFFF4FBFF),
+            color: isRead
+                ? theme.colorScheme.surface
+                : theme.colorScheme.secondaryContainer,
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: isRead ? AppColors.border : const Color(0xFFB9E3F5),
+              color: isRead
+                  ? AppColors.border
+                  : theme.colorScheme.secondary.withAlpha(60),
             ),
           ),
           child: Row(
@@ -340,12 +344,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 width: 42,
                 height: 42,
                 decoration: BoxDecoration(
-                  color: _iconColorForType(type).withAlpha(24),
+                  color: _iconColorForType(type, theme).withAlpha(24),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(
                   _iconForType(type),
-                  color: _iconColorForType(type),
+                  color: _iconColorForType(type, theme),
                   size: 22,
                 ),
               ),

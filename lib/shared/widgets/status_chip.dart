@@ -12,30 +12,32 @@ class StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final Color bg;
     final Color fg;
     final String label;
 
     switch (status) {
       case OrderStatus.processing:
-        bg = AppColors.statusBlueBg;
-        fg = AppColors.info;
+        bg = isDark ? AppColors.info.withAlpha(30) : AppColors.statusBlueBg;
+        fg = isDark ? const Color(0xFF64B5F6) : AppColors.info;
         label = AppStrings.orderProcessing;
       case OrderStatus.active:
-        bg = AppColors.statusGreenBg;
+        bg = isDark ? AppColors.success.withAlpha(30) : AppColors.statusGreenBg;
         fg = AppColors.success;
         label = AppStrings.orderActive;
       case OrderStatus.completed:
-        bg = AppColors.statusGreenBg;
+        bg = isDark ? AppColors.success.withAlpha(30) : AppColors.statusGreenBg;
         fg = AppColors.success;
         label = AppStrings.orderCompleted;
       case OrderStatus.cancelled:
-        bg = AppColors.statusRedBg;
+        bg = isDark ? AppColors.coral.withAlpha(30) : AppColors.statusRedBg;
         fg = AppColors.coral;
         label = AppStrings.orderCancelled;
       case OrderStatus.archived:
-        bg = const Color(0xFFF5F5F5);
-        fg = AppColors.textSecondary;
+        bg = theme.colorScheme.surfaceContainerHighest;
+        fg = theme.colorScheme.onSurfaceVariant;
         label = AppStrings.orderArchived;
     }
 

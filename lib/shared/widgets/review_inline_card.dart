@@ -32,7 +32,7 @@ class ReviewInlineCard extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
+        color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(radius),
       ),
       child: Column(

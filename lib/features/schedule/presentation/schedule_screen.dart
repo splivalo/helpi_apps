@@ -230,9 +230,13 @@ class _WeekStrip extends StatelessWidget {
     ];
 
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: HelpiTheme.border)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        border: Border(
+          bottom: BorderSide(
+            color: Theme.of(context).colorScheme.outlineVariant,
+          ),
+        ),
       ),
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
@@ -296,8 +300,10 @@ class _WeekStrip extends StatelessWidget {
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                             color: isSelected
-                                ? Colors.white
-                                : HelpiTheme.textSecondary,
+                                ? Theme.of(context).colorScheme.onPrimary
+                                : Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -319,10 +325,10 @@ class _WeekStrip extends StatelessWidget {
                                   ? FontWeight.w700
                                   : FontWeight.w400,
                               color: isSelected
-                                  ? Colors.white
+                                  ? Theme.of(context).colorScheme.onPrimary
                                   : isToday
                                   ? teal
-                                  : const Color(0xFF2D2D2D),
+                                  : Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                         ),
@@ -334,7 +340,9 @@ class _WeekStrip extends StatelessWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: hasDot
-                                ? (isSelected ? Colors.white : HelpiTheme.coral)
+                                ? (isSelected
+                                      ? Theme.of(context).colorScheme.onPrimary
+                                      : HelpiTheme.coral)
                                 : Colors.transparent,
                           ),
                         ),
@@ -390,7 +398,7 @@ class _EmptyDayState extends StatelessWidget {
             Text(
               AppStrings.scheduleNoJobsSubtitle,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: HelpiTheme.textSecondary,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
@@ -421,7 +429,7 @@ class _JobCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
+      color: theme.colorScheme.surface,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
@@ -429,7 +437,7 @@ class _JobCard extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: HelpiTheme.border),
+            border: Border.all(color: theme.colorScheme.outlineVariant),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -479,10 +487,10 @@ class _JobCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.place_outlined,
                       size: 20,
-                      color: HelpiTheme.textSecondary,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                     const SizedBox(width: 8),
                     Expanded(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:helpi_app/core/constants/colors.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/utils/formatters.dart';
 
@@ -58,12 +57,8 @@ class HelpiTextField extends StatelessWidget {
           color: theme.colorScheme.onSurface.withAlpha(enabled ? 180 : 153),
         ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: theme.colorScheme.surface,
       ),
     );
   }
@@ -93,13 +88,9 @@ class HelpiGenderPicker extends StatelessWidget {
           color: theme.colorScheme.onSurface.withAlpha(enabled ? 180 : 153),
         ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-        disabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
         enabled: enabled,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: theme.colorScheme.surface,
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -170,16 +161,8 @@ class HelpiDatePicker extends StatelessWidget {
             color: theme.colorScheme.onSurface.withAlpha(enabled ? 180 : 153),
           ),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: enabled
-                  ? theme.colorScheme.onSurface.withAlpha(100)
-                  : AppColors.border,
-            ),
-          ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: theme.colorScheme.surface,
           suffixIcon: enabled
               ? Icon(
                   Icons.calendar_today,

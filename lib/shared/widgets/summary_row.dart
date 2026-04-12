@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:helpi_app/core/constants/colors.dart';
-
 /// Red s label (lijevo, sivi) i value (desno, bold).
 class SummaryRow extends StatelessWidget {
   const SummaryRow({
@@ -28,7 +26,7 @@ class SummaryRow extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                 )
               : theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
         ),
         const Spacer(),

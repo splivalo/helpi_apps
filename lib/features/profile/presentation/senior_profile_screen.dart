@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:helpi_app/core/constants/colors.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/l10n/locale_notifier.dart';
+import 'package:helpi_app/core/l10n/theme_notifier.dart';
 import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/core/services/auth_service.dart';
 import 'package:helpi_app/core/network/token_storage.dart';
@@ -15,10 +16,12 @@ class ProfileScreen extends StatefulWidget {
   const ProfileScreen({
     super.key,
     required this.localeNotifier,
+    required this.themeNotifier,
     required this.onLogout,
   });
 
   final LocaleNotifier localeNotifier;
+  final ThemeNotifier themeNotifier;
   final VoidCallback onLogout;
 
   @override
@@ -387,24 +390,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 if (_cards.isEmpty)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: AppColors.border),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Text(
-                        AppStrings.noCards,
-                        style: TextStyle(
-                          color: theme.colorScheme.onSurface.withAlpha(153),
-                          fontSize: 16,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.credit_card_off,
+                          size: 20,
+                          color: theme.colorScheme.onSurface.withAlpha(120),
                         ),
-                      ),
+                        const SizedBox(width: 8),
+                        Text(
+                          AppStrings.noCards,
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface.withAlpha(153),
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
                     ),
                   )
                 else
@@ -418,18 +419,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       padding: const EdgeInsets.only(bottom: 8),
                       child: InputDecorator(
                         decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          disabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            borderSide: const BorderSide(
-                              color: AppColors.border,
-                            ),
-                          ),
                           enabled: _isEditing,
                           filled: true,
-                          fillColor: Colors.white,
+                          fillColor: theme.colorScheme.surface,
                           prefixIcon: Icon(
                             Icons.credit_card,
                             color: theme.colorScheme.secondary,
@@ -557,11 +549,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Icons.language,
                       color: theme.colorScheme.secondary,
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: theme.colorScheme.surface,
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
@@ -590,6 +579,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                   ),
+                ),
+                const SizedBox(height: 16),
+
+                // -- THEME MODE --
+                ValueListenableBuilder<ThemeMode>(
+                  valueListenable: widget.themeNotifier,
+                  builder: (context, themeMode, _) {
+                    return InputDecorator(
+                      decoration: InputDecoration(
+                        labelText: AppStrings.themeMode,
+                        labelStyle: TextStyle(
+                          color: theme.colorScheme.onSurface.withAlpha(180),
+                        ),
+                        prefixIcon: Icon(
+                          Icons.brightness_6,
+                          color: theme.colorScheme.secondary,
+                        ),
+                        filled: true,
+                        fillColor: theme.colorScheme.surface,
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<ThemeMode>(
+                          value: themeMode,
+                          isDense: true,
+                          isExpanded: true,
+                          onChanged: (v) {
+                            if (v != null) {
+                              widget.themeNotifier.setThemeMode(v);
+                            }
+                          },
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface,
+                            fontSize: 16,
+                          ),
+                          items: [
+                            DropdownMenuItem(
+                              value: ThemeMode.system,
+                              child: Text(AppStrings.themeSystem),
+                            ),
+                            DropdownMenuItem(
+                              value: ThemeMode.light,
+                              child: Text(AppStrings.themeLight),
+                            ),
+                            DropdownMenuItem(
+                              value: ThemeMode.dark,
+                              child: Text(AppStrings.themeDark),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 24),
 

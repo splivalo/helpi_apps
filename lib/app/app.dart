@@ -7,6 +7,7 @@ import 'package:helpi_app/app/student_shell.dart';
 import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/l10n/locale_notifier.dart';
+import 'package:helpi_app/core/l10n/theme_notifier.dart';
 import 'package:helpi_app/core/providers/auth_provider.dart';
 import 'package:helpi_app/core/providers/realtime_sync_provider.dart';
 import 'package:helpi_app/core/providers/signalr_provider.dart';
@@ -27,6 +28,7 @@ class HelpiApp extends ConsumerStatefulWidget {
 class _HelpiAppState extends ConsumerState<HelpiApp>
     with WidgetsBindingObserver {
   final _localeNotifier = LocaleNotifier();
+  final _themeNotifier = ThemeNotifier();
 
   @override
   void initState() {
@@ -48,6 +50,12 @@ class _HelpiAppState extends ConsumerState<HelpiApp>
         // Re-fetch data - if user was suspended, 403 interceptor will handle it.
         // If user was activated, data refreshes and suspension clears.
         ref.read(authProvider.notifier).refreshAfterResume();
+
+        // Reconnect SignalR if WebSocket dropped while in background.
+        final signalR = ref.read(signalRProvider);
+        if (!signalR.isConnected) {
+          signalR.start();
+        }
       }
     }
   }
@@ -65,18 +73,25 @@ class _HelpiAppState extends ConsumerState<HelpiApp>
       builder: (context, locale, _) {
         AppStrings.setLocale(locale.languageCode);
 
-        return MaterialApp(
-          title: 'Helpi',
-          debugShowCheckedModeBanner: false,
-          theme: HelpiTheme.light,
-          locale: locale,
-          supportedLocales: const [Locale('hr'), Locale('en')],
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          home: _buildHome(auth),
+        return ValueListenableBuilder<ThemeMode>(
+          valueListenable: _themeNotifier,
+          builder: (context, themeMode, _) {
+            return MaterialApp(
+              title: 'Helpi',
+              debugShowCheckedModeBanner: false,
+              theme: HelpiTheme.light,
+              darkTheme: HelpiTheme.dark,
+              themeMode: themeMode,
+              locale: locale,
+              supportedLocales: const [Locale('hr'), Locale('en')],
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              home: _buildHome(auth),
+            );
+          },
         );
       },
     );
@@ -131,6 +146,7 @@ class _HelpiAppState extends ConsumerState<HelpiApp>
 
       return StudentShell(
         localeNotifier: _localeNotifier,
+        themeNotifier: _themeNotifier,
         availabilityNotifier: authNotifier.availabilityNotifier,
         onLogout: authNotifier.handleLogout,
       );
@@ -139,6 +155,7 @@ class _HelpiAppState extends ConsumerState<HelpiApp>
     // 3. Customer (Senior) -> SeniorShell
     return SeniorShell(
       localeNotifier: _localeNotifier,
+      themeNotifier: _themeNotifier,
       onLogout: authNotifier.handleLogout,
       ordersNotifier: authNotifier.ordersNotifier,
     );

@@ -55,7 +55,7 @@ class RealTimeSyncService {
       } else if (prev != null && prev.isLoggedIn && !next.isLoggedIn) {
         _listening = false;
       }
-    });
+    }, fireImmediately: true);
   }
 
   void _startListening() {

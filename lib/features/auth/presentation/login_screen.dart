@@ -91,7 +91,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: AppColors.background,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -158,7 +157,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Text(
           AppStrings.loginSubtitle,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textSecondary,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
         ),
         const SizedBox(height: 40),
@@ -184,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: theme.colorScheme.surface,
                 ),
               ),
               const SizedBox(height: 16),
@@ -209,14 +208,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       _obscurePassword
                           ? Icons.visibility_off_outlined
                           : Icons.visibility_outlined,
-                      color: AppColors.textSecondary,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: theme.colorScheme.surface,
                 ),
               ),
             ],
@@ -241,44 +240,52 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // -- Error message --
         if (_errorMessage != null) ...[
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: _isServerError
-                  ? Colors.orange.shade50
-                  : Colors.red.shade50,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: _isServerError
-                    ? Colors.orange.shade200
-                    : Colors.red.shade200,
-              ),
-            ),
-            child: Row(
-              children: [
-                if (_isServerError)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: Icon(
-                      Icons.cloud_off_outlined,
-                      color: Colors.orange.shade700,
-                      size: 20,
-                    ),
-                  ),
-                Expanded(
-                  child: Text(
-                    _errorMessage!,
-                    style: TextStyle(
-                      color: _isServerError
-                          ? Colors.orange.shade700
-                          : Colors.red.shade700,
-                      fontSize: 14,
-                    ),
+          Builder(
+            builder: (context) {
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              final errorColor = _isServerError ? Colors.orange : Colors.red;
+              return Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isDark ? errorColor.withAlpha(30) : errorColor.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isDark
+                        ? errorColor.withAlpha(80)
+                        : _isServerError
+                        ? Colors.orange.shade200
+                        : Colors.red.shade200,
                   ),
                 ),
-              ],
-            ),
+                child: Row(
+                  children: [
+                    if (_isServerError)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: Icon(
+                          Icons.cloud_off_outlined,
+                          color: isDark
+                              ? errorColor.shade300
+                              : errorColor.shade700,
+                          size: 20,
+                        ),
+                      ),
+                    Expanded(
+                      child: Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                          color: isDark
+                              ? errorColor.shade300
+                              : errorColor.shade700,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
           const SizedBox(height: 16),
         ],
@@ -409,7 +416,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Text(
           AppStrings.chooseRoleSubtitle,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textSecondary,
+            color: theme.colorScheme.onSurfaceVariant,
           ),
           textAlign: TextAlign.center,
         ),
@@ -471,7 +478,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Text(
             AppStrings.regProfileSubtitle,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textSecondary,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ),
@@ -573,44 +580,52 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // -- Error message --
         if (_errorMessage != null) ...[
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: _isServerError
-                  ? Colors.orange.shade50
-                  : Colors.red.shade50,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: _isServerError
-                    ? Colors.orange.shade200
-                    : Colors.red.shade200,
-              ),
-            ),
-            child: Row(
-              children: [
-                if (_isServerError)
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: Icon(
-                      Icons.cloud_off_outlined,
-                      color: Colors.orange.shade700,
-                      size: 20,
-                    ),
-                  ),
-                Expanded(
-                  child: Text(
-                    _errorMessage!,
-                    style: TextStyle(
-                      color: _isServerError
-                          ? Colors.orange.shade700
-                          : Colors.red.shade700,
-                      fontSize: 14,
-                    ),
+          Builder(
+            builder: (context) {
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              final errorColor = _isServerError ? Colors.orange : Colors.red;
+              return Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isDark ? errorColor.withAlpha(30) : errorColor.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isDark
+                        ? errorColor.withAlpha(80)
+                        : _isServerError
+                        ? Colors.orange.shade200
+                        : Colors.red.shade200,
                   ),
                 ),
-              ],
-            ),
+                child: Row(
+                  children: [
+                    if (_isServerError)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: Icon(
+                          Icons.cloud_off_outlined,
+                          color: isDark
+                              ? errorColor.shade300
+                              : errorColor.shade700,
+                          size: 20,
+                        ),
+                      ),
+                    Expanded(
+                      child: Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                          color: isDark
+                              ? errorColor.shade300
+                              : errorColor.shade700,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
           const SizedBox(height: 16),
         ],
@@ -653,7 +668,7 @@ class _LoginScreenState extends State<LoginScreen> {
             textAlign: TextAlign.center,
             text: TextSpan(
               style: theme.textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
+                color: theme.colorScheme.onSurfaceVariant,
               ),
               children: [
                 TextSpan(text: AppStrings.byClickingRegister),
@@ -981,12 +996,22 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
             ],
             if (_message != null) ...[
               const SizedBox(height: 12),
-              Text(
-                _message!,
-                style: TextStyle(
-                  color: _isError ? Colors.red : Colors.green,
-                  fontSize: 13,
-                ),
+              Builder(
+                builder: (context) {
+                  final isDark =
+                      Theme.of(context).brightness == Brightness.dark;
+                  return Text(
+                    _message!,
+                    style: TextStyle(
+                      color: _isError
+                          ? (isDark ? Colors.red.shade300 : Colors.red.shade700)
+                          : (isDark
+                                ? Colors.green.shade300
+                                : Colors.green.shade700),
+                      fontSize: 13,
+                    ),
+                  );
+                },
               ),
             ],
           ],
@@ -1044,15 +1069,16 @@ class _RoleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: theme.colorScheme.outlineVariant),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha(8),
@@ -1079,26 +1105,26 @@ class _RoleCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     description,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.textSecondary,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.arrow_forward_ios,
-              color: AppColors.textSecondary,
+              color: theme.colorScheme.onSurfaceVariant,
               size: 18,
             ),
           ],

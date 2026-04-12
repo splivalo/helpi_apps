@@ -287,6 +287,10 @@ class AppStrings {
       'langEn': 'English',
       'langHrvatski': 'Hrvatski',
       'langEnglish': 'English',
+      'themeMode': 'Tema',
+      'themeSystem': 'Sustav',
+      'themeLight': 'Svijetla',
+      'themeDark': 'Tamna',
       'appVersion': 'Helpi v2.0.0',
       'creditCards': 'Kreditne kartice',
       'noCards': 'Nemate spremljenih kartica',
@@ -685,6 +689,10 @@ class AppStrings {
       'langEn': 'English',
       'langHrvatski': 'Hrvatski',
       'langEnglish': 'English',
+      'themeMode': 'Theme',
+      'themeSystem': 'System',
+      'themeLight': 'Light',
+      'themeDark': 'Dark',
       'appVersion': 'Helpi v2.0.0',
       'creditCards': 'Credit cards',
       'noCards': 'No saved cards',
@@ -1116,6 +1124,10 @@ class AppStrings {
   static String get langEn => _t('langEn');
   static String get langHrvatski => _t('langHrvatski');
   static String get langEnglish => _t('langEnglish');
+  static String get themeMode => _t('themeMode');
+  static String get themeSystem => _t('themeSystem');
+  static String get themeLight => _t('themeLight');
+  static String get themeDark => _t('themeDark');
   static String get appVersion => _t('appVersion');
   static String get creditCards => _t('creditCards');
   static String get noCards => _t('noCards');

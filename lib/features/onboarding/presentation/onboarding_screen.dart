@@ -81,7 +81,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: HelpiTheme.offWhite,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -107,7 +106,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               Text(
                 AppStrings.onboardingSubtitle,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: HelpiTheme.textSecondary,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: 32),
@@ -131,7 +130,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: HelpiTheme.coral,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: HelpiTheme.border,
+                    disabledBackgroundColor: theme.colorScheme.outlineVariant,
                     disabledForegroundColor: const Color(0xFF9E9E9E),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),

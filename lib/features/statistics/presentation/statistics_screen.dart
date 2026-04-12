@@ -168,11 +168,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
 
     if (jobsState.isLoading) {
       return Scaffold(
-        backgroundColor: HelpiTheme.offWhite,
         appBar: AppBar(
           title: Text(AppStrings.statsTitle),
           centerTitle: true,
-          backgroundColor: Colors.white,
           surfaceTintColor: Colors.transparent,
           elevation: 0,
         ),
@@ -183,7 +181,6 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: HelpiTheme.offWhite,
       appBar: AppBar(
         title: Text(
           AppStrings.statsTitle,
@@ -192,7 +189,6 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
       ),
@@ -236,9 +232,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.chevron_left,
-                  color: HelpiTheme.textSecondary,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
                 onPressed: _prevWeek,
                 splashRadius: 20,
@@ -248,9 +244,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                 style: theme.textTheme.bodyMedium,
               ),
               IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.chevron_right,
-                  color: HelpiTheme.textSecondary,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
                 onPressed: _nextWeek,
                 splashRadius: 20,
@@ -274,9 +270,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                         if (h > 0)
                           Text(
                             '${h.toStringAsFixed(0)}h',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 10,
-                              color: HelpiTheme.textSecondary,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                         const SizedBox(height: 4),
@@ -284,17 +280,19 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                           height: maxH > 0 ? 100 * barRatio : 0,
                           constraints: const BoxConstraints(minHeight: 4),
                           decoration: BoxDecoration(
-                            color: h > 0 ? HelpiTheme.teal : HelpiTheme.barBg,
+                            color: h > 0
+                                ? HelpiTheme.teal
+                                : theme.colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(6),
                           ),
                         ),
                         const SizedBox(height: 6),
                         Text(
                           _dayLabels[i],
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: HelpiTheme.textSecondary,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -316,7 +314,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
             decoration: BoxDecoration(
-              color: HelpiTheme.barBg,
+              color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -360,9 +358,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.chevron_left,
-                  color: HelpiTheme.textSecondary,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
                 onPressed: _prevMonth,
                 splashRadius: 20,
@@ -372,9 +370,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                 style: theme.textTheme.bodyMedium,
               ),
               IconButton(
-                icon: const Icon(
+                icon: Icon(
                   Icons.chevron_right,
-                  color: HelpiTheme.textSecondary,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
                 onPressed: _nextMonth,
                 splashRadius: 20,
@@ -399,9 +397,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                           Flexible(
                             child: Text(
                               '${w.hours.toStringAsFixed(0)}h',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 10,
-                                color: HelpiTheme.textSecondary,
+                                color: theme.colorScheme.onSurfaceVariant,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -413,7 +411,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                           decoration: BoxDecoration(
                             color: w.hours > 0
                                 ? HelpiTheme.teal
-                                : HelpiTheme.barBg,
+                                : theme.colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(6),
                           ),
                         ),
@@ -421,9 +419,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
                         Text(
                           '${_fmtDate(w.from)}\n${_fmtDate(w.to)}',
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 9,
-                            color: HelpiTheme.textSecondary,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -445,7 +443,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
             decoration: BoxDecoration(
-              color: HelpiTheme.barBg,
+              color: theme.colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
@@ -482,7 +480,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
       icon = Icons.trending_up;
     } else if (current == previous) {
       text = AppStrings.statsCompareSame(period);
-      color = HelpiTheme.textSecondary;
+      color = theme.colorScheme.onSurfaceVariant;
       icon = Icons.trending_flat;
     } else {
       final pct = (((current - previous).abs() / previous) * 100).round();
@@ -505,7 +503,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           child: Text(
             text,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: HelpiTheme.textSecondary,
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ),

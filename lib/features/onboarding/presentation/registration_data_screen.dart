@@ -93,7 +93,6 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: HelpiTheme.offWhite,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -123,7 +122,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
                     Text(
                       AppStrings.registrationDataSubtitle,
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: HelpiTheme.textSecondary,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -206,8 +205,10 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: HelpiTheme.coral,
                           foregroundColor: Colors.white,
-                          disabledBackgroundColor: HelpiTheme.border,
-                          disabledForegroundColor: HelpiTheme.textSecondary,
+                          disabledBackgroundColor:
+                              theme.colorScheme.outlineVariant,
+                          disabledForegroundColor:
+                              theme.colorScheme.onSurfaceVariant,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -311,7 +312,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
         ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: theme.colorScheme.surface,
       ),
     );
   }
@@ -325,7 +326,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
         ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: theme.colorScheme.surface,
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -371,7 +372,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
           ),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: theme.colorScheme.surface,
           suffixIcon: Icon(
             Icons.calendar_today,
             size: 20,
@@ -383,7 +384,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
           style: TextStyle(
             color: hasDate
                 ? theme.colorScheme.onSurface
-                : HelpiTheme.textSecondary,
+                : theme.colorScheme.onSurfaceVariant,
             fontSize: 16,
           ),
         ),
@@ -413,7 +414,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
           ),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: theme.colorScheme.surface,
           suffixIcon: Icon(
             Icons.arrow_drop_down,
             color: theme.colorScheme.secondary,
@@ -433,7 +434,10 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
               )
             : Text(
                 AppStrings.facultyHint,
-                style: TextStyle(color: HelpiTheme.textSecondary, fontSize: 16),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontSize: 16,
+                ),
               ),
       ),
     );

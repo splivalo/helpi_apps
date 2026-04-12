@@ -29,6 +29,14 @@ class AppColors {
   // -- Chip / selection --
   static const Color selectedChipBg = Color(0xFFE0F5F5);
 
+  // -- Dark mode neutrals --
+  static const Color darkBackground = Color(0xFF121212);
+  static const Color darkSurface = Color(0xFF1E1E1E);
+  static const Color darkCard = Color(0xFF2C2C2C);
+  static const Color darkTextPrimary = Color(0xFFE0E0E0);
+  static const Color darkTextSecondary = Color(0xFF9E9E9E);
+  static const Color darkBorder = Color(0xFF3A3A3A);
+
   // -- Reusable button styles --
   static final ButtonStyle coralOutlinedStyle = OutlinedButton.styleFrom(
     foregroundColor: coral,

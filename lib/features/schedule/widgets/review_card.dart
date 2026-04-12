@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/features/schedule/data/review_model.dart';
 import 'package:helpi_app/features/schedule/widgets/star_rating.dart';
 
@@ -20,9 +19,9 @@ class ReviewCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: HelpiTheme.border),
+          border: Border.all(color: theme.colorScheme.outlineVariant),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,8 +31,8 @@ class ReviewCard extends StatelessWidget {
                 Container(
                   width: 36,
                   height: 36,
-                  decoration: const BoxDecoration(
-                    color: HelpiTheme.avatarBg,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.secondary.withAlpha(25),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -54,7 +53,7 @@ class ReviewCard extends StatelessWidget {
                 Text(
                   review.date,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: HelpiTheme.textSecondary,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],

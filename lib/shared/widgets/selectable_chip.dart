@@ -17,16 +17,21 @@ class SelectableChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.selectedChipBg : Colors.white,
+          color: isSelected
+              ? AppColors.teal.withAlpha(30)
+              : theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? AppColors.teal : AppColors.border,
+            color: isSelected
+                ? AppColors.teal
+                : theme.colorScheme.outlineVariant,
           ),
         ),
         child: Text(
@@ -34,7 +39,7 @@ class SelectableChip extends StatelessWidget {
           style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w600,
-            color: isSelected ? AppColors.teal : AppColors.textPrimary,
+            color: isSelected ? AppColors.teal : theme.colorScheme.onSurface,
           ),
         ),
       ),

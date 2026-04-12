@@ -80,7 +80,7 @@ class _FacultyPickerSheetState extends State<_FacultyPickerSheet> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: HelpiTheme.border,
+                  color: theme.colorScheme.outlineVariant,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -108,7 +108,7 @@ class _FacultyPickerSheetState extends State<_FacultyPickerSheet> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: theme.colorScheme.surface,
                     isDense: true,
                     contentPadding: const EdgeInsets.symmetric(vertical: 10),
                   ),
@@ -123,7 +123,7 @@ class _FacultyPickerSheetState extends State<_FacultyPickerSheet> {
                         child: Text(
                           AppStrings.facultyNoResults,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: HelpiTheme.textSecondary,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
                       )
@@ -154,7 +154,7 @@ class _FacultyPickerSheetState extends State<_FacultyPickerSheet> {
                               f.name,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: HelpiTheme.textSecondary,
+                                color: theme.colorScheme.onSurfaceVariant,
                               ),
                             ),
                             trailing: isSelected
