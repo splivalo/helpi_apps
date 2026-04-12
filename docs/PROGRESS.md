@@ -4,13 +4,13 @@
 
 ## Status: Backend-Connected App (API-first + fallback cache)
 
-**Datum:** 04.04.2026.  
+**Datum:** 12.04.2026.  
 **Analyze:** 0 errors, 0 warnings  
 **Fajlovi:** 64 .dart files  
 **State mgmt:** Riverpod (flutter_riverpod ^2.6.1)  
 **Real-time:** SignalR (signalr_netcore ^1.4.4)  
-**API pokrivanje:** ~95% real API (auth, orders, sessions, reviews, pricing, dashboard, notifications, availability)  
-**Izuzeci:** Chat (demo UI — backend ne postoji), Stripe (dummy kartice — čeka integraciju), push notifikacije (čeka Firebase setup)
+**API pokrivanje:** ~98% real API (auth, orders, sessions, reviews, pricing, dashboard, notifications, availability, chat)  
+**Izuzeci:** Stripe (dummy kartice — čeka integraciju), push notifikacije (čeka Firebase setup)
 
 ---
 
@@ -60,8 +60,8 @@
 - [x] order_detail_screen.dart — detalji narudžbe + recenzije (Customer)
 - [x] schedule_screen.dart — tjedni raspored (Student)
 - [x] job_detail_screen.dart — detalji posla + review/decline (Student)
-- [x] senior_chat_list_screen.dart — chat (Customer)
-- [x] student_chat_screen.dart — chat (Student)
+- [x] senior_chat_list_screen.dart — chat (Customer) — DirectChatScreen wrapper, real API
+- [x] student_chat_screen.dart — chat (Student) — DirectChatScreen wrapper, real API
 - [x] senior_profile_screen.dart — profil (Customer)
 - [x] student_profile_screen.dart — profil + dostupnost (Student)
 - [x] statistics_screen.dart — statistika (Student)
@@ -71,8 +71,8 @@
 ### Navigation & App Shell (4/4) — 100%
 
 - [x] app.dart — root widget, role-based routing (**ConsumerStatefulWidget**, Riverpod)
-- [x] senior_shell.dart — 4 taba (Naruči, Narudžbe, Poruke, Profil)
-- [x] student_shell.dart — 4 taba (Raspored, Poruke, Statistika, Profil)
+- [x] senior_shell.dart — 4 taba (Naruči, Narudžbe, Poruke, Profil) — ConsumerStatefulWidget, unread badge
+- [x] student_shell.dart — 4 taba (Raspored, Poruke, Statistika, Profil) — ConsumerStatefulWidget, unread badge
 - [x] main.dart — entry point (**ProviderScope** wrapper)
 
 ### Student-Specific Widgets (7/7) — 100%
@@ -125,6 +125,17 @@
 
 ## API Integration Status (ažurirano 2026-04-04)
 
+### Chat (NEW 2026-04-12) — real API
+
+- [x] direct_chat_screen.dart — DirectChatScreen (no room list, opens Helpi convo directly)
+- [x] chat_models.dart — ChatRoom, ChatMessage models (fromJson, isMine, timeFormatted)
+- [x] chat_api_service.dart — ChatApiService (getRooms, getMessages, sendMessage, markAsRead, getUnreadCount)
+- [x] chat_provider.dart — chatRoomsProvider, chatMessagesProvider, chatUnreadCountProvider
+- [x] Unread badge na bottom nav (oba shell-a)
+- [x] Badge se čisti odmah na tab tap
+- [x] Sender name ("Helpi") prikazan na primljenim porukama
+- [x] WhatsApp-style shrink-wrap bubbles (Row+Flexible)
+
 ### Spojeno na backend ✅
 
 - [x] Auth (login, register, forgot/reset password) → pravi API
@@ -146,7 +157,6 @@
 
 ### Čeka backend implementaciju ❌
 
-- [ ] Chat (demo UI — backend nema ChatController/ChatHub)
 - [ ] Push notifikacije (Firebase FCM — backend ima endpoint, nema setup)
 - [ ] Stripe plaćanje (dummy kartice dok se ne integrira pravi Stripe)
 

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/features/chat/providers/chat_provider.dart';
+import 'package:helpi_app/features/chat/data/chat_api_service.dart';
 import 'package:helpi_app/core/l10n/locale_notifier.dart';
 import 'package:helpi_app/core/l10n/theme_notifier.dart';
 import 'package:helpi_app/features/booking/data/order_model.dart';
@@ -11,7 +14,7 @@ import 'package:helpi_app/features/chat/presentation/senior_chat_list_screen.dar
 import 'package:helpi_app/features/profile/presentation/senior_profile_screen.dart';
 
 /// Senior shell - 4 tabs: Order, Orders, Messages, Profile.
-class SeniorShell extends StatefulWidget {
+class SeniorShell extends ConsumerStatefulWidget {
   const SeniorShell({
     super.key,
     required this.localeNotifier,
@@ -26,10 +29,10 @@ class SeniorShell extends StatefulWidget {
   final OrdersNotifier ordersNotifier;
 
   @override
-  State<SeniorShell> createState() => _SeniorShellState();
+  ConsumerState<SeniorShell> createState() => _SeniorShellState();
 }
 
-class _SeniorShellState extends State<SeniorShell> {
+class _SeniorShellState extends ConsumerState<SeniorShell> {
   int _currentIndex = 0;
 
   late final List<Widget> _screens;
@@ -72,6 +75,7 @@ class _SeniorShellState extends State<SeniorShell> {
           onTap: (index) {
             HapticFeedback.selectionClick();
             setState(() => _currentIndex = index);
+            if (index == 2) _clearChatBadge();
           },
           items: [
             BottomNavigationBarItem(
@@ -83,7 +87,7 @@ class _SeniorShellState extends State<SeniorShell> {
               label: AppStrings.navOrders,
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.chat_bubble_outline, size: 28),
+              icon: _badgedIcon(Icons.chat_bubble_outline, 28),
               label: AppStrings.navMessages,
             ),
             BottomNavigationBarItem(
@@ -94,5 +98,24 @@ class _SeniorShellState extends State<SeniorShell> {
         ),
       ),
     );
+  }
+
+  Widget _badgedIcon(IconData icon, double size) {
+    final count = ref.watch(chatUnreadCountProvider);
+    return Badge(
+      isLabelVisible: count > 0,
+      label: Text('$count'),
+      child: Icon(icon, size: size),
+    );
+  }
+
+  void _clearChatBadge() {
+    ref.read(chatUnreadCountProvider.notifier).state = 0;
+    final roomId = ref.read(chatMessagesProvider.notifier).currentRoomId;
+    if (roomId != null) {
+      ref.read(chatRoomsProvider.notifier).clearUnread(roomId);
+      ref.read(chatMessagesProvider.notifier).markAsRead();
+      ChatApiService().markAsRead(roomId);
+    }
   }
 }

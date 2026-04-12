@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/features/chat/providers/chat_provider.dart';
+import 'package:helpi_app/features/chat/data/chat_api_service.dart';
 import 'package:helpi_app/core/l10n/locale_notifier.dart';
 import 'package:helpi_app/core/l10n/theme_notifier.dart';
 import 'package:helpi_app/features/schedule/data/availability_model.dart';
@@ -11,7 +14,7 @@ import 'package:helpi_app/features/schedule/presentation/schedule_screen.dart';
 import 'package:helpi_app/features/statistics/presentation/statistics_screen.dart';
 
 /// Student shell - 4 tabs: Schedule, Messages, Statistics, Profile.
-class StudentShell extends StatefulWidget {
+class StudentShell extends ConsumerStatefulWidget {
   const StudentShell({
     super.key,
     required this.onLogout,
@@ -26,10 +29,10 @@ class StudentShell extends StatefulWidget {
   final AvailabilityNotifier availabilityNotifier;
 
   @override
-  State<StudentShell> createState() => _StudentShellState();
+  ConsumerState<StudentShell> createState() => _StudentShellState();
 }
 
-class _StudentShellState extends State<StudentShell> {
+class _StudentShellState extends ConsumerState<StudentShell> {
   int _selectedIndex = 0;
 
   late final List<Widget> _screens;
@@ -53,6 +56,7 @@ class _StudentShellState extends State<StudentShell> {
   void _onTabTapped(int index) {
     HapticFeedback.selectionClick();
     setState(() => _selectedIndex = index);
+    if (index == 1) _clearChatBadge();
   }
 
   @override
@@ -80,8 +84,8 @@ class _StudentShellState extends State<StudentShell> {
               label: AppStrings.navSchedule,
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.chat_bubble_outline),
-              activeIcon: const Icon(Icons.chat_bubble),
+              icon: _badgedIcon(Icons.chat_bubble_outline),
+              activeIcon: _badgedIcon(Icons.chat_bubble),
               label: AppStrings.navMessages,
             ),
             BottomNavigationBarItem(
@@ -98,5 +102,24 @@ class _StudentShellState extends State<StudentShell> {
         ),
       ),
     );
+  }
+
+  Widget _badgedIcon(IconData icon) {
+    final count = ref.watch(chatUnreadCountProvider);
+    return Badge(
+      isLabelVisible: count > 0,
+      label: Text('$count'),
+      child: Icon(icon),
+    );
+  }
+
+  void _clearChatBadge() {
+    ref.read(chatUnreadCountProvider.notifier).state = 0;
+    final roomId = ref.read(chatMessagesProvider.notifier).currentRoomId;
+    if (roomId != null) {
+      ref.read(chatRoomsProvider.notifier).clearUnread(roomId);
+      ref.read(chatMessagesProvider.notifier).markAsRead();
+      ChatApiService().markAsRead(roomId);
+    }
   }
 }

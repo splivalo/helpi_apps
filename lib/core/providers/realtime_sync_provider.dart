@@ -9,6 +9,9 @@ import 'package:helpi_app/core/providers/auth_provider.dart';
 import 'package:helpi_app/core/providers/jobs_provider.dart';
 import 'package:helpi_app/core/providers/signalr_provider.dart';
 import 'package:helpi_app/core/services/app_api_service.dart';
+import 'package:helpi_app/features/chat/data/chat_api_service.dart';
+import 'package:helpi_app/features/chat/data/chat_models.dart';
+import 'package:helpi_app/features/chat/providers/chat_provider.dart';
 
 /// Listens to SignalR events and auto-refreshes data.
 ///
@@ -89,6 +92,39 @@ class RealTimeSyncService {
       );
       _refreshData();
     });
+
+    // ── Chat events ──
+    signalR.on('ReceiveChatMessage', (args) async {
+      debugPrint('[RealTimeSync] ReceiveChatMessage: $args');
+      if (args == null || args.isEmpty) return;
+      try {
+        final data = args[0];
+        final json = data is Map<String, dynamic>
+            ? data
+            : data is Map<Object?, Object?>
+            ? Map<String, dynamic>.from(data)
+            : <String, dynamic>{};
+        if (json.isEmpty) return;
+        final msg = ChatMessage.fromJson(json);
+        final myUserId = await _tokenStorage.getUserId();
+        if (myUserId == null || msg.senderUserId == myUserId) return;
+
+        _ref.read(chatMessagesProvider.notifier).onReceiveMessage(msg);
+        _ref.read(chatRoomsProvider.notifier).onNewMessage(msg);
+        _refreshUnreadCount();
+      } catch (e) {
+        debugPrint('[RealTimeSync] ReceiveChatMessage error: $e');
+      }
+    });
+
+    signalR.on('ChatUnreadUpdate', (args) {
+      debugPrint('[RealTimeSync] ChatUnreadUpdate');
+      _refreshUnreadCount();
+    });
+
+    signalR.on('ChatMessagesRead', (args) {
+      debugPrint('[RealTimeSync] ChatMessagesRead: $args');
+    });
   }
 
   bool _shouldRefreshForNotification(List<Object?>? args) {
@@ -147,6 +183,13 @@ class RealTimeSyncService {
       await _refreshSeniorOrders(authNotifier);
     } else if (auth.userType == 'Student') {
       await _refreshStudentJobs(authNotifier);
+    }
+  }
+
+  Future<void> _refreshUnreadCount() async {
+    final result = await ChatApiService().getUnreadCount();
+    if (result.success && result.data != null) {
+      _ref.read(chatUnreadCountProvider.notifier).state = result.data!;
     }
   }
 

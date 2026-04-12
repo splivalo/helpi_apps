@@ -81,7 +81,10 @@ class ApiEndpoints {
   static const String services = '/api/service-categories';
 
   // Chat
-  static const String chat = '/api/chat';
+  static const String chatRooms = '/api/chat/rooms';
+  static String chatMessages(int roomId) => '/api/chat/rooms/$roomId/messages';
+  static String chatMarkRead(int roomId) => '/api/chat/rooms/$roomId/read';
+  static const String chatUnreadCount = '/api/chat/unread-count';
 
   // Faculties
   static const String faculties = '/api/faculties';

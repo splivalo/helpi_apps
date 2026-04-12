@@ -102,9 +102,16 @@ lib/
 │   │       ├── job_helpers.dart
 │   │       ├── formatters.dart
 │   │       └── availability_helpers.dart
-│   ├── chat/presentation/
-│   │   ├── senior_chat_list_screen.dart # Customer chat
-│   │   └── student_chat_screen.dart     # Student chat
+│   ├── chat/
+│   │   ├── data/
+│   │   │   ├── chat_models.dart           # ChatRoom, ChatMessage (fromJson, isMine)
+│   │   │   └── chat_api_service.dart      # ChatApiService (REST + unread count)
+│   │   ├── providers/
+│   │   │   └── chat_provider.dart         # chatRoomsProvider, chatMessagesProvider, chatUnreadCountProvider
+│   │   └── presentation/
+│   │       ├── direct_chat_screen.dart    # DirectChatScreen — auto-open admin room, WhatsApp bubbles
+│   │       ├── senior_chat_list_screen.dart # Customer chat wrapper
+│   │       └── student_chat_screen.dart     # Student chat wrapper
 │   ├── profile/presentation/
 │   │   ├── senior_profile_screen.dart   # Customer profil
 │   │   └── student_profile_screen.dart  # Student profil (+ dostupnost)
@@ -175,4 +182,4 @@ lib/
 - Isti naziv, različiti fajlovi — NEMA konflikta jer nijedan fajl ne importa oba
 - Ako ikad treba oba u istom fajlu, koristi Dart import prefix: `import '...' as senior;`
 
-## 55 Dart fajlova | 0 analyze errora
+## 55+ Dart fajlova | 0 analyze errora

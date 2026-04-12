@@ -1,4 +1,4 @@
-﻿import 'package:dio/dio.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:helpi_app/core/l10n/app_strings.dart';
@@ -27,7 +27,7 @@ class AppApiService {
   final ApiClient _client = ApiClient();
 
   /// Pretvara iznimku u user-friendly poruku greške.
-  static String _friendlyError(Object e) {
+  static String friendlyError(Object e) {
     if (e is DioException) {
       final statusCode = e.response?.statusCode;
       if (statusCode == 403) return AppStrings.suspendedMessage;
@@ -59,7 +59,7 @@ class AppApiService {
       return ApiResult.success(orders);
     } catch (e) {
       debugPrint('[AppApiService] getOrdersBySenior error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -73,7 +73,7 @@ class AppApiService {
       return ApiResult.success(order);
     } catch (e) {
       debugPrint('[AppApiService] createOrder error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -87,7 +87,7 @@ class AppApiService {
       return ApiResult.success(true);
     } catch (e) {
       debugPrint('[AppApiService] cancelOrder error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -99,7 +99,7 @@ class AppApiService {
       return ApiResult.success(order);
     } catch (e) {
       debugPrint('[AppApiService] getOrderById error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -110,7 +110,7 @@ class AppApiService {
       return ApiResult.success(true);
     } catch (e) {
       debugPrint('[AppApiService] cancelSession error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -123,7 +123,7 @@ class AppApiService {
       return ApiResult.success(response.data as Map<String, dynamic>);
     } catch (e) {
       debugPrint('[AppApiService] fetchPricingConfig error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -147,7 +147,7 @@ class AppApiService {
       return ApiResult.success(response.data as Map<String, dynamic>);
     } catch (e) {
       debugPrint('[AppApiService] validatePromoCode error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -171,7 +171,7 @@ class AppApiService {
       return ApiResult.success(response.data as Map<String, dynamic>);
     } catch (e) {
       debugPrint('[AppApiService] applyPromoCode error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -189,10 +189,10 @@ class AppApiService {
         '[AppApiService] getCustomerProfile error: '
         'status=${e.response?.statusCode}',
       );
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     } catch (e) {
       debugPrint('[AppApiService] getCustomerProfile error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -205,7 +205,7 @@ class AppApiService {
       return ApiResult.success(response.data as Map<String, dynamic>);
     } catch (e) {
       debugPrint('[AppApiService] getStudentProfile error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -222,7 +222,7 @@ class AppApiService {
       return ApiResult.success(jobs);
     } catch (e) {
       debugPrint('[AppApiService] getSessionsByStudent error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -239,7 +239,7 @@ class AppApiService {
       return ApiResult.success(jobs);
     } catch (e) {
       debugPrint('[AppApiService] getUpcomingSessionsByStudent error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -260,7 +260,7 @@ class AppApiService {
       return ApiResult.success(reviews);
     } catch (e) {
       debugPrint('[AppApiService] getReviewsBySenior error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -278,7 +278,7 @@ class AppApiService {
       return ApiResult.success(reviews);
     } catch (e) {
       debugPrint('[AppApiService] getPendingReviewsBySenior error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -296,7 +296,7 @@ class AppApiService {
       return ApiResult.success(reviews);
     } catch (e) {
       debugPrint('[AppApiService] getPendingReviewsByStudent error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -307,7 +307,7 @@ class AppApiService {
       return ApiResult.success(true);
     } catch (e) {
       debugPrint('[AppApiService] submitReview error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -326,7 +326,7 @@ class AppApiService {
       return ApiResult.success(methods);
     } catch (e) {
       debugPrint('[AppApiService] getPaymentMethods error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -342,7 +342,7 @@ class AppApiService {
       return ApiResult.success(response.data as Map<String, dynamic>);
     } catch (e) {
       debugPrint('[AppApiService] createPaymentMethod error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -353,7 +353,7 @@ class AppApiService {
       return ApiResult.success(true);
     } catch (e) {
       debugPrint('[AppApiService] deletePaymentMethod error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -374,7 +374,7 @@ class AppApiService {
       return ApiResult.success(notifications);
     } catch (e) {
       debugPrint('[AppApiService] getNotificationsByUser error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -393,7 +393,7 @@ class AppApiService {
       return ApiResult.success(notifications);
     } catch (e) {
       debugPrint('[AppApiService] getUnreadNotificationsByUser error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -407,7 +407,7 @@ class AppApiService {
       return ApiResult.success(count);
     } catch (e) {
       debugPrint('[AppApiService] getUnreadNotificationCount error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -418,7 +418,7 @@ class AppApiService {
       return ApiResult.success(true);
     } catch (e) {
       debugPrint('[AppApiService] markNotificationAsRead error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -429,7 +429,7 @@ class AppApiService {
       return ApiResult.success(true);
     } catch (e) {
       debugPrint('[AppApiService] markAllNotificationsAsRead error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -444,7 +444,7 @@ class AppApiService {
       return ApiResult.success(cities);
     } catch (e) {
       debugPrint('[AppApiService] getCities error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -457,7 +457,7 @@ class AppApiService {
       return ApiResult.success(categories);
     } catch (e) {
       debugPrint('[AppApiService] getServiceCategories error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -476,7 +476,7 @@ class AppApiService {
       return ApiResult.success(tiles);
     } catch (e) {
       debugPrint('[AppApiService] getSeniorDashboard error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -493,7 +493,7 @@ class AppApiService {
       return ApiResult.success(tiles);
     } catch (e) {
       debugPrint('[AppApiService] getStudentDashboard error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -510,7 +510,7 @@ class AppApiService {
       return ApiResult.success(jobs);
     } catch (e) {
       debugPrint('[AppApiService] getCompletedSessionsByStudent error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -527,7 +527,7 @@ class AppApiService {
       return ApiResult.success(jobs);
     } catch (e) {
       debugPrint('[AppApiService] getCompletedSessionsBySenior error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -546,7 +546,7 @@ class AppApiService {
       return ApiResult.success(slots);
     } catch (e) {
       debugPrint('[AppApiService] getStudentAvailability error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -559,7 +559,7 @@ class AppApiService {
       return ApiResult.success(true);
     } catch (e) {
       debugPrint('[AppApiService] updateStudentAvailability error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -595,7 +595,7 @@ class AppApiService {
       return ApiResult.success(true);
     } catch (e) {
       debugPrint('[AppApiService] updateContactInfo error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 
@@ -612,7 +612,7 @@ class AppApiService {
       return ApiResult.success(true);
     } catch (e) {
       debugPrint('[AppApiService] updateStudent error: $e');
-      return ApiResult.failure(_friendlyError(e));
+      return ApiResult.failure(friendlyError(e));
     }
   }
 

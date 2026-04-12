@@ -199,6 +199,15 @@ class AppStrings {
       'typeMessage': 'Upiši poruku...',
       'sendMessage': 'Pošalji',
       'noMessages': 'Nema poruka',
+      'chatRooms': 'Poruke',
+      'chatNoRooms': 'Nemate još razgovora',
+      'chatNoRoomsSubtitle': 'Započnite razgovor s Helpi podrškom.',
+      'chatLoadError': 'Greška pri učitavanju razgovora.',
+      'chatSendError': 'Poruka nije poslana.',
+      'chatYou': 'Vi',
+      'chatAdmin': 'Admin',
+      'chatStudent': 'Student',
+      'chatSenior': 'Senior',
       'notificationsTitle': 'Obavijesti',
       'notificationsUnreadTab': 'Nepročitane',
       'notificationsAllTab': 'Sve',
@@ -601,6 +610,15 @@ class AppStrings {
       'typeMessage': 'Type a message...',
       'sendMessage': 'Send',
       'noMessages': 'No messages',
+      'chatRooms': 'Messages',
+      'chatNoRooms': 'No conversations yet',
+      'chatNoRoomsSubtitle': 'Start a conversation with Helpi support.',
+      'chatLoadError': 'Error loading conversations.',
+      'chatSendError': 'Message not sent.',
+      'chatYou': 'You',
+      'chatAdmin': 'Admin',
+      'chatStudent': 'Student',
+      'chatSenior': 'Senior',
       'notificationsTitle': 'Notifications',
       'notificationsUnreadTab': 'Unread',
       'notificationsAllTab': 'All',
@@ -1030,6 +1048,15 @@ class AppStrings {
   static String get typeMessage => _t('typeMessage');
   static String get sendMessage => _t('sendMessage');
   static String get noMessages => _t('noMessages');
+  static String get chatRooms => _t('chatRooms');
+  static String get chatNoRooms => _t('chatNoRooms');
+  static String get chatNoRoomsSubtitle => _t('chatNoRoomsSubtitle');
+  static String get chatLoadError => _t('chatLoadError');
+  static String get chatSendError => _t('chatSendError');
+  static String get chatYou => _t('chatYou');
+  static String get chatAdmin => _t('chatAdmin');
+  static String get chatStudent => _t('chatStudent');
+  static String get chatSenior => _t('chatSenior');
   static String get notificationsTitle => _t('notificationsTitle');
   static String get notificationsUnreadTab => _t('notificationsUnreadTab');
   static String get notificationsAllTab => _t('notificationsAllTab');
