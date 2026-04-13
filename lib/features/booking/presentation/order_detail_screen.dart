@@ -101,6 +101,20 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           status = JobStatus.scheduled;
         }
 
+        // Parse review from backend (if submitted)
+        ReviewModel? review;
+        final reviewJson = json['review'] as Map<String, dynamic>?;
+        if (reviewJson != null && reviewJson['isPending'] != true) {
+          review = ReviewModel(
+            rating: (reviewJson['rating'] as num?)?.toInt() ?? 0,
+            comment: reviewJson['comment'] as String? ?? '',
+            date: DateTime.tryParse(
+                  reviewJson['createdAt'] as String? ?? '',
+                ) ??
+                DateTime.now(),
+          );
+        }
+
         order.jobs.add(
           JobModel(
             id: (json['id'] as num?)?.toInt(),
@@ -113,6 +127,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             orderId: (json['orderId'] as num?)?.toInt().toString() ?? '',
             studentId: studentId,
             status: status,
+            review: review,
           ),
         );
       }
