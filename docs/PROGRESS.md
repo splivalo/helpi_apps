@@ -14,6 +14,18 @@
 
 ---
 
+## ⚠️ For developer — Firebase / Push notifications
+
+When implementing Firebase Messaging (`firebase_messaging` + `flutter_local_notifications`):
+
+- **Review notification** (type `reviewRequest`, arrives 10 min after session completion):
+  - Tap should navigate to `OrderDetailScreen` (senior) or `JobDetailScreen` (student)
+  - The coral "Rate" button is already there — **NO separate modal needed**
+  - Payload must contain `orderId` / `jobInstanceId` for navigation
+- **TODO comments** in code: `main.dart`, `notifications_screen.dart` — grep for `TODO(firebase)`
+
+---
+
 ## Checklist
 
 ### Core Layer (10/10) — 100%

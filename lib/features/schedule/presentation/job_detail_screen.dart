@@ -418,12 +418,31 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       if (_job.status == JobStatus.completed &&
                           _job.review == null)
                         SizedBox(
-                          height: 30,
-                          child: OutlinedButton.icon(
+                          height: 36,
+                          child: ElevatedButton.icon(
                             onPressed: _showReviewSheet,
-                            icon: const Icon(Icons.star, size: 14),
+                            icon: const Icon(
+                              Icons.star,
+                              size: 16,
+                              color: Colors.white,
+                            ),
                             label: Text(AppStrings.rateSenior),
-                            style: AppColors.tealSmallOutlinedStyle,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.coral,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
+                              textStyle: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              minimumSize: Size.zero,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
                           ),
                         ),
                     ],
@@ -434,7 +453,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     const SizedBox(height: 12),
                     ReviewInlineCard(
                       rating: _job.review!.rating,
-                      date: DateTime.tryParse(_job.review!.date) ??
+                      date:
+                          DateTime.tryParse(_job.review!.date) ??
                           DateTime.now(),
                       comment: _job.review!.comment,
                     ),

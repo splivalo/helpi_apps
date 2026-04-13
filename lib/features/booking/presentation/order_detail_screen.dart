@@ -242,7 +242,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
               // -- Summary card --
               _summaryCard(theme, order),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
+
+              // -- Student + Review card (one-time completed) --
+              _studentReviewCard(theme, order),
+              if (order.isOneTime &&
+                  order.status == OrderStatus.completed &&
+                  order.jobs.isNotEmpty)
+                const SizedBox(height: 16),
 
               // -- Jobs / sessions (recurring only, not processing) --
               if (order.status != OrderStatus.processing && !order.isOneTime)
@@ -417,74 +424,99 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             const SizedBox(height: 4),
             Text(order.notes, style: theme.textTheme.bodyMedium),
           ],
+        ],
+      ),
+    );
+  }
 
-          // One-time completed: student + review inside summary card
-          if (order.isOneTime &&
-              order.status == OrderStatus.completed &&
-              order.jobs.isNotEmpty) ...[
-            const Divider(height: 24),
-            // Grey label
-            Text(
-              AppStrings.studentName,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+  // -- Student + Review card (separate, like student screen's "Senior" card) --
+  Widget _studentReviewCard(ThemeData theme, OrderModel order) {
+    if (!order.isOneTime ||
+        order.status != OrderStatus.completed ||
+        order.jobs.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final job = order.jobs.first;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppStrings.jobStudent,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w600,
             ),
-            const SizedBox(height: 6),
-            // Student name + small Ocijeni button
-            if (order.jobs.first.review == null)
-              Row(
-                children: [
-                  const Icon(
-                    Icons.person_outline,
-                    size: 16,
-                    color: AppColors.teal,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    order.jobs.first.studentName,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.teal,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const Spacer(),
-                  SizedBox(
-                    height: 30,
-                    child: OutlinedButton.icon(
-                      onPressed: () => _showJobReviewSheet(order, 0),
-                      icon: const Icon(Icons.star, size: 14),
-                      label: Text(AppStrings.rateStudent),
-                      style: AppColors.tealSmallOutlinedStyle,
-                    ),
-                  ),
-                ],
-              )
-            else ...[
-              Row(
-                children: [
-                  const Icon(
-                    Icons.person_outline,
-                    size: 16,
-                    color: AppColors.teal,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    order.jobs.first.studentName,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.teal,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+          ),
+          const SizedBox(height: 12),
+
+          // Student name + Rate button
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.teal.withAlpha(25),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.person_outline,
+                  color: AppColors.teal,
+                  size: 24,
+                ),
               ),
-              const SizedBox(height: 8),
-              ReviewInlineCard(
-                rating: order.jobs.first.review!.rating,
-                date: order.jobs.first.review!.date,
-                comment: order.jobs.first.review!.comment,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  job.studentName,
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
+              if (job.review == null)
+                SizedBox(
+                  height: 36,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _showJobReviewSheet(order, 0),
+                    icon: const Icon(Icons.star, size: 16, color: Colors.white),
+                    label: Text(AppStrings.rateStudent),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.coral,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      textStyle: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      minimumSize: Size.zero,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
             ],
+          ),
+
+          // Review display
+          if (job.review != null) ...[
+            const SizedBox(height: 12),
+            ReviewInlineCard(
+              rating: job.review!.rating,
+              date: job.review!.date,
+              comment: job.review!.comment,
+            ),
           ],
         ],
       ),
@@ -628,22 +660,31 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             ),
           ),
 
-          // Row 3: student name
+          // Row 3: student name with avatar
           Padding(
             padding: const EdgeInsets.only(left: 26, top: 4),
             child: Row(
               children: [
-                const Icon(
-                  Icons.person_outline,
-                  size: 14,
-                  color: AppColors.teal,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  job.studentName,
-                  style: theme.textTheme.bodySmall?.copyWith(
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: AppColors.teal.withAlpha(25),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.person_outline,
                     color: AppColors.teal,
-                    fontWeight: FontWeight.w600,
+                    size: 18,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    job.studentName,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -660,12 +701,29 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   // Rate button (completed only, no review yet)
                   if (isCompleted && job.review == null)
                     SizedBox(
-                      height: 30,
-                      child: OutlinedButton.icon(
+                      height: 36,
+                      child: ElevatedButton.icon(
                         onPressed: () => _showJobReviewSheet(order, jobIndex),
-                        icon: const Icon(Icons.star, size: 14),
+                        icon: const Icon(
+                          Icons.star,
+                          size: 16,
+                          color: Colors.white,
+                        ),
                         label: Text(AppStrings.rateStudent),
-                        style: AppColors.tealSmallOutlinedStyle,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.coral,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          textStyle: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          minimumSize: Size.zero,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                       ),
                     ),
 

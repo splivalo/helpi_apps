@@ -8,6 +8,9 @@ import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/core/utils/formatters.dart';
 import 'package:helpi_app/shared/widgets/tab_bar_selector.dart';
 
+// TODO(firebase): Tapping a 'reviewRequest' notification should open
+// the order/job detail screen (OrderDetailScreen or JobDetailScreen)
+// instead of just marking it as read. Payload must contain orderId/jobId.
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
 
