@@ -69,6 +69,50 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     super.dispose();
   }
 
+  /// Check if a specific job can be cancelled (time > cutoff).
+  bool _canCancelJob(JobModel job) {
+    if (job.status != JobStatus.scheduled) return false;
+    final timeParts = job.time.split(':');
+    final hour = int.tryParse(timeParts[0]) ?? 0;
+    final minute = timeParts.length > 1 ? int.tryParse(timeParts[1]) ?? 0 : 0;
+    final jobStart = DateTime(
+      job.date.year,
+      job.date.month,
+      job.date.day,
+      hour,
+      minute,
+    );
+    return jobStart.difference(DateTime.now()).inMinutes >
+        AppPricing.seniorCancelCutoffHours * 60;
+  }
+
+  /// Check if the order-level cancel is allowed.
+  bool _canCancelOrder(OrderModel order) {
+    // Processing = no sessions yet, always cancellable.
+    if (order.status == OrderStatus.processing) return true;
+    if (order.status != OrderStatus.active) return false;
+
+    // One-time order with known time.
+    if (order.isOneTime && order.fromHour != null && order.fromMinute != null) {
+      final sessionStart = DateTime(
+        order.date.year,
+        order.date.month,
+        order.date.day,
+        order.fromHour!,
+        order.fromMinute!,
+      );
+      return sessionStart.difference(DateTime.now()).inMinutes >
+          AppPricing.seniorCancelCutoffHours * 60;
+    }
+
+    // Recurring order — check nearest upcoming scheduled job.
+    final upcoming =
+        order.jobs.where((j) => j.status == JobStatus.scheduled).toList()
+          ..sort((a, b) => a.date.compareTo(b.date));
+    if (upcoming.isEmpty) return false;
+    return _canCancelJob(upcoming.first);
+  }
+
   Future<void> _cancelOrder(int orderId) async {
     final api = AppApiService();
     final result = await api.cancelOrder(orderId);
@@ -131,8 +175,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 const SizedBox(height: 20),
 
               // -- Action buttons --
-              if (order.status == OrderStatus.processing ||
-                  order.status == OrderStatus.active)
+              if (_canCancelOrder(order))
                 OutlinedButton.icon(
                   onPressed: () {
                     HapticFeedback.selectionClick();
@@ -550,8 +593,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       ),
                     ),
 
-                  // Cancel button (upcoming only)
-                  if (isUpcoming) ...[
+                  // Cancel button (upcoming only, outside cutoff)
+                  if (isUpcoming && _canCancelJob(job)) ...[
                     const Spacer(),
                     SizedBox(
                       height: 30,
