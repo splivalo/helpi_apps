@@ -416,15 +416,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
           const Divider(height: 24),
 
-          // Services as chips
+          // Services as text list
           Text(
             AppStrings.orderSummaryServices,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: 8),
-          ServiceChipsWrap(labels: order.services),
+          const SizedBox(height: 4),
+          Text(order.services.join(', '), style: theme.textTheme.bodyMedium),
 
           // Notes
           if (order.notes.isNotEmpty) ...[

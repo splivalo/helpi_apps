@@ -12,22 +12,23 @@ class JobStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final Color bg;
     final Color fg;
     final String label;
 
     switch (status) {
       case JobStatus.completed:
-        bg = AppColors.statusGreenBg;
-        fg = AppColors.success;
+        bg = isDark ? AppColors.success.withAlpha(30) : AppColors.statusGreenBg;
+        fg = isDark ? const Color(0xFF81C784) : AppColors.success;
         label = AppStrings.jobCompleted;
       case JobStatus.scheduled:
-        bg = AppColors.statusBlueBg;
-        fg = AppColors.info;
+        bg = isDark ? AppColors.info.withAlpha(30) : AppColors.statusBlueBg;
+        fg = isDark ? const Color(0xFF64B5F6) : AppColors.info;
         label = AppStrings.jobUpcoming;
       case JobStatus.cancelled:
-        bg = AppColors.statusRedBg;
-        fg = AppColors.coral;
+        bg = isDark ? AppColors.coral.withAlpha(30) : AppColors.statusRedBg;
+        fg = isDark ? const Color(0xFFEF9A9A) : AppColors.coral;
         label = AppStrings.jobCancelled;
     }
 
