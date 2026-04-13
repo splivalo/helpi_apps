@@ -409,6 +409,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       Expanded(
                         child: Text(
                           _job.seniorName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),

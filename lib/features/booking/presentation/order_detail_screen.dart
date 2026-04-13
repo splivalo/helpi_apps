@@ -478,6 +478,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               Expanded(
                 child: Text(
                   job.studentName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -682,6 +684,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 Expanded(
                   child: Text(
                     job.studentName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
