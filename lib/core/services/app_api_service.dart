@@ -757,9 +757,9 @@ class AppApiService {
       }
     }
 
-    // Review iz nested data (if available)
+    // Review iz nested data — student's review of senior (studentReview)
     schedule_review.ReviewModel? review;
-    final reviewData = json['review'] as Map<String, dynamic>?;
+    final reviewData = json['studentReview'] as Map<String, dynamic>?;
     if (reviewData != null) {
       review = _mapReview(reviewData);
     }
