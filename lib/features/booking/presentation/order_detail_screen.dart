@@ -59,10 +59,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         // Parse date/time
         final dateStr = json['scheduledDate'] as String? ?? '';
         final date = DateTime.tryParse(dateStr) ?? DateTime.now();
-        final startParts = (json['startTime'] as String? ?? '09:00:00').split(':');
+        final startParts = (json['startTime'] as String? ?? '09:00:00').split(
+          ':',
+        );
         final endParts = (json['endTime'] as String? ?? '11:00:00').split(':');
         final fromH = int.tryParse(startParts[0]) ?? 0;
-        final fromM = startParts.length > 1 ? int.tryParse(startParts[1]) ?? 0 : 0;
+        final fromM = startParts.length > 1
+            ? int.tryParse(startParts[1]) ?? 0
+            : 0;
         final toH = int.tryParse(endParts[0]) ?? 0;
         final toM = endParts.length > 1 ? int.tryParse(endParts[1]) ?? 0 : 0;
         final durationHours = ((toH * 60 + toM) - (fromH * 60 + fromM)) ~/ 60;
@@ -102,7 +106,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             id: (json['id'] as num?)?.toInt(),
             date: date,
             weekday: date.weekday,
-            time: '${fromH.toString().padLeft(2, '0')}:${fromM.toString().padLeft(2, '0')}',
+            time:
+                '${fromH.toString().padLeft(2, '0')}:${fromM.toString().padLeft(2, '0')}',
             durationHours: durationHours > 0 ? durationHours : 1,
             studentName: studentName,
             orderId: (json['orderId'] as num?)?.toInt().toString() ?? '',

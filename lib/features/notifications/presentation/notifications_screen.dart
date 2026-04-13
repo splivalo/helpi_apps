@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:helpi_app/core/constants/colors.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/shared/widgets/helpi_empty_state.dart';
 import 'package:helpi_app/core/network/token_storage.dart';
 import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/core/utils/formatters.dart';
@@ -267,29 +268,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       return RefreshIndicator(
         onRefresh: _loadNotifications,
         child: ListView(
-          padding: const EdgeInsets.all(24),
           children: [
             const SizedBox(height: 120),
-            Icon(
-              Icons.notifications_none_outlined,
-              size: 80,
-              color: theme.colorScheme.secondary.withAlpha(110),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              AppStrings.notificationsEmpty,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              AppStrings.notificationsEmptySubtitle,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
+            HelpiEmptyState(
+              icon: Icons.notifications_none_outlined,
+              title: AppStrings.notificationsEmpty,
+              subtitle: AppStrings.notificationsEmptySubtitle,
             ),
           ],
         ),

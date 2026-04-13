@@ -36,8 +36,7 @@ class ApiEndpoints {
       '/api/sessions/completed/student/$studentId';
   static String sessionsCompletedBySenior(int seniorId) =>
       '/api/sessions/completed/senior/$seniorId';
-  static String sessionsByOrder(int orderId) =>
-      '/api/sessions/order/$orderId';
+  static String sessionsByOrder(int orderId) => '/api/sessions/order/$orderId';
   static String sessionCancel(int id) => '/api/sessions/$id/cancel';
 
   // Legacy alias

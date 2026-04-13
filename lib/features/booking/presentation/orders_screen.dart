@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/shared/widgets/helpi_empty_state.dart';
 import 'package:helpi_app/core/utils/formatters.dart';
 import 'package:helpi_app/features/booking/data/order_model.dart';
 import 'package:helpi_app/features/booking/presentation/order_detail_screen.dart';
@@ -80,28 +81,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
   // -- Empty state --
   Widget _buildEmpty(ThemeData theme) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.receipt_outlined,
-              size: 80,
-              color: theme.colorScheme.secondary.withAlpha(100),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              AppStrings.noOrdersInCategory,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurface.withAlpha(153),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+    return HelpiEmptyState(
+      icon: Icons.receipt_outlined,
+      title: AppStrings.noOrdersInCategory,
     );
   }
 

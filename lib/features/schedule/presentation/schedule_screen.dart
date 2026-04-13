@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/shared/widgets/helpi_empty_state.dart';
 import 'package:helpi_app/core/providers/jobs_provider.dart';
 import 'package:helpi_app/features/schedule/data/job_model.dart';
 import 'package:helpi_app/features/schedule/utils/formatters.dart';
@@ -169,7 +170,11 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
           // -- Jobs list --
           Expanded(
             child: todayJobs.isEmpty
-                ? _EmptyDayState(theme: theme, teal: teal)
+                ? HelpiEmptyState(
+                    icon: Icons.event_available_outlined,
+                    title: AppStrings.scheduleNoJobs,
+                    subtitle: AppStrings.scheduleNoJobsSubtitle,
+                  )
                 : ListView.separated(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     itemCount: todayJobs.length,
@@ -362,50 +367,6 @@ class _WeekStrip extends StatelessWidget {
     // Show month + year of week middle
     final mid = weekStart.add(const Duration(days: 3));
     return '${AppStrings.monthName(mid.month)} ${mid.year}';
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  EMPTY STATE - kada nema poslova za odabrani dan
-// ═══════════════════════════════════════════════════════════════
-
-class _EmptyDayState extends StatelessWidget {
-  const _EmptyDayState({required this.theme, required this.teal});
-
-  final ThemeData theme;
-  final Color teal;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.event_available_outlined,
-              size: 80,
-              color: teal.withAlpha(100),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              AppStrings.scheduleNoJobs,
-              style: theme.textTheme.bodyLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              AppStrings.scheduleNoJobsSubtitle,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
 

@@ -217,9 +217,7 @@ class AppApiService {
     int orderId,
   ) async {
     try {
-      final response = await _client.get(
-        ApiEndpoints.sessionsByOrder(orderId),
-      );
+      final response = await _client.get(ApiEndpoints.sessionsByOrder(orderId));
       final list = response.data as List<dynamic>;
       return ApiResult.success(
         list.map((e) => e as Map<String, dynamic>).toList(),
