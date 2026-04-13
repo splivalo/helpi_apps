@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:helpi_app/app/theme.dart';
+import 'package:helpi_app/core/constants/colors.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/network/token_storage.dart';
 import 'package:helpi_app/core/services/app_api_service.dart';
@@ -12,6 +13,7 @@ import 'package:helpi_app/features/schedule/utils/job_helpers.dart';
 import 'package:helpi_app/core/utils/snackbar_helper.dart';
 import 'package:helpi_app/features/schedule/widgets/job_status_badge.dart';
 import 'package:helpi_app/features/schedule/widgets/star_rating.dart';
+import 'package:helpi_app/shared/widgets/review_inline_card.dart';
 
 /// Job details - displays all info + section for rating senior.
 class JobDetailScreen extends StatefulWidget {
@@ -416,31 +418,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       if (_job.status == JobStatus.completed &&
                           _job.review == null)
                         SizedBox(
-                          height: 36,
-                          child: ElevatedButton.icon(
+                          height: 30,
+                          child: OutlinedButton.icon(
                             onPressed: _showReviewSheet,
-                            icon: const Icon(
-                              Icons.star,
-                              size: 16,
-                              color: Colors.white,
-                            ),
+                            icon: const Icon(Icons.star, size: 14),
                             label: Text(AppStrings.rateSenior),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: HelpiTheme.coral,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
-                              textStyle: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              minimumSize: Size.zero,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
+                            style: AppColors.tealSmallOutlinedStyle,
                           ),
                         ),
                     ],
@@ -449,50 +432,11 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   // -- Review display (if exists) --
                   if (_job.review != null) ...[
                     const SizedBox(height: 12),
-                    Text(
-                      AppStrings.yourReview,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              StarRating(rating: _job.review!.rating, size: 16),
-                              const Spacer(),
-                              Text(
-                                _job.review!.date,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
-                          if (_job.review!.comment.isNotEmpty)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: Text(
-                                _job.review!.comment,
-                                style: theme.textTheme.bodySmall,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                        ],
-                      ),
+                    ReviewInlineCard(
+                      rating: _job.review!.rating,
+                      date: DateTime.tryParse(_job.review!.date) ??
+                          DateTime.now(),
+                      comment: _job.review!.comment,
                     ),
                   ],
                 ],
