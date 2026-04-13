@@ -4,6 +4,11 @@ import 'package:helpi_app/core/services/app_api_service.dart';
 
 /// Centralizirane cijene za Helpi app.
 /// Defaults se koriste dok se ne učitaju iz API-ja.
+///
+// TODO(stripe-integration): Backend JobInstanceRepository.UpdateToInProgressAsync
+//   has the PaymentStatus check commented out. When Stripe is fully integrated,
+//   uncomment: if (instance?.PaymentStatus != PaymentStatus.Paid) return null;
+//   Without it, sessions transition InProgress→Completed without charging.
 class AppPricing {
   AppPricing._();
 

@@ -211,6 +211,25 @@ class AppApiService {
 
   // STUDENT: Sessions / Jobs
 
+  /// Fetch sessions for a specific order (used in senior order detail).
+  /// Returns raw JSON maps so caller can extract student name etc.
+  Future<ApiResult<List<Map<String, dynamic>>>> getSessionsByOrder(
+    int orderId,
+  ) async {
+    try {
+      final response = await _client.get(
+        ApiEndpoints.sessionsByOrder(orderId),
+      );
+      final list = response.data as List<dynamic>;
+      return ApiResult.success(
+        list.map((e) => e as Map<String, dynamic>).toList(),
+      );
+    } catch (e) {
+      debugPrint('[AppApiService] getSessionsByOrder error: $e');
+      return ApiResult.failure(friendlyError(e));
+    }
+  }
+
   /// Fetch all sessions for student.
   Future<ApiResult<List<Job>>> getSessionsByStudent(int studentId) async {
     try {

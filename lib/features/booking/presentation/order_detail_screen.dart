@@ -42,6 +42,77 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     super.initState();
     widget.ordersNotifier.addListener(_onChanged);
     _loadPendingReviews();
+    _loadSessions();
+  }
+
+  /// Fetch sessions from API and populate order.jobs.
+  Future<void> _loadSessions() async {
+    final api = AppApiService();
+    final result = await api.getSessionsByOrder(widget.order.id);
+
+    if (!mounted) return;
+
+    if (result.success && result.data != null) {
+      final order = widget.order;
+      order.jobs.clear();
+      for (final json in result.data!) {
+        // Parse date/time
+        final dateStr = json['scheduledDate'] as String? ?? '';
+        final date = DateTime.tryParse(dateStr) ?? DateTime.now();
+        final startParts = (json['startTime'] as String? ?? '09:00:00').split(':');
+        final endParts = (json['endTime'] as String? ?? '11:00:00').split(':');
+        final fromH = int.tryParse(startParts[0]) ?? 0;
+        final fromM = startParts.length > 1 ? int.tryParse(startParts[1]) ?? 0 : 0;
+        final toH = int.tryParse(endParts[0]) ?? 0;
+        final toM = endParts.length > 1 ? int.tryParse(endParts[1]) ?? 0 : 0;
+        final durationHours = ((toH * 60 + toM) - (fromH * 60 + fromM)) ~/ 60;
+
+        // Extract student name from scheduleAssignment.student.contact.fullName
+        String studentName = '';
+        String studentId = '';
+        final assignment = json['scheduleAssignment'] as Map<String, dynamic>?;
+        if (assignment != null) {
+          final student = assignment['student'] as Map<String, dynamic>?;
+          if (student != null) {
+            studentId = student['userId']?.toString() ?? '';
+            final contact = student['contact'] as Map<String, dynamic>?;
+            studentName = contact?['fullName'] as String? ?? '';
+          }
+        }
+
+        // Map backend status to booking JobStatus
+        final rawStatus = json['status'];
+        JobStatus status;
+        if (rawStatus is int) {
+          switch (rawStatus) {
+            case 2:
+              status = JobStatus.completed;
+            case 3:
+            case 4:
+              status = JobStatus.cancelled;
+            default:
+              status = JobStatus.scheduled;
+          }
+        } else {
+          status = JobStatus.scheduled;
+        }
+
+        order.jobs.add(
+          JobModel(
+            id: (json['id'] as num?)?.toInt(),
+            date: date,
+            weekday: date.weekday,
+            time: '${fromH.toString().padLeft(2, '0')}:${fromM.toString().padLeft(2, '0')}',
+            durationHours: durationHours > 0 ? durationHours : 1,
+            studentName: studentName,
+            orderId: (json['orderId'] as num?)?.toInt().toString() ?? '',
+            studentId: studentId,
+            status: status,
+          ),
+        );
+      }
+      setState(() {});
+    }
   }
 
   /// Fetch pending reviews for this senior.
