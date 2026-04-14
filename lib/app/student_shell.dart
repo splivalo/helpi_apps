@@ -9,7 +9,7 @@ import 'package:helpi_app/core/l10n/locale_notifier.dart';
 import 'package:helpi_app/core/l10n/theme_notifier.dart';
 import 'package:helpi_app/features/schedule/data/availability_model.dart';
 import 'package:helpi_app/features/chat/presentation/student_chat_screen.dart';
-import 'package:helpi_app/features/profile/presentation/student_profile_screen.dart';
+import 'package:helpi_app/features/profile/presentation/student_menu_screen.dart';
 import 'package:helpi_app/features/schedule/presentation/schedule_screen.dart';
 import 'package:helpi_app/features/statistics/presentation/statistics_screen.dart';
 
@@ -44,7 +44,7 @@ class _StudentShellState extends ConsumerState<StudentShell> {
       const ScheduleScreen(),
       const ChatScreen(),
       const StatisticsScreen(),
-      ProfileScreen(
+      StudentMenuScreen(
         localeNotifier: widget.localeNotifier,
         themeNotifier: widget.themeNotifier,
         onLogout: widget.onLogout,
