@@ -60,24 +60,23 @@ class _TermsScreenState extends State<TermsScreen> {
   /// Extracts the main article content from the full HTML page.
   String _extractContent(String html) {
     // Try <article>…</article> first
-    final articleMatch =
-        RegExp(r'<article[^>]*>([\s\S]*?)</article>').firstMatch(html);
+    final articleMatch = RegExp(
+      r'<article[^>]*>([\s\S]*?)</article>',
+    ).firstMatch(html);
     if (articleMatch != null) return articleMatch.group(1)!;
 
     // Try <main>…</main>
-    final mainMatch =
-        RegExp(r'<main[^>]*>([\s\S]*?)</main>').firstMatch(html);
+    final mainMatch = RegExp(r'<main[^>]*>([\s\S]*?)</main>').firstMatch(html);
     if (mainMatch != null) return mainMatch.group(1)!;
 
     // Try .entry-content (WordPress)
-    final entryMatch =
-        RegExp(r'<div[^>]*class="[^"]*entry-content[^"]*"[^>]*>([\s\S]*?)</div>\s*(?:</div>|<footer)')
-            .firstMatch(html);
+    final entryMatch = RegExp(
+      r'<div[^>]*class="[^"]*entry-content[^"]*"[^>]*>([\s\S]*?)</div>\s*(?:</div>|<footer)',
+    ).firstMatch(html);
     if (entryMatch != null) return entryMatch.group(1)!;
 
     // Fallback: content between <body> tags
-    final bodyMatch =
-        RegExp(r'<body[^>]*>([\s\S]*?)</body>').firstMatch(html);
+    final bodyMatch = RegExp(r'<body[^>]*>([\s\S]*?)</body>').firstMatch(html);
     if (bodyMatch != null) return bodyMatch.group(1)!;
 
     return html;
@@ -99,44 +98,51 @@ class _TermsScreenState extends State<TermsScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _hasError
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.wifi_off,
-                          size: 48,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          AppStrings.termsLoadError,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyLarge,
-                        ),
-                        const SizedBox(height: 24),
-                        ElevatedButton.icon(
-                          onPressed: _fetchContent,
-                          icon: const Icon(Icons.refresh),
-                          label: Text(AppStrings.retry),
-                        ),
-                      ],
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.wifi_off,
+                      size: 48,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
-                  ),
-                )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: HtmlWidget(
-                    _html ?? '',
-                    onTapUrl: (url) {
-                      _onTapUrl(url);
-                      return true;
-                    },
-                    textStyle: theme.textTheme.bodyMedium,
-                  ),
+                    const SizedBox(height: 16),
+                    Text(
+                      AppStrings.termsLoadError,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyLarge,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: _fetchContent,
+                      icon: const Icon(Icons.refresh),
+                      label: Text(AppStrings.retry),
+                    ),
+                  ],
                 ),
+              ),
+            )
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: HtmlWidget(
+                _html ?? '',
+                onTapUrl: (url) {
+                  _onTapUrl(url);
+                  return true;
+                },
+                customStylesBuilder: (element) {
+                  final tag = element.localName;
+                  if (tag == 'ol' || tag == 'ul') {
+                    return {'padding-left': '16px'};
+                  }
+                  return null;
+                },
+                textStyle: theme.textTheme.bodyMedium,
+              ),
+            ),
     );
   }
 }
