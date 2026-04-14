@@ -140,92 +140,95 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen> {
       }
     });
 
-    return Scaffold(
-      appBar: AppBar(title: Text(AppStrings.chatRooms)),
-      body: SafeArea(
-        top: false,
-        child: Column(
-          children: [
-            Expanded(
-              child: state.isLoading && state.messages.isEmpty
-                  ? const Center(child: CircularProgressIndicator())
-                  : state.messages.isEmpty
-                  ? Center(
-                      child: Text(
-                        AppStrings.noMessages,
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        appBar: AppBar(title: Text(AppStrings.chatRooms)),
+        body: SafeArea(
+          top: false,
+          child: Column(
+            children: [
+              Expanded(
+                child: state.isLoading && state.messages.isEmpty
+                    ? const Center(child: CircularProgressIndicator())
+                    : state.messages.isEmpty
+                    ? Center(
+                        child: Text(
+                          AppStrings.noMessages,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
                         ),
+                      )
+                    : ListView.builder(
+                        controller: _scrollController,
+                        padding: const EdgeInsets.all(16),
+                        itemCount: state.messages.length,
+                        itemBuilder: (context, index) {
+                          final msg = state.messages[index];
+                          return _ChatBubble(
+                            text: msg.content,
+                            isMe: msg.isMine(_myUserId!),
+                            time: msg.timeFormatted,
+                            senderName: msg.senderName,
+                          );
+                        },
                       ),
-                    )
-                  : ListView.builder(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.all(16),
-                      itemCount: state.messages.length,
-                      itemBuilder: (context, index) {
-                        final msg = state.messages[index];
-                        return _ChatBubble(
-                          text: msg.content,
-                          isMe: msg.isMine(_myUserId!),
-                          time: msg.timeFormatted,
-                          senderName: msg.senderName,
-                        );
-                      },
-                    ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(16),
-              color: theme.colorScheme.surface,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      onSubmitted: (_) => _sendMessage(),
-                      textInputAction: TextInputAction.send,
-                      decoration: InputDecoration(
-                        hintText: AppStrings.typeMessage,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 14,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  SizedBox(
-                    height: 48,
-                    width: 48,
-                    child: Material(
-                      color: theme.colorScheme.secondary,
-                      shape: const CircleBorder(),
-                      child: InkWell(
-                        onTap: _isSending ? null : _sendMessage,
-                        customBorder: const CircleBorder(),
-                        child: _isSending
-                            ? const Padding(
-                                padding: EdgeInsets.all(12),
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Icon(
-                                Icons.send,
-                                color: Colors.white,
-                                size: 22,
-                              ),
-                      ),
-                    ),
-                  ),
-                ],
               ),
-            ),
-          ],
+              Container(
+                padding: const EdgeInsets.all(16),
+                color: theme.colorScheme.surface,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        onSubmitted: (_) => _sendMessage(),
+                        textInputAction: TextInputAction.send,
+                        decoration: InputDecoration(
+                          hintText: AppStrings.typeMessage,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      height: 48,
+                      width: 48,
+                      child: Material(
+                        color: theme.colorScheme.secondary,
+                        shape: const CircleBorder(),
+                        child: InkWell(
+                          onTap: _isSending ? null : _sendMessage,
+                          customBorder: const CircleBorder(),
+                          child: _isSending
+                              ? const Padding(
+                                  padding: EdgeInsets.all(12),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.send,
+                                  color: Colors.white,
+                                  size: 22,
+                                ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
