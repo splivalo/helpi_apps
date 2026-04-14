@@ -10,7 +10,6 @@ import 'package:helpi_app/core/utils/formatters.dart';
 import 'package:helpi_app/features/booking/data/order_model.dart';
 import 'package:helpi_app/shared/widgets/info_card.dart';
 import 'package:helpi_app/shared/widgets/selectable_chip.dart';
-import 'package:helpi_app/shared/widgets/service_chips_wrap.dart';
 import 'package:helpi_app/shared/widgets/summary_row.dart';
 import 'package:helpi_app/shared/widgets/tab_bar_selector.dart';
 import 'package:helpi_app/shared/widgets/helpi_switch.dart';
@@ -1413,11 +1412,14 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(height: 8),
-                ServiceChipsWrap(
-                  labels: _selectedServices.map((key) {
-                    return _serviceChips[key]?.call() ?? key;
-                  }).toList(),
+                const SizedBox(height: 4),
+                Text(
+                  _selectedServices
+                      .map((key) {
+                        return _serviceChips[key]?.call() ?? key;
+                      })
+                      .join(', '),
+                  style: theme.textTheme.bodyMedium,
                 ),
 
                 // Service note

@@ -101,6 +101,11 @@ class AppStrings {
       'confirm': 'Potvrdi',
       'selectTime': 'Odaberite vrijeme',
       'save': 'Spremi',
+      'comingSoon': 'Uskoro dostupno',
+      'takePhoto': 'Uslikaj',
+      'chooseFromGallery': 'Odaberi iz galerije',
+      'removePhoto': 'Ukloni fotografiju',
+      'photoUploadFailed': 'Greška pri uploadu fotografije',
       'back': 'Natrag',
       'next': 'Dalje',
       'close': 'Zatvori',
@@ -517,6 +522,11 @@ class AppStrings {
       'confirm': 'Confirm',
       'selectTime': 'Select time',
       'save': 'Save',
+      'comingSoon': 'Coming soon',
+      'takePhoto': 'Take photo',
+      'chooseFromGallery': 'Choose from gallery',
+      'removePhoto': 'Remove photo',
+      'photoUploadFailed': 'Photo upload failed',
       'back': 'Back',
       'next': 'Next',
       'close': 'Close',
@@ -963,6 +973,11 @@ class AppStrings {
   static String get confirm => _t('confirm');
   static String get selectTime => _t('selectTime');
   static String get save => _t('save');
+  static String get comingSoon => _t('comingSoon');
+  static String get takePhoto => _t('takePhoto');
+  static String get chooseFromGallery => _t('chooseFromGallery');
+  static String get removePhoto => _t('removePhoto');
+  static String get photoUploadFailed => _t('photoUploadFailed');
   static String get back => _t('back');
   static String get next => _t('next');
   static String get close => _t('close');

@@ -67,7 +67,7 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
           // -- Theme --
           ValueListenableBuilder<ThemeMode>(

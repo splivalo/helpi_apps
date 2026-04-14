@@ -68,4 +68,7 @@ class ApiClient {
 
   Future<Response<dynamic>> patch(String path, {Object? data}) =>
       _dio.patch(path, data: data);
+
+  /// Raw Dio instance for multipart uploads etc.
+  Dio get dio => _dio;
 }

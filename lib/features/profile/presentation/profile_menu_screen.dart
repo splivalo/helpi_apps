@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 
 import 'package:helpi_app/core/constants/colors.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
@@ -15,6 +16,7 @@ import 'package:helpi_app/features/profile/presentation/profile_orderer_screen.d
 import 'package:helpi_app/features/profile/presentation/profile_senior_screen.dart';
 import 'package:helpi_app/features/profile/presentation/profile_cards_screen.dart';
 import 'package:helpi_app/features/profile/presentation/profile_settings_screen.dart';
+import 'package:helpi_app/core/network/api_endpoints.dart';
 
 /// Bolt/Glovo-style profile menu with icon list items.
 class ProfileMenuScreen extends ConsumerStatefulWidget {
@@ -35,9 +37,10 @@ class ProfileMenuScreen extends ConsumerStatefulWidget {
 
 class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
   String _userName = '';
-  String _userEmail = '';
   bool _isLoading = true;
   bool _hasOrderer = false;
+  String? _profileImageUrl;
+  int? _contactId;
 
   // Profile data cache – loaded once, passed to sub-screens
   Map<String, dynamic>? _profileData;
@@ -61,7 +64,15 @@ class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
       _profileData = result.data!;
       final contact = result.data!['contact'] as Map<String, dynamic>? ?? {};
       _userName = contact['fullName'] as String? ?? '';
-      _userEmail = contact['email'] as String? ?? '';
+      _contactId = (contact['id'] as num?)?.toInt();
+
+      // Profile image: relative URL from backend → full URL
+      final imgPath = contact['profileImageUrl'] as String?;
+      if (imgPath != null && imgPath.isNotEmpty) {
+        _profileImageUrl = '${ApiEndpoints.baseUrl}$imgPath';
+      } else {
+        _profileImageUrl = null;
+      }
 
       // Check relationship: 0 = Self (no orderer)
       final seniors = result.data!['seniors'] as List<dynamic>? ?? [];
@@ -118,52 +129,69 @@ class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
           : ListView(
               padding: const EdgeInsets.symmetric(vertical: 8),
               children: [
-                // -- User header --
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 16,
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundColor: theme.colorScheme.secondary.withAlpha(
-                          30,
+                // -- Bolt-style centered header --
+                const SizedBox(height: 12),
+                Center(
+                  child: GestureDetector(
+                    onTap: _pickProfilePhoto,
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 44,
+                          backgroundColor:
+                              theme.colorScheme.surfaceContainerHighest,
+                          backgroundImage: _profileImageUrl != null
+                              ? NetworkImage(_profileImageUrl!)
+                              : null,
+                          child: _profileImageUrl == null
+                              ? Icon(
+                                  Icons.person,
+                                  size: 44,
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                )
+                              : null,
                         ),
-                        child: Icon(
-                          Icons.person,
-                          size: 28,
-                          color: theme.colorScheme.secondary,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _userName,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: theme.colorScheme.surface,
+                                width: 2,
                               ),
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              _userEmail,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurface.withAlpha(
-                                  153,
-                                ),
-                              ),
+                            child: Icon(
+                              Icons.add,
+                              size: 16,
+                              color: theme.colorScheme.onPrimary,
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-                const Divider(height: 1),
+                const SizedBox(height: 12),
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Text(
+                      _userName,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Divider(height: 1, indent: 20, endIndent: 20),
 
                 // -- Menu items --
                 _MenuItem(
@@ -218,8 +246,7 @@ class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
                   onTap: _openTerms,
                 ),
 
-                const Divider(height: 1),
-                const SizedBox(height: 8),
+                const Divider(height: 1, indent: 20, endIndent: 20),
 
                 // -- Logout --
                 _MenuItem(
@@ -227,7 +254,7 @@ class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
                   label: AppStrings.logout,
                   onTap: _confirmLogout,
                 ),
-                const Divider(height: 1),
+                const Divider(height: 1, indent: 20, endIndent: 20),
 
                 const SizedBox(height: 24),
 
@@ -257,6 +284,90 @@ class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
               ],
             ),
     );
+  }
+
+  void _pickProfilePhoto() {
+    if (_contactId == null) return;
+
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: Text(AppStrings.takePhoto),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickAndUpload(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: Text(AppStrings.chooseFromGallery),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickAndUpload(ImageSource.gallery);
+              },
+            ),
+            if (_profileImageUrl != null)
+              ListTile(
+                leading: Icon(
+                  Icons.delete,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                title: Text(
+                  AppStrings.removePhoto,
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _deleteProfileImage();
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickAndUpload(ImageSource source) async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: source,
+      maxWidth: 800,
+      maxHeight: 800,
+      imageQuality: 85,
+    );
+    if (picked == null || !mounted) return;
+
+    final api = AppApiService();
+    final result = await api.uploadProfileImage(
+      contactId: _contactId!,
+      filePath: picked.path,
+    );
+    if (!mounted) return;
+
+    if (result.success && result.data != null) {
+      setState(() {
+        _profileImageUrl = '${ApiEndpoints.baseUrl}${result.data!}';
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.error ?? AppStrings.photoUploadFailed)),
+      );
+    }
+  }
+
+  Future<void> _deleteProfileImage() async {
+    final api = AppApiService();
+    final result = await api.deleteProfileImage(contactId: _contactId!);
+    if (!mounted) return;
+
+    if (result.success) {
+      setState(() => _profileImageUrl = null);
+    }
   }
 
   Future<void> _push(Widget screen) async {

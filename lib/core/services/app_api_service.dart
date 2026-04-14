@@ -927,4 +927,45 @@ class AppApiService {
     if (student == null) return '';
     return student['userId']?.toString() ?? '';
   }
+
+  // --
+  // PROFILE IMAGE
+  // --
+
+  /// Upload profile image for a contact. Returns the URL on success.
+  Future<ApiResult<String>> uploadProfileImage({
+    required int contactId,
+    required String filePath,
+  }) async {
+    try {
+      final fileName = filePath.split('/').last.split('\\').last;
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(filePath, filename: fileName),
+      });
+      final response = await _client.dio.post(
+        '${ApiEndpoints.contactInfoById(contactId)}/profile-image',
+        data: formData,
+        options: Options(contentType: 'multipart/form-data'),
+      );
+      final url =
+          (response.data as Map<String, dynamic>)['profileImageUrl'] as String;
+      return ApiResult.success(url);
+    } catch (e) {
+      debugPrint('[AppApiService] uploadProfileImage error: $e');
+      return ApiResult.failure(friendlyError(e));
+    }
+  }
+
+  /// Delete profile image for a contact.
+  Future<ApiResult<bool>> deleteProfileImage({required int contactId}) async {
+    try {
+      await _client.delete(
+        '${ApiEndpoints.contactInfoById(contactId)}/profile-image',
+      );
+      return ApiResult.success(true);
+    } catch (e) {
+      debugPrint('[AppApiService] deleteProfileImage error: $e');
+      return ApiResult.failure(friendlyError(e));
+    }
+  }
 }
