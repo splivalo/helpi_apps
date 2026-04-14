@@ -313,9 +313,14 @@ class AppStrings {
       'promoCodeApplied': 'Promo kod primijenjen',
       'agreeToTerms': 'Slažem se s ',
       'termsOfUse': 'uvjetima',
+      'termsOfUseTitle': 'Uvjeti korištenja',
       'byClickingRegister': 'Klikom na "Završi registraciju" prihvaćate ',
       'termsOfUseLink': 'uvjete korištenja',
       'cardEndingIn': 'Kartica završava na {digits}',
+      'profileSaved': 'Podaci su spremljeni',
+      'profileSaveError': 'Greška pri spremanju',
+      'logoutConfirmTitle': 'Odjava',
+      'logoutConfirmContent': 'Jeste li sigurni da se želite odjaviti?',
 
       // -- Schedule (student) --
       'scheduleTitle': 'Raspored',
@@ -724,10 +729,15 @@ class AppStrings {
       'promoCodeApplied': 'Promo code applied',
       'agreeToTerms': 'I agree to the ',
       'termsOfUse': 'terms',
+      'termsOfUseTitle': 'Terms of use',
       'byClickingRegister':
           'By clicking "Complete registration" you accept the ',
       'termsOfUseLink': 'terms of use',
       'cardEndingIn': 'Card ending in {digits}',
+      'profileSaved': 'Changes saved',
+      'profileSaveError': 'Error saving changes',
+      'logoutConfirmTitle': 'Log out',
+      'logoutConfirmContent': 'Are you sure you want to log out?',
 
       // -- Schedule (student) --
       'scheduleTitle': 'Schedule',
@@ -1173,6 +1183,11 @@ class AppStrings {
   static String get termsOfUseLink => _t('termsOfUseLink');
   static String cardEndingIn(String digits) =>
       _t('cardEndingIn', params: {'digits': digits});
+  static String get profileSaved => _t('profileSaved');
+  static String get profileSaveError => _t('profileSaveError');
+  static String get termsOfUseTitle => _t('termsOfUseTitle');
+  static String get logoutConfirmTitle => _t('logoutConfirmTitle');
+  static String get logoutConfirmContent => _t('logoutConfirmContent');
 
   // -- Schedule --
   static String get scheduleTitle => _t('scheduleTitle');

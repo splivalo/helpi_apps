@@ -591,6 +591,7 @@ class AppApiService {
     required String fullAddress,
     required int gender,
     required String dateOfBirth,
+    String googlePlaceId = 'app-manual-entry',
     int cityId = 1,
   }) async {
     try {
@@ -603,7 +604,7 @@ class AppApiService {
           'fullAddress': fullAddress,
           'gender': gender,
           'dateOfBirth': dateOfBirth,
-          'googlePlaceId': 'app-manual-entry',
+          'googlePlaceId': googlePlaceId,
           'languageCode': 'hr',
           'country': 'Croatia',
           'cityId': cityId,

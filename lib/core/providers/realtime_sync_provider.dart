@@ -84,13 +84,34 @@ class RealTimeSyncService {
     });
 
     signalR.on('EntityChanged', (args) {
-      final entityType = (args != null && args.isNotEmpty)
-          ? args.first?.toString() ?? 'unknown'
-          : 'unknown';
+      // Backend sends either a plain string or a Map {entityType: "X", timestamp: "..."}
+      String entityType = 'unknown';
+      if (args != null && args.isNotEmpty) {
+        final first = args.first;
+        if (first is Map) {
+          entityType = first['entityType']?.toString() ?? 'unknown';
+        } else {
+          entityType = first?.toString() ?? 'unknown';
+        }
+      }
       debugPrint(
         '[RealTimeSync] EntityChanged ($entityType) — refreshing data',
       );
       _refreshData();
+      // Profile-relevant entities: bump version so profile screens reload
+      // Backend sends controller names (plural): Seniors, ContactInfos, Customers, Students
+      const profileEntities = {
+        'ContactInfos',
+        'Seniors',
+        'Customers',
+        'Students',
+      };
+      if (profileEntities.contains(entityType) || entityType == 'unknown') {
+        _ref.read(profileVersionProvider.notifier).state++;
+        debugPrint(
+          '[RealTimeSync] profileVersion bumped → ${_ref.read(profileVersionProvider)}',
+        );
+      }
     });
 
     // ── Chat events ──
@@ -219,6 +240,10 @@ class RealTimeSyncService {
     }
   }
 }
+
+/// Bumped when backend sends EntityChanged for contact/senior data.
+/// Profile screens watch this to auto-reload.
+final profileVersionProvider = StateProvider<int>((ref) => 0);
 
 /// Eager provider - initializes as soon as someone reads it.
 final realTimeSyncProvider = Provider<RealTimeSyncService>((ref) {

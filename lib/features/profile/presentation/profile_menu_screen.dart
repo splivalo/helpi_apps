@@ -1,0 +1,393 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:helpi_app/core/constants/colors.dart';
+import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/core/l10n/locale_notifier.dart';
+import 'package:helpi_app/core/l10n/theme_notifier.dart';
+import 'package:helpi_app/core/services/auth_service.dart';
+import 'package:helpi_app/core/network/token_storage.dart';
+import 'package:helpi_app/core/services/app_api_service.dart';
+import 'package:helpi_app/core/providers/realtime_sync_provider.dart';
+import 'package:helpi_app/features/notifications/presentation/notifications_screen.dart';
+import 'package:helpi_app/features/profile/presentation/profile_credentials_screen.dart';
+import 'package:helpi_app/features/profile/presentation/profile_orderer_screen.dart';
+import 'package:helpi_app/features/profile/presentation/profile_senior_screen.dart';
+import 'package:helpi_app/features/profile/presentation/profile_cards_screen.dart';
+import 'package:helpi_app/features/profile/presentation/profile_settings_screen.dart';
+
+/// Bolt/Glovo-style profile menu with icon list items.
+class ProfileMenuScreen extends ConsumerStatefulWidget {
+  const ProfileMenuScreen({
+    super.key,
+    required this.localeNotifier,
+    required this.themeNotifier,
+    required this.onLogout,
+  });
+
+  final LocaleNotifier localeNotifier;
+  final ThemeNotifier themeNotifier;
+  final VoidCallback onLogout;
+
+  @override
+  ConsumerState<ProfileMenuScreen> createState() => _ProfileMenuScreenState();
+}
+
+class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
+  String _userName = '';
+  String _userEmail = '';
+  bool _isLoading = true;
+  bool _hasOrderer = false;
+
+  // Profile data cache – loaded once, passed to sub-screens
+  Map<String, dynamic>? _profileData;
+  List<Map<String, dynamic>> _cards = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBasicInfo();
+  }
+
+  Future<void> _loadBasicInfo() async {
+    final userId = await TokenStorage().getUserId();
+    if (userId == null || !mounted) return;
+
+    final api = AppApiService();
+    final result = await api.getCustomerProfile(userId);
+    if (!mounted) return;
+
+    if (result.success && result.data != null) {
+      _profileData = result.data!;
+      final contact = result.data!['contact'] as Map<String, dynamic>? ?? {};
+      _userName = contact['fullName'] as String? ?? '';
+      _userEmail = contact['email'] as String? ?? '';
+
+      // Check relationship: 0 = Self (no orderer)
+      final seniors = result.data!['seniors'] as List<dynamic>? ?? [];
+      if (seniors.isNotEmpty) {
+        final senior = seniors.first as Map<String, dynamic>;
+        final relationship = senior['relationship'] as int? ?? 0;
+        _hasOrderer = relationship != 0;
+        debugPrint(
+          '[ProfileMenu] relationship=$relationship, hasOrderer=$_hasOrderer',
+        );
+      }
+    }
+
+    final cardsResult = await api.getPaymentMethods(userId);
+    if (!mounted) return;
+    if (cardsResult.success && cardsResult.data != null) {
+      _cards = cardsResult.data!;
+    }
+
+    setState(() => _isLoading = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    // Auto-reload when backend pushes profile changes via SignalR
+    ref.listen<int>(profileVersionProvider, (prev, next) {
+      if (prev != next) {
+        debugPrint(
+          '[ProfileMenu] profileVersion changed $prev → $next, reloading',
+        );
+        _loadBasicInfo();
+      }
+    });
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(AppStrings.profile),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+              );
+            },
+            icon: const Icon(Icons.notifications_outlined),
+            tooltip: AppStrings.notificationsTitle,
+          ),
+        ],
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              children: [
+                // -- User header --
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 28,
+                        backgroundColor: theme.colorScheme.secondary.withAlpha(
+                          30,
+                        ),
+                        child: Icon(
+                          Icons.person,
+                          size: 28,
+                          color: theme.colorScheme.secondary,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _userName,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              _userEmail,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurface.withAlpha(
+                                  153,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
+
+                // -- Menu items --
+                _MenuItem(
+                  icon: Icons.email_outlined,
+                  label: AppStrings.accessData,
+                  onTap: () => _push(
+                    ProfileCredentialsScreen(profileData: _profileData),
+                  ),
+                ),
+                const Divider(height: 1, indent: 20, endIndent: 20),
+                if (_hasOrderer) ...[
+                  _MenuItem(
+                    icon: Icons.person_outline,
+                    label: AppStrings.ordererData,
+                    onTap: () =>
+                        _push(ProfileOrdererScreen(profileData: _profileData)),
+                  ),
+                  const Divider(height: 1, indent: 20, endIndent: 20),
+                ],
+                _MenuItem(
+                  icon: Icons.elderly,
+                  label: AppStrings.seniorData,
+                  onTap: () =>
+                      _push(ProfileSeniorScreen(profileData: _profileData)),
+                ),
+                const Divider(height: 1, indent: 20, endIndent: 20),
+                _MenuItem(
+                  icon: Icons.credit_card_outlined,
+                  label: AppStrings.creditCards,
+                  onTap: () => _push(
+                    ProfileCardsScreen(
+                      cards: _cards,
+                      onCardsChanged: (cards) => _cards = cards,
+                    ),
+                  ),
+                ),
+                const Divider(height: 1, indent: 20, endIndent: 20),
+                _MenuItem(
+                  icon: Icons.tune_outlined,
+                  label: AppStrings.settings,
+                  onTap: () => _push(
+                    ProfileSettingsScreen(
+                      localeNotifier: widget.localeNotifier,
+                      themeNotifier: widget.themeNotifier,
+                    ),
+                  ),
+                ),
+                const Divider(height: 1, indent: 20, endIndent: 20),
+                _MenuItem(
+                  icon: Icons.description_outlined,
+                  label: AppStrings.termsOfUseTitle,
+                  onTap: _openTerms,
+                ),
+
+                const Divider(height: 1),
+                const SizedBox(height: 8),
+
+                // -- Logout --
+                _MenuItem(
+                  icon: Icons.logout,
+                  label: AppStrings.logout,
+                  onTap: _confirmLogout,
+                ),
+                const Divider(height: 1),
+
+                const SizedBox(height: 24),
+
+                // -- Delete account --
+                Center(
+                  child: GestureDetector(
+                    onTap: () => _confirmDeleteAccount(context),
+                    child: Text(
+                      AppStrings.deleteAccount,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.error,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                // -- Version --
+                Center(
+                  child: Text(
+                    AppStrings.appVersion,
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+    );
+  }
+
+  Future<void> _push(Widget screen) async {
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
+    if (!mounted) return;
+    // Reload profile data after returning from sub-screen
+    setState(() => _isLoading = true);
+    await _loadBasicInfo();
+  }
+
+  void _openTerms() {
+    // ignore: avoid_dynamic_calls
+    _push(_TermsScreen());
+  }
+
+  Future<void> _confirmLogout() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(AppStrings.logoutConfirmTitle),
+        content: Text(AppStrings.logoutConfirmContent),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(AppStrings.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.coral),
+            child: Text(AppStrings.logout),
+          ),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    if (confirmed == true) widget.onLogout();
+  }
+
+  Future<void> _confirmDeleteAccount(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(AppStrings.deleteAccountConfirmTitle),
+        content: Text(AppStrings.deleteAccountConfirmContent),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(AppStrings.deleteAccountNo),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(ctx).colorScheme.error,
+            ),
+            child: Text(AppStrings.deleteAccountYes),
+          ),
+        ],
+      ),
+    );
+    if (!context.mounted) return;
+    if (confirmed != true) return;
+
+    final result = await AuthService().deleteAccount();
+    if (!context.mounted) return;
+
+    if (result.success) {
+      widget.onLogout();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.message ?? AppStrings.deleteAccountError),
+        ),
+      );
+    }
+  }
+}
+
+// ══════════════════════════════════════════════
+// Menu Item tile
+// ══════════════════════════════════════════════
+class _MenuItem extends StatelessWidget {
+  const _MenuItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return ListTile(
+      leading: Icon(icon, color: theme.colorScheme.onSurface, size: 24),
+      title: Text(
+        label,
+        style: theme.textTheme.bodyLarge?.copyWith(
+          color: theme.colorScheme.onSurface,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      trailing: Icon(
+        Icons.chevron_right,
+        color: theme.colorScheme.onSurface.withAlpha(100),
+      ),
+      onTap: onTap,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+    );
+  }
+}
+
+// ══════════════════════════════════════════════
+// Terms of use screen (simple WebView/text)
+// ══════════════════════════════════════════════
+class _TermsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(AppStrings.termsOfUseTitle)),
+      body: const SingleChildScrollView(
+        padding: EdgeInsets.all(20),
+        child: Text(
+          'https://helpi.social/pravila-privatnosti/\n\n'
+          'Uvjeti korištenja Helpi aplikacije...\n\n'
+          'Ovaj sadržaj će biti zamijenjen stvarnim uvjetima korištenja.',
+          style: TextStyle(fontSize: 15, height: 1.6),
+        ),
+      ),
+    );
+  }
+}

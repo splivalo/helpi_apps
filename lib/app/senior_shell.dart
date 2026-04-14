@@ -11,7 +11,7 @@ import 'package:helpi_app/features/booking/data/order_model.dart';
 import 'package:helpi_app/features/booking/presentation/order_screen.dart';
 import 'package:helpi_app/features/booking/presentation/orders_screen.dart';
 import 'package:helpi_app/features/chat/presentation/senior_chat_list_screen.dart';
-import 'package:helpi_app/features/profile/presentation/senior_profile_screen.dart';
+import 'package:helpi_app/features/profile/presentation/profile_menu_screen.dart';
 
 /// Senior shell - 4 tabs: Order, Orders, Messages, Profile.
 class SeniorShell extends ConsumerStatefulWidget {
@@ -47,7 +47,7 @@ class _SeniorShellState extends ConsumerState<SeniorShell> {
       ),
       OrdersScreen(ordersNotifier: widget.ordersNotifier),
       const ChatScreen(),
-      ProfileScreen(
+      ProfileMenuScreen(
         localeNotifier: widget.localeNotifier,
         themeNotifier: widget.themeNotifier,
         onLogout: widget.onLogout,

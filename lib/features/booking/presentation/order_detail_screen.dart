@@ -13,7 +13,6 @@ import 'package:helpi_app/features/schedule/data/review_model.dart'
     as schedule_review;
 import 'package:helpi_app/shared/widgets/job_status_badge.dart';
 import 'package:helpi_app/shared/widgets/review_inline_card.dart';
-import 'package:helpi_app/shared/widgets/service_chips_wrap.dart';
 import 'package:helpi_app/shared/widgets/star_rating.dart';
 import 'package:helpi_app/shared/widgets/status_chip.dart';
 import 'package:helpi_app/shared/widgets/summary_row.dart';
