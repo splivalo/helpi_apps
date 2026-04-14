@@ -16,6 +16,7 @@ import 'package:helpi_app/features/profile/presentation/profile_credentials_scre
 import 'package:helpi_app/features/profile/presentation/profile_student_data_screen.dart';
 import 'package:helpi_app/features/profile/presentation/profile_availability_screen.dart';
 import 'package:helpi_app/features/profile/presentation/profile_settings_screen.dart';
+import 'package:helpi_app/features/profile/presentation/terms_screen.dart';
 import 'package:helpi_app/features/schedule/data/availability_model.dart';
 
 /// Bolt/Glovo-style profile menu for student role.
@@ -362,7 +363,7 @@ class _StudentMenuScreenState extends ConsumerState<StudentMenuScreen> {
   }
 
   void _openTerms() {
-    _push(_TermsScreen());
+    _push(const TermsScreen());
   }
 
   Future<void> _confirmLogout() async {
@@ -460,27 +461,6 @@ class _MenuItem extends StatelessWidget {
       ),
       onTap: onTap,
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
-    );
-  }
-}
-
-// ══════════════════════════════════════════════
-// Terms of use screen
-// ══════════════════════════════════════════════
-class _TermsScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(AppStrings.termsOfUseTitle)),
-      body: const SingleChildScrollView(
-        padding: EdgeInsets.all(20),
-        child: Text(
-          'https://helpi.social/pravila-privatnosti/\n\n'
-          'Uvjeti korištenja Helpi aplikacije...\n\n'
-          'Ovaj sadržaj će biti zamijenjen stvarnim uvjetima korištenja.',
-          style: TextStyle(fontSize: 15, height: 1.6),
-        ),
-      ),
     );
   }
 }

@@ -319,6 +319,8 @@ class AppStrings {
       'agreeToTerms': 'Slažem se s ',
       'termsOfUse': 'uvjetima',
       'termsOfUseTitle': 'Uvjeti korištenja',
+      'termsLoadError': 'Stranica se ne može učitati',
+      'openInBrowser': 'Otvori u pregledniku',
       'byClickingRegister': 'Klikom na "Završi registraciju" prihvaćate ',
       'termsOfUseLink': 'uvjete korištenja',
       'cardEndingIn': 'Kartica završava na {digits}',
@@ -740,6 +742,8 @@ class AppStrings {
       'agreeToTerms': 'I agree to the ',
       'termsOfUse': 'terms',
       'termsOfUseTitle': 'Terms of use',
+      'termsLoadError': 'Page could not be loaded',
+      'openInBrowser': 'Open in browser',
       'byClickingRegister':
           'By clicking "Complete registration" you accept the ',
       'termsOfUseLink': 'terms of use',
@@ -1201,6 +1205,8 @@ class AppStrings {
   static String get profileSaved => _t('profileSaved');
   static String get profileSaveError => _t('profileSaveError');
   static String get termsOfUseTitle => _t('termsOfUseTitle');
+  static String get termsLoadError => _t('termsLoadError');
+  static String get openInBrowser => _t('openInBrowser');
   static String get logoutConfirmTitle => _t('logoutConfirmTitle');
   static String get logoutConfirmContent => _t('logoutConfirmContent');
 
