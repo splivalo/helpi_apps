@@ -51,6 +51,13 @@ class HelpiTheme {
     ),
     scaffoldBackgroundColor: AppColors.background,
 
+    // -- Cursor / text selection --
+    textSelectionTheme: const TextSelectionThemeData(
+      cursorColor: AppColors.teal,
+      selectionColor: Color(0x40009D9D),
+      selectionHandleColor: AppColors.teal,
+    ),
+
     // -- AppBar --
     appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.background,
@@ -310,6 +317,13 @@ class HelpiTheme {
       onError: Colors.white,
     ),
     scaffoldBackgroundColor: AppColors.darkBackground,
+
+    // -- Cursor / text selection --
+    textSelectionTheme: const TextSelectionThemeData(
+      cursorColor: AppColors.teal,
+      selectionColor: Color(0x40009D9D),
+      selectionHandleColor: AppColors.teal,
+    ),
 
     // -- AppBar --
     appBarTheme: const AppBarTheme(
