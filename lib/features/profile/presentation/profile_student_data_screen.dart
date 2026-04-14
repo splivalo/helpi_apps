@@ -33,6 +33,7 @@ class _ProfileStudentDataScreenState extends State<ProfileStudentDataScreen> {
   String _gender = 'F';
   DateTime _dob = DateTime(2002, 1, 1);
 
+  String _email = '';
   bool _isEditing = false;
   bool _isSaving = false;
   bool _isLoading = true;
@@ -57,12 +58,14 @@ class _ProfileStudentDataScreenState extends State<ProfileStudentDataScreen> {
 
     final contact = data['contact'] as Map<String, dynamic>? ?? {};
     _contactId = (contact['id'] as num?)?.toInt();
+    _email = contact['email'] as String? ?? '';
 
     final fullName = contact['fullName'] as String? ?? '';
     final nameParts = fullName.split(' ');
     _firstNameCtrl.text = nameParts.isNotEmpty ? nameParts.first : '';
-    _lastNameCtrl.text =
-        nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+    _lastNameCtrl.text = nameParts.length > 1
+        ? nameParts.sublist(1).join(' ')
+        : '';
     _phoneCtrl.text = contact['phone'] as String? ?? '';
     _addressCtrl.text = contact['fullAddress'] as String? ?? '';
 
@@ -117,7 +120,7 @@ class _ProfileStudentDataScreenState extends State<ProfileStudentDataScreen> {
     final result = await api.updateContactInfo(
       contactId: _contactId!,
       fullName: fullName,
-      email: '', // email is read-only, handled in credentials screen
+      email: _email,
       phone: _phoneCtrl.text.trim(),
       fullAddress: _addressCtrl.text.trim(),
       gender: _gender == 'M' ? 0 : 1,
@@ -140,9 +143,9 @@ class _ProfileStudentDataScreenState extends State<ProfileStudentDataScreen> {
     });
 
     if (!result.success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result.error ?? AppStrings.error)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result.error ?? AppStrings.error)));
     }
   }
 

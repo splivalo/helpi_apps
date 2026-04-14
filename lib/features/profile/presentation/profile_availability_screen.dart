@@ -62,9 +62,9 @@ class _ProfileAvailabilityScreenState extends State<ProfileAvailabilityScreen> {
     });
 
     if (!result.success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result.error ?? AppStrings.error)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result.error ?? AppStrings.error)));
     }
   }
 
