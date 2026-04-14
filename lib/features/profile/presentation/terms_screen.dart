@@ -135,8 +135,23 @@ class _TermsScreenState extends State<TermsScreen> {
                 },
                 customStylesBuilder: (element) {
                   final tag = element.localName;
+                  if (tag == 'a') {
+                    return {'color': '#009D9D', 'text-decoration': 'none'};
+                  }
                   if (tag == 'ol' || tag == 'ul') {
                     return {'padding-left': '16px'};
+                  }
+                  if (tag == 'table' || tag == 'td' || tag == 'th') {
+                    return {'font-size': '12px'};
+                  }
+                  if (tag == 'h1') {
+                    return {'font-size': '20px'};
+                  }
+                  if (tag == 'h2') {
+                    return {'font-size': '17px'};
+                  }
+                  if (tag == 'h3') {
+                    return {'font-size': '15px'};
                   }
                   return null;
                 },
