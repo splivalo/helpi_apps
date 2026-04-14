@@ -139,7 +139,11 @@ class _TermsScreenState extends State<TermsScreen> {
                     return {'color': '#009D9D', 'text-decoration': 'none'};
                   }
                   if (tag == 'ol' || tag == 'ul') {
-                    return {'padding-left': '16px'};
+                    return {
+                      'list-style-type': 'none',
+                      'padding-left': '0px',
+                      'margin': '0px',
+                    };
                   }
                   if (tag == 'table' || tag == 'td' || tag == 'th') {
                     return {'font-size': '12px'};
