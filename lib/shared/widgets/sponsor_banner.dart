@@ -46,17 +46,9 @@ class SponsorBanner extends ConsumerWidget {
     final isSvg = logoPath.toLowerCase().endsWith('.svg');
 
     return Center(
-      child: Row(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            displayLabel,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant.withAlpha(150),
-              fontSize: 11,
-            ),
-          ),
-          const SizedBox(width: 6),
           isSvg
               ? SvgPicture.network(
                   fullUrl,
@@ -72,6 +64,14 @@ class SponsorBanner extends ConsumerWidget {
                   errorBuilder: (_, _, _) =>
                       const SizedBox(width: 24, height: 24),
                 ),
+          const SizedBox(height: 4),
+          Text(
+            displayLabel,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant.withAlpha(150),
+              fontSize: 11,
+            ),
+          ),
         ],
       ),
     );
