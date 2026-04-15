@@ -196,9 +196,9 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
         children: [
           _buildWeeklySection(theme),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           _buildMonthlySection(theme),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           _buildRatingSection(theme),
           const SizedBox(height: 16),
         ],
