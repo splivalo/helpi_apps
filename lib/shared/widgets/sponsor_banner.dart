@@ -30,9 +30,6 @@ class SponsorBanner extends ConsumerWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final localLabel = sponsor.label(AppStrings.currentLocale);
-    final displayLabel = localLabel.isNotEmpty
-        ? localLabel
-        : AppStrings.sponsoredBy;
 
     // Pick dark logo in dark mode if available, otherwise light logo.
     final logoPath =
@@ -68,14 +65,16 @@ class SponsorBanner extends ConsumerWidget {
                     errorBuilder: (_, _, _) =>
                         const SizedBox(width: 24, height: 24),
                   ),
-            const SizedBox(height: 4),
-            Text(
-              displayLabel,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant.withAlpha(150),
-                fontSize: 11,
+            if (localLabel.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                localLabel,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant.withAlpha(150),
+                  fontSize: 11,
+                ),
               ),
-            ),
+            ],
           ],
         ),
       ),
