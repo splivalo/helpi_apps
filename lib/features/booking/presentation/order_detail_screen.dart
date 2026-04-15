@@ -16,7 +16,6 @@ import 'package:helpi_app/shared/widgets/review_inline_card.dart';
 import 'package:helpi_app/shared/widgets/star_rating.dart';
 import 'package:helpi_app/shared/widgets/status_chip.dart';
 import 'package:helpi_app/shared/widgets/summary_row.dart';
-import 'package:helpi_app/shared/widgets/sponsor_banner.dart';
 
 /// Order details - full screen with data + Students section + reviews.
 class OrderDetailScreen extends StatefulWidget {
@@ -326,10 +325,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   ],
                 ),
               ),
-            ),
-            const Padding(
-              padding: EdgeInsets.only(bottom: 32, top: 8),
-              child: SponsorBanner(),
             ),
           ],
         ),
