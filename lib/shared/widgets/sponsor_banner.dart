@@ -45,34 +45,39 @@ class SponsorBanner extends ConsumerWidget {
     final fullUrl = '${ApiEndpoints.baseUrl}$logoPath';
     final isSvg = logoPath.toLowerCase().endsWith('.svg');
 
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          isSvg
-              ? SvgPicture.network(
-                  fullUrl,
-                  height: 24,
-                  fit: BoxFit.contain,
-                  placeholderBuilder: (_) =>
-                      const SizedBox(width: 24, height: 24),
-                )
-              : Image.network(
-                  fullUrl,
-                  height: 24,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, _, _) =>
-                      const SizedBox(width: 24, height: 24),
-                ),
-          const SizedBox(height: 4),
-          Text(
-            displayLabel,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant.withAlpha(150),
-              fontSize: 11,
+    final systemBottom = MediaQuery.of(context).padding.bottom;
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: systemBottom > 0 ? systemBottom : 0),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            isSvg
+                ? SvgPicture.network(
+                    fullUrl,
+                    height: 24,
+                    fit: BoxFit.contain,
+                    placeholderBuilder: (_) =>
+                        const SizedBox(width: 24, height: 24),
+                  )
+                : Image.network(
+                    fullUrl,
+                    height: 24,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, _, _) =>
+                        const SizedBox(width: 24, height: 24),
+                  ),
+            const SizedBox(height: 4),
+            Text(
+              displayLabel,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant.withAlpha(150),
+                fontSize: 11,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
