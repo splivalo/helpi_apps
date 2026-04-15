@@ -142,10 +142,62 @@
 | ----------------------------- | ----------------------- |
 | Ukupno .dart fajlova          | 64                      |
 | Analyze errori                | 0                       |
-| i18n ključeva                 | ~1000+ (HR+EN)          |
+| i18n ključeva                 | ~1100+ (HR+EN)          |
 | Shared widgets                | 12                      |
 | Feature screens               | 15 (+ suspended_screen) |
 | Riverpod providers            | 4                       |
-| Backend endpointi (korišteni) | 6                       |
+| Backend endpointi (korišteni) | 8                       |
 | State management              | Riverpod ^2.6.1         |
 | Real-time                     | SignalR ^1.4.4          |
+
+---
+
+## 2026-04-13 — Terms of Use s native HTML renderiranjem
+
+**Problem:** WebView za Terms of Use nije radio na svim platformama i bio spor.
+
+**Odluka:** `flutter_widget_from_html_core` renderira HTML direkt u Flutter widgete. Custom styles (teal linkovi, smanjen font, bez list numbering).
+
+---
+
+## 2026-04-14 — Timer-based live session status + WidgetsBindingObserver fix
+
+**Problem:** Session badge je statički prikazivao backend status. Ako je backend kašnjao s Hangfire completionom, badge je ostao "Predstojeći" i nakon završetka posla.
+
+**Odluka:** Badge widget postao `StatefulWidget` s `Timer`. Izračuna exactan `Duration` do sljedeće tranzicije (start/end time) i postavi jedan Timer. Kad Timer fired → `setState` → nova tranzicija.
+
+**Android sleep bug:** `Timer` u Dartu ne fired kad je app u backgroundu. Dodali `WidgetsBindingObserver` — na `AppLifecycleState.resumed`, cancela stari Timer i re-evaluira na temelju `DateTime.now()`.
+
+**Rezultat:** Badge automatski prelazi Predstojeći→Aktivan→Završen u realnom vremenu, čak i kad se app vrati iz backgrounda.
+
+---
+
+## 2026-04-15 — Bulletproof review flow (EnsureCompleted pattern)
+
+**Problem:** Senior pokušava ostaviti recenziju, ali backend Hangfire job još nije markirao sesiju kao completed → pending review ne postoji → "Pošalji ocjenu" ne radi.
+
+**Odluka:** 3-step fallback pattern na frontendu:
+
+1. Check lokalni cache
+2. Re-fetch s backenda (Hangfire možda upravo završio)
+3. Pozovi `POST /api/sessions/{id}/ensure-completed` — backend idempotentno završava sesiju i kreira pending reviews
+
+**Backend `EnsureCompletedAsync`:**
+
+- Idempotent: ako session već completed → provjeri reviewe, ako fale → ponovo ih kreira
+- Samo dopušta completion ako je `now > endTime` i status je scheduled/inProgress
+- Kreira 2 pending reviews (SeniorToStudent + StudentToSenior)
+
+**Frontend instant update:** Nakon submit-a, `job.review` se direktno mutira na lokalnom objektu → `Navigator.pop` → `setState` → UI se odmah updatea bez reload-a.
+
+---
+
+## 2026-04-15 — Jednokratne narudžbe unificirane s ponavljajućim
+
+**Problem:** Jednokratne completed narudžbe imale posebnu `_studentReviewCard` karticu koja je prikazivala studenta i review u custom layoutu. Ponavljajuće koristile `_jobsSection` s popisom job kartica. Dvostruki kod za istu stvar.
+
+**Odluka:** Obrisana `_studentReviewCard`. Sve narudžbe (one-time + recurring) sada koriste `_jobsSection`:
+
+- Jednokratne: naslov "Termin" (singular), default expanded
+- Ponavljajuće: naslov "Termini" (plural), default collapsed
+- Isti job card layout za obje: datum, vrijeme, cijena, student, status badge, review/cancel gumbi

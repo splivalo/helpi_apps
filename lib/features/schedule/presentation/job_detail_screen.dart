@@ -154,11 +154,35 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   Future<void> _onReviewSubmitted(ReviewModel review) async {
     if (!context.mounted) return;
 
-    // Ako imamo pendingReviewId, pošalji na backend
-    if (_pendingReviewId != null) {
+    // Bulletproof: resolve pending review ID
+    int? reviewId = _pendingReviewId;
+
+    if (reviewId == null && _job.sessionId != null) {
+      final sessionIdInt = int.tryParse(_job.sessionId!);
+      if (sessionIdInt != null) {
+        // Re-fetch pending reviews (Hangfire may have run)
+        await _loadPendingReviewId();
+        reviewId = _pendingReviewId;
+
+        if (reviewId == null && mounted) {
+          // Trigger ensure-completed on backend
+          final api = AppApiService();
+          final ensureResult = await api.ensureSessionCompleted(sessionIdInt);
+          if (!mounted) return;
+          if (ensureResult.success) {
+            await _loadPendingReviewId();
+            reviewId = _pendingReviewId;
+          }
+        }
+      }
+    }
+
+    if (!mounted) return;
+
+    if (reviewId != null) {
       final api = AppApiService();
       final result = await api.submitReview({
-        'reviewId': _pendingReviewId,
+        'reviewId': reviewId,
         'rating': review.rating.toDouble(),
         'comment': review.comment,
       });
@@ -173,6 +197,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         );
         return;
       }
+    } else {
+      showHelpiSnackBar(context, AppStrings.reviewNotReady, isError: true);
+      return;
     }
 
     // Locally update display
@@ -237,7 +264,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                           ),
                         ),
                         const Spacer(),
-                        JobStatusBadge(status: _job.status),
+                        JobStatusBadge(
+                          status: _job.status,
+                          date: _job.date,
+                          from: _job.from,
+                          to: _job.to,
+                        ),
                       ],
                     ),
                   ),

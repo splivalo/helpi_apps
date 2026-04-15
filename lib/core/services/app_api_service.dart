@@ -328,6 +328,17 @@ class AppApiService {
     }
   }
 
+  /// Ensure session is completed (triggers backend completion if time passed).
+  Future<ApiResult<bool>> ensureSessionCompleted(int sessionId) async {
+    try {
+      await _client.post(ApiEndpoints.sessionEnsureCompleted(sessionId));
+      return ApiResult.success(true);
+    } catch (e) {
+      debugPrint('[AppApiService] ensureSessionCompleted error: $e');
+      return ApiResult.failure(friendlyError(e));
+    }
+  }
+
   // PAYMENT METHODS
 
   /// Fetch cards (payment methods) for user.

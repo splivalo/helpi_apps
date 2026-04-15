@@ -417,7 +417,12 @@ class _JobCard extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    JobStatusBadge(status: job.status),
+                    JobStatusBadge(
+                      status: job.status,
+                      date: job.date,
+                      from: job.from,
+                      to: job.to,
+                    ),
                   ],
                 ),
               ),

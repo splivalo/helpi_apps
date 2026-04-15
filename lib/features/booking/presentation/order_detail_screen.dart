@@ -39,6 +39,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   @override
   void initState() {
     super.initState();
+    _jobsExpanded = widget.order.isOneTime;
     widget.ordersNotifier.addListener(_onChanged);
     _loadPendingReviews();
     _loadSessions();
@@ -158,6 +159,42 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     super.dispose();
   }
 
+  /// Check if a session is currently in-progress (active) based on time.
+  bool _isSessionActive(JobModel job) {
+    if (job.status != JobStatus.scheduled) return false;
+    final timeParts = job.time.split(':');
+    final hour = int.tryParse(timeParts[0]) ?? 0;
+    final minute = timeParts.length > 1 ? int.tryParse(timeParts[1]) ?? 0 : 0;
+    final jobStart = DateTime(
+      job.date.year,
+      job.date.month,
+      job.date.day,
+      hour,
+      minute,
+    );
+    final jobEnd = jobStart.add(Duration(hours: job.durationHours));
+    final now = DateTime.now();
+    return now.isAfter(jobStart) && now.isBefore(jobEnd);
+  }
+
+  /// Check if a session is effectively done (time has passed) even if backend
+  /// hasn't marked it completed yet.
+  bool _isSessionDone(JobModel job) {
+    if (job.status == JobStatus.completed) return true;
+    if (job.status != JobStatus.scheduled) return false;
+    final timeParts = job.time.split(':');
+    final hour = int.tryParse(timeParts[0]) ?? 0;
+    final minute = timeParts.length > 1 ? int.tryParse(timeParts[1]) ?? 0 : 0;
+    final jobEnd = DateTime(
+      job.date.year,
+      job.date.month,
+      job.date.day,
+      hour,
+      minute,
+    ).add(Duration(hours: job.durationHours));
+    return DateTime.now().isAfter(jobEnd);
+  }
+
   /// Check if a specific job can be cancelled (time > cutoff).
   bool _canCancelJob(JobModel job) {
     if (job.status != JobStatus.scheduled) return false;
@@ -257,17 +294,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               _summaryCard(theme, order),
               const SizedBox(height: 16),
 
-              // -- Student + Review card (one-time completed) --
-              _studentReviewCard(theme, order),
-              if (order.isOneTime &&
-                  order.status == OrderStatus.completed &&
-                  order.jobs.isNotEmpty)
-                const SizedBox(height: 16),
-
-              // -- Jobs / sessions (recurring only, not processing) --
-              if (order.status != OrderStatus.processing && !order.isOneTime)
+              // -- Jobs / sessions (all orders, not processing) --
+              if (order.status != OrderStatus.processing)
                 _jobsSection(theme, order),
-              if (order.status != OrderStatus.processing && !order.isOneTime)
+              if (order.status != OrderStatus.processing)
                 const SizedBox(height: 20),
 
               // -- Action buttons --
@@ -442,102 +472,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-  // -- Student + Review card (separate, like student screen's "Senior" card) --
-  Widget _studentReviewCard(ThemeData theme, OrderModel order) {
-    if (!order.isOneTime ||
-        order.status != OrderStatus.completed ||
-        order.jobs.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    final job = order.jobs.first;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.outlineVariant),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppStrings.jobStudent,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // Student name + Rate button
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: AppColors.teal.withAlpha(25),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.person_outline,
-                  color: AppColors.teal,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  job.studentName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              if (job.review == null)
-                SizedBox(
-                  height: 36,
-                  child: ElevatedButton.icon(
-                    onPressed: () => _showJobReviewSheet(order, 0),
-                    icon: const Icon(Icons.star, size: 16, color: Colors.white),
-                    label: Text(AppStrings.rateStudent),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.coral,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      textStyle: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      minimumSize: Size.zero,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-
-          // Review display
-          if (job.review != null) ...[
-            const SizedBox(height: 12),
-            ReviewInlineCard(
-              rating: job.review!.rating,
-              date: job.review!.date,
-              comment: job.review!.comment,
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
   // -- Jobs / sessions section --
   Widget _jobsSection(ThemeData theme, OrderModel order) {
     if (order.jobs.isEmpty) return const SizedBox.shrink();
@@ -561,7 +495,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             child: Row(
               children: [
                 Text(
-                  AppStrings.jobsSection,
+                  order.isOneTime
+                      ? AppStrings.jobSectionSingular
+                      : AppStrings.jobsSection,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -614,9 +550,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     JobModel job,
     int price,
   ) {
-    final isCompleted = job.status == JobStatus.completed;
     final isCancelled = job.status == JobStatus.cancelled;
     final isUpcoming = job.status == JobStatus.scheduled;
+    final isActive = _isSessionActive(job);
+    final effectivelyCompleted = _isSessionDone(job);
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -634,13 +571,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           Row(
             children: [
               Icon(
-                isCompleted
+                effectivelyCompleted
                     ? Icons.check_circle
                     : isCancelled
                     ? Icons.cancel
                     : Icons.schedule,
                 size: 18,
-                color: isCompleted
+                color: effectivelyCompleted
                     ? AppColors.success
                     : isCancelled
                     ? AppColors.coral
@@ -659,7 +596,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   ),
                 ),
               ),
-              JobStatusBadge(status: job.status),
+              JobStatusBadge(
+                status: job.status,
+                date: job.date,
+                time: job.time,
+                durationHours: job.durationHours,
+              ),
             ],
           ),
           const SizedBox(height: 6),
@@ -709,48 +651,37 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           ),
 
           // Row 4: action buttons
-          if (isUpcoming || (isCompleted && job.review == null)) ...[
+          if (isUpcoming ||
+              isActive ||
+              (effectivelyCompleted && job.review == null)) ...[
             const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.only(left: 26),
               child: Row(
                 children: [
                   // Rate button (completed only, no review yet)
-                  if (isCompleted && job.review == null)
-                    SizedBox(
-                      height: 36,
-                      child: ElevatedButton.icon(
-                        onPressed: () => _showJobReviewSheet(order, jobIndex),
-                        icon: const Icon(
-                          Icons.star,
-                          size: 16,
-                          color: Colors.white,
-                        ),
-                        label: Text(AppStrings.rateStudent),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.coral,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          textStyle: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          minimumSize: Size.zero,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                  // Cancel button (upcoming only, outside cutoff)
-                  if (isUpcoming && _canCancelJob(job)) ...[
+                  if (effectivelyCompleted && job.review == null) ...[
                     const Spacer(),
                     SizedBox(
                       height: 30,
                       child: OutlinedButton.icon(
-                        onPressed: () => _confirmCancelJob(order, jobIndex),
+                        onPressed: () => _showJobReviewSheet(order, jobIndex),
+                        icon: const Icon(Icons.star, size: 14),
+                        label: Text(AppStrings.rateStudent),
+                        style: AppColors.tealSmallOutlinedStyle,
+                      ),
+                    ),
+                  ],
+
+                  // Cancel button (upcoming or active-disabled)
+                  if ((isUpcoming && _canCancelJob(job)) || isActive) ...[
+                    const Spacer(),
+                    SizedBox(
+                      height: 30,
+                      child: OutlinedButton.icon(
+                        onPressed: isActive
+                            ? null
+                            : () => _confirmCancelJob(order, jobIndex),
                         icon: const Icon(Icons.close, size: 14),
                         label: Text(AppStrings.cancelJobLabel),
                         style: AppColors.coralSmallOutlinedStyle,
@@ -926,27 +857,46 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-  /// Review bottom sheet for a specific job.
-  void _showJobReviewSheet(OrderModel order, int jobIndex) {
-    // Pronađi pending review za ovaj order
-    // (ako job ima id, match po jobInstanceId; inače koristi prvi available)
-    int? pendingReviewId;
-    final job = order.jobs[jobIndex];
-
-    if (job.id != null) {
-      // Match by jobInstanceId
+  /// Resolve pending review ID for a job — ensures backend has completed
+  /// the session and created pending reviews before we try to submit.
+  Future<int?> _resolvePendingReviewId(int? jobInstanceId) async {
+    // 1. Check local cache first
+    if (jobInstanceId != null) {
       for (final pr in _pendingReviews) {
-        if (pr.jobInstanceId == job.id) {
-          pendingReviewId = pr.id;
-          break;
+        if (pr.jobInstanceId == jobInstanceId) return pr.id;
+      }
+    }
+    if (_pendingReviews.isNotEmpty) return _pendingReviews.first.id;
+
+    // 2. No local match — re-fetch from backend (Hangfire may have run)
+    await _loadPendingReviews();
+    if (jobInstanceId != null) {
+      for (final pr in _pendingReviews) {
+        if (pr.jobInstanceId == jobInstanceId) return pr.id;
+      }
+    }
+    if (_pendingReviews.isNotEmpty) return _pendingReviews.first.id;
+
+    // 3. Still nothing — trigger ensure-completed on backend
+    if (jobInstanceId != null) {
+      final api = AppApiService();
+      final ensureResult = await api.ensureSessionCompleted(jobInstanceId);
+      if (ensureResult.success) {
+        // Re-fetch pending reviews after backend created them
+        await _loadPendingReviews();
+        for (final pr in _pendingReviews) {
+          if (pr.jobInstanceId == jobInstanceId) return pr.id;
         }
+        if (_pendingReviews.isNotEmpty) return _pendingReviews.first.id;
       }
     }
 
-    // Fallback: koristi prvi pending review ako nema exact match
-    if (pendingReviewId == null && _pendingReviews.isNotEmpty) {
-      pendingReviewId = _pendingReviews.first.id;
-    }
+    return null;
+  }
+
+  /// Review bottom sheet for a specific job.
+  void _showJobReviewSheet(OrderModel order, int jobIndex) {
+    final job = order.jobs[jobIndex];
 
     int selectedRating = 0;
     final commentCtrl = TextEditingController();
@@ -1021,11 +971,18 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           ? () async {
                               setSheetState(() => isSubmitting = true);
 
-                              // Ako imamo pendingReviewId, pošalji na backend
-                              if (pendingReviewId != null) {
-                                final api = AppApiService();
+                              final api = AppApiService();
+
+                              // Bulletproof: resolve pending review
+                              final resolvedId = await _resolvePendingReviewId(
+                                job.id,
+                              );
+
+                              if (!ctx.mounted) return;
+
+                              if (resolvedId != null) {
                                 final result = await api.submitReview({
-                                  'reviewId': pendingReviewId,
+                                  'reviewId': resolvedId,
                                   'rating': selectedRating.toDouble(),
                                   'comment': commentCtrl.text.trim(),
                                 });
@@ -1042,25 +999,38 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                   return;
                                 }
 
-                                // Ukloni iz pending liste
                                 _pendingReviews.removeWhere(
-                                  (r) => r.id == pendingReviewId,
+                                  (r) => r.id == resolvedId,
                                 );
+                              } else {
+                                // Backend can't create review yet
+                                setSheetState(() => isSubmitting = false);
+                                showHelpiSnackBar(
+                                  ctx,
+                                  AppStrings.reviewNotReady,
+                                  isError: true,
+                                );
+                                return;
                               }
 
-                              // Lokalno ažuriraj UI
+                              // Lokalno ažuriraj UI — direktno na objektu
+                              final submittedReview = ReviewModel(
+                                rating: selectedRating,
+                                comment: commentCtrl.text.trim(),
+                                date: DateTime.now(),
+                              );
+                              job.review = submittedReview;
                               widget.ordersNotifier.addJobReview(
                                 order.id,
                                 jobIndex,
-                                ReviewModel(
-                                  rating: selectedRating,
-                                  comment: commentCtrl.text.trim(),
-                                  date: DateTime.now(),
-                                ),
+                                submittedReview,
                               );
 
                               if (!ctx.mounted) return;
                               Navigator.pop(ctx);
+
+                              // Rebuild parent after sheet closes
+                              if (mounted) setState(() {});
                             }
                           : null,
                       child: isSubmitting

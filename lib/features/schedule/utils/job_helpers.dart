@@ -9,6 +9,8 @@ class JobHelpers {
 
   // -- Status --
 
+  static String get activeLabel => AppStrings.jobActive;
+
   static String statusLabel(JobStatus status) {
     switch (status) {
       case JobStatus.scheduled:

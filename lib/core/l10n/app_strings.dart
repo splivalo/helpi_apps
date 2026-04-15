@@ -260,9 +260,11 @@ class AppStrings {
       'orderDetails': 'Detalji narudžbe',
       'studentsSection': 'Studenti',
       'jobsSection': 'Termini',
+      'jobSectionSingular': 'Termin',
       'jobsMonthlySubtitle': 'Prikazani termini za tekući mjesec.',
       'jobCompleted': 'Završen',
       'jobUpcoming': 'Predstojeći',
+      'jobActive': 'Aktivan',
       'jobCancelled': 'Otkazan',
       'cancelJobLabel': 'Otkaži',
       'cancelJobConfirm': 'Jeste li sigurni da želite otkazati ovaj termin?',
@@ -270,7 +272,9 @@ class AppStrings {
       'assignedSince': 'Dolazi od',
       'rateStudent': 'Ocijeni',
       'sendReview': 'Pošalji ocjenu',
+      'reviewTitle': 'Recenzija',
       'reviewHint': 'Komentar (opcionalno)',
+      'reviewNotReady': 'Termin se još obrađuje, pokušajte za minutu.',
       'yourReviews': 'Vaše ocjene',
       'noStudentsYet': 'Još nema dodijeljenih studenata',
       'logout': 'Odjava',
@@ -683,9 +687,11 @@ class AppStrings {
       'orderDetails': 'Order details',
       'studentsSection': 'Students',
       'jobsSection': 'Sessions',
+      'jobSectionSingular': 'Session',
       'jobsMonthlySubtitle': 'Showing sessions for the current month.',
       'jobCompleted': 'Completed',
       'jobUpcoming': 'Upcoming',
+      'jobActive': 'Active',
       'jobCancelled': 'Cancelled',
       'cancelJobLabel': 'Cancel',
       'cancelJobConfirm': 'Are you sure you want to cancel this session?',
@@ -693,7 +699,10 @@ class AppStrings {
       'assignedSince': 'Assigned since',
       'rateStudent': 'Rate',
       'sendReview': 'Send review',
+      'reviewTitle': 'Review',
       'reviewHint': 'Comment (optional)',
+      'reviewNotReady':
+          'Session is still being processed, try again in a minute.',
       'yourReviews': 'Your reviews',
       'noStudentsYet': 'No students assigned yet',
       'logout': 'Log out',
@@ -1138,9 +1147,11 @@ class AppStrings {
   static String get orderDetails => _t('orderDetails');
   static String get studentsSection => _t('studentsSection');
   static String get jobsSection => _t('jobsSection');
+  static String get jobSectionSingular => _t('jobSectionSingular');
   static String get jobsMonthlySubtitle => _t('jobsMonthlySubtitle');
   static String get jobCompleted => _t('jobCompleted');
   static String get jobUpcoming => _t('jobUpcoming');
+  static String get jobActive => _t('jobActive');
   static String get jobCancelled => _t('jobCancelled');
   static String get cancelJobLabel => _t('cancelJobLabel');
   static String get cancelJobConfirm => _t('cancelJobConfirm');
@@ -1148,7 +1159,9 @@ class AppStrings {
   static String get assignedSince => _t('assignedSince');
   static String get rateStudent => _t('rateStudent');
   static String get sendReview => _t('sendReview');
+  static String get reviewTitle => _t('reviewTitle');
   static String get reviewHint => _t('reviewHint');
+  static String get reviewNotReady => _t('reviewNotReady');
   static String get yourReviews => _t('yourReviews');
   static String get noStudentsYet => _t('noStudentsYet');
   static String get logout => _t('logout');

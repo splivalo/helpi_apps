@@ -38,6 +38,8 @@ class ApiEndpoints {
       '/api/sessions/completed/senior/$seniorId';
   static String sessionsByOrder(int orderId) => '/api/sessions/order/$orderId';
   static String sessionCancel(int id) => '/api/sessions/$id/cancel';
+  static String sessionEnsureCompleted(int id) =>
+      '/api/sessions/$id/ensure-completed';
 
   // Legacy alias
   static const String jobInstances = '/api/sessions';

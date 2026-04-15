@@ -4,7 +4,7 @@
 
 ## Status: Backend-Connected App (API-first + fallback cache)
 
-**Datum:** 12.04.2026.  
+**Datum:** 15.04.2026.  
 **Analyze:** 0 errors, 0 warnings  
 **Fajlovi:** 64 .dart files  
 **State mgmt:** Riverpod (flutter_riverpod ^2.6.1)  
@@ -202,3 +202,80 @@ When implementing Firebase Messaging (`firebase_messaging` + `flutter_local_noti
 - [x] Dodan backend-driven `NotificationsScreen` s tabovima `Nepročitane` i `Sve`, pull-to-refresh i `Označi sve pročitanim`
 - [x] Notifications screen je dostupan iz customer i student profile app bara
 - [x] Verifikacija: `flutter analyze` = 0 issues
+
+---
+
+## 2026-04-13 — Terms of Use screen (native HTML)
+
+- [x] `terms_screen.dart` — renderira HTML s helpi.social koristeći `flutter_widget_from_html_core` (ne WebView)
+- [x] Custom styles: teal linkovi, smanjen font za tablice/headinge, bez rednih brojeva u listama
+- [x] Teal cursor boja u light i dark temi (`textSelectionTheme`)
+- [x] Chat screen keyboard dismiss (`GestureDetector` wrapper)
+
+---
+
+## 2026-04-14 — Live session status chips + disabled buttons
+
+- [x] `shared/widgets/job_status_badge.dart` — REWRITE: `StatefulWidget` s `Timer`, auto-transition Predstojeći→Aktivan→Završen po vremenu
+- [x] `features/schedule/widgets/job_status_badge.dart` — isto za student raspored badge
+- [x] Oba badgea koriste `WidgetsBindingObserver` — kad app dođe u foreground, re-evaluira status (fix za Android Timer sleep bug)
+- [x] `order_detail_screen.dart` — cancel gumb disabled kad je sesija aktivna (onPressed: null)
+- [x] `schedule/utils/job_helpers.dart` — dodan `activeLabel` getter
+
+---
+
+## 2026-04-15 — Bulletproof review flow (ensure-completed)
+
+### Problem
+
+Kad Hangfire još nije markirao sesiju kao completed (ali vrijeme je prošlo), frontend nije mogao pronaći pending review → "Pošalji ocjenu" nije radio.
+
+### Rješenje — 3-step fallback
+
+1. **Local cache** — check `_pendingReviews` lista
+2. **Re-fetch** — pozovi `getPendingReviewsBySenior` ponovo (Hangfire možda već odradio)
+3. **Ensure-completed** — pozovi `POST /api/sessions/{id}/ensure-completed` → backend kreira sesiju + reviews → re-fetch
+
+### Backend
+
+- `EnsureCompletedAsync(int jobInstanceId)` u `JobInstanceService.cs` — idempotent endpoint
+- Ako session već completed ali reviews ne postoje (obrisani/missing) → ponovo ih kreira
+- Guards: validira `now > endUtc`, status mora biti Upcoming/InProgress (ili Completed za re-create), mora imati assignment
+
+### Frontend
+
+- `_resolvePendingReviewId(int? jobInstanceId)` — 3-step fallback metoda
+- `_isSessionDone(job)` — true ako backend kaže completed ILI ako je vrijeme prošlo (time-based)
+- `effectivelyCompleted` zamjenjuje `isCompleted` u UI-ju (pokazuje review gumb i na time-based Done)
+- Review submit: direktna mutacija `job.review = submittedReview` + `Navigator.pop` + `setState` → instant UI update
+- `ensureSessionCompleted(int sessionId)` API metoda + endpoint u `api_endpoints.dart`
+
+### i18n
+
+- `jobActive` (HR: "Aktivan", EN: "Active")
+- `reviewNotReady` (HR: "Termin se još obrađuje, pokušajte za minutu.", EN: "Session is still being processed...")
+- `reviewTitle` (HR: "Recenzija", EN: "Review")
+- `jobSectionSingular` (HR: "Termin", EN: "Session")
+
+---
+
+## 2026-04-15 — Review UX polish
+
+- [x] Review gumb promijenjen iz coral `ElevatedButton` u teal `OutlinedButton` (visina 30, desno poravnanje sa Spacer)
+- [x] `ReviewInlineCard` — tap otvara `AlertDialog` s punim komentarom (za dugačke reviewove koji su skraćeni s ellipsis)
+
+---
+
+## 2026-04-15 — Jednokratne narudžbe unificirane s ponavljajućim
+
+### Prije
+
+- Jednokratne completed narudžbe imale posebnu karticu `_studentReviewCard` (student + review)
+- Ponavljajuće koristile `_jobsSection` s popisom termina
+
+### Poslije
+
+- `_studentReviewCard` **OBRISAN** — dead code
+- Sve narudžbe (jednokratne i ponavljajuće) koriste `_jobsSection`
+- Jednokratne: naslov "Termin" (singular), po defaultu **expandirane** (`_jobsExpanded = widget.order.isOneTime`)
+- Ponavljajuće: naslov "Termini" (plural), po defaultu collapsed
