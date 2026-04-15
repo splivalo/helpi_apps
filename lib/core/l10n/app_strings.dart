@@ -438,6 +438,9 @@ class AppStrings {
       'suspendedEmail': 'podrska@helpi.hr',
       'suspendedLogout': 'Odjavi se',
 
+      // -- Sponsor --
+      'sponsoredBy': 'Uz podršku',
+
       // -- Server unavailable --
       'serverUnavailableTitle': 'Server nedostupan',
       'serverUnavailableMessage':
@@ -867,6 +870,9 @@ class AppStrings {
       'suspendedContact': 'For more information, contact support:',
       'suspendedEmail': 'support@helpi.hr',
       'suspendedLogout': 'Log out',
+
+      // -- Sponsor --
+      'sponsoredBy': 'Supported by',
 
       // -- Server Unavailable --
       'serverUnavailableTitle': 'Server Unavailable',
@@ -1324,6 +1330,9 @@ class AppStrings {
 
   // -- Calendar --
   static String monthName(int month) => _t('month$month');
+
+  // -- Sponsor --
+  static String get sponsoredBy => _t('sponsoredBy');
 
   // -- Server unavailable --
   static String get serverUnavailableTitle => _t('serverUnavailableTitle');

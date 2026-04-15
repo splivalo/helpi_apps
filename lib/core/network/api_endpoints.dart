@@ -114,4 +114,7 @@ class ApiEndpoints {
 
   // Pricing Configuration
   static const String pricingConfig = '/api/PricingConfiguration/1';
+
+  // Sponsors
+  static const String sponsorsActive = '/api/Sponsors/active';
 }

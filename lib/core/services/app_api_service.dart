@@ -114,6 +114,21 @@ class AppApiService {
     }
   }
 
+  // SPONSORS
+
+  /// Fetch first active sponsor from backend.
+  Future<ApiResult<Map<String, dynamic>?>> getActiveSponsor() async {
+    try {
+      final response = await _client.get(ApiEndpoints.sponsorsActive);
+      final list = response.data as List<dynamic>;
+      if (list.isEmpty) return ApiResult.success(null);
+      return ApiResult.success(list.first as Map<String, dynamic>);
+    } catch (e) {
+      debugPrint('[AppApiService] getActiveSponsor error: $e');
+      return ApiResult.failure(friendlyError(e));
+    }
+  }
+
   // PRICING CONFIGURATION
 
   /// Fetch pricing configuration from backend.

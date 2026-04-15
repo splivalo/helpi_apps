@@ -16,6 +16,7 @@ import 'package:helpi_app/shared/widgets/review_inline_card.dart';
 import 'package:helpi_app/shared/widgets/star_rating.dart';
 import 'package:helpi_app/shared/widgets/status_chip.dart';
 import 'package:helpi_app/shared/widgets/summary_row.dart';
+import 'package:helpi_app/shared/widgets/sponsor_banner.dart';
 
 /// Order details - full screen with data + Students section + reviews.
 class OrderDetailScreen extends StatefulWidget {
@@ -265,60 +266,72 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(AppStrings.orderDetails)),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // -- Header --
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      AppStrings.orderNumber(
-                        order.orderNumber > 0
-                            ? order.orderNumber.toString()
-                            : order.id.toString(),
-                      ),
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // -- Header --
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            AppStrings.orderNumber(
+                              order.orderNumber > 0
+                                  ? order.orderNumber.toString()
+                                  : order.id.toString(),
+                            ),
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        StatusChip(status: order.status),
+                      ],
                     ),
-                  ),
-                  StatusChip(status: order.status),
-                ],
+                    const SizedBox(height: 20),
+
+                    // -- Summary card --
+                    _summaryCard(theme, order),
+                    const SizedBox(height: 16),
+
+                    // -- Jobs / sessions (all orders, not processing) --
+                    if (order.status != OrderStatus.processing)
+                      _jobsSection(theme, order),
+                    if (order.status != OrderStatus.processing)
+                      const SizedBox(height: 20),
+
+                    // -- Action buttons --
+                    if (_canCancelOrder(order))
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          HapticFeedback.selectionClick();
+                          _cancelOrder(order.id);
+                        },
+                        icon: const Icon(Icons.close, size: 20),
+                        label: Text(AppStrings.cancelOrder),
+                        style: AppColors.coralOutlinedStyle,
+                      ),
+                    if (order.status == OrderStatus.completed)
+                      OutlinedButton.icon(
+                        onPressed: () => _repeatOrder(order),
+                        icon: const Icon(Icons.refresh, size: 20),
+                        label: Text(AppStrings.repeatOrder),
+                      ),
+
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
-              const SizedBox(height: 20),
-
-              // -- Summary card --
-              _summaryCard(theme, order),
-              const SizedBox(height: 16),
-
-              // -- Jobs / sessions (all orders, not processing) --
-              if (order.status != OrderStatus.processing)
-                _jobsSection(theme, order),
-              if (order.status != OrderStatus.processing)
-                const SizedBox(height: 20),
-
-              // -- Action buttons --
-              if (_canCancelOrder(order))
-                OutlinedButton.icon(
-                  onPressed: () {
-                    HapticFeedback.selectionClick();
-                    _cancelOrder(order.id);
-                  },
-                  icon: const Icon(Icons.close, size: 20),
-                  label: Text(AppStrings.cancelOrder),
-                  style: AppColors.coralOutlinedStyle,
-                ),
-              if (order.status == OrderStatus.completed)
-                OutlinedButton.icon(
-                  onPressed: () => _repeatOrder(order),
-                  icon: const Icon(Icons.refresh, size: 20),
-                  label: Text(AppStrings.repeatOrder),
-                ),
-            ],
-          ),
+            ),
+            const Padding(
+              padding: EdgeInsets.only(bottom: 32, top: 8),
+              child: SponsorBanner(),
+            ),
+          ],
         ),
       ),
     );
