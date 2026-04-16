@@ -116,6 +116,40 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // ══════════════════════════════════════════════
+  // ERROR BANNER (shared by login + register)
+  // ══════════════════════════════════════════════
+  Widget _buildErrorBanner(BuildContext context) {
+    final theme = Theme.of(context);
+    final fg = _isServerError
+        ? theme.colorScheme.tertiary
+        : theme.colorScheme.error;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: fg.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: fg.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          if (_isServerError)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Icon(Icons.cloud_off_outlined, color: fg, size: 20),
+            ),
+          Expanded(
+            child: Text(
+              _errorMessage!,
+              style: TextStyle(color: fg, fontSize: 14),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ══════════════════════════════════════════════
   // STEP 0: Login / Register (email + password)
   // ══════════════════════════════════════════════
   Widget _buildLoginRegisterStep(ThemeData theme) {
@@ -240,53 +274,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // -- Error message --
         if (_errorMessage != null) ...[
-          Builder(
-            builder: (context) {
-              final isDark = Theme.of(context).brightness == Brightness.dark;
-              final errorColor = _isServerError ? Colors.orange : Colors.red;
-              return Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isDark ? errorColor.withAlpha(30) : errorColor.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: isDark
-                        ? errorColor.withAlpha(80)
-                        : _isServerError
-                        ? Colors.orange.shade200
-                        : Colors.red.shade200,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    if (_isServerError)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: Icon(
-                          Icons.cloud_off_outlined,
-                          color: isDark
-                              ? errorColor.shade300
-                              : errorColor.shade700,
-                          size: 20,
-                        ),
-                      ),
-                    Expanded(
-                      child: Text(
-                        _errorMessage!,
-                        style: TextStyle(
-                          color: isDark
-                              ? errorColor.shade300
-                              : errorColor.shade700,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+          _buildErrorBanner(context),
           const SizedBox(height: 16),
         ],
 
@@ -580,53 +568,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         // -- Error message --
         if (_errorMessage != null) ...[
-          Builder(
-            builder: (context) {
-              final isDark = Theme.of(context).brightness == Brightness.dark;
-              final errorColor = _isServerError ? Colors.orange : Colors.red;
-              return Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isDark ? errorColor.withAlpha(30) : errorColor.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: isDark
-                        ? errorColor.withAlpha(80)
-                        : _isServerError
-                        ? Colors.orange.shade200
-                        : Colors.red.shade200,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    if (_isServerError)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: Icon(
-                          Icons.cloud_off_outlined,
-                          color: isDark
-                              ? errorColor.shade300
-                              : errorColor.shade700,
-                          size: 20,
-                        ),
-                      ),
-                    Expanded(
-                      child: Text(
-                        _errorMessage!,
-                        style: TextStyle(
-                          color: isDark
-                              ? errorColor.shade300
-                              : errorColor.shade700,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+          _buildErrorBanner(context),
           const SizedBox(height: 16),
         ],
 

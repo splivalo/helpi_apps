@@ -146,9 +146,9 @@ class _JobStatusBadgeState extends State<JobStatusBadge>
     if (_phase == _Phase.active) {
       final isDark = brightness == Brightness.dark;
       bg = isDark
-          ? const Color(0xFF009D9D).withAlpha(30)
-          : const Color(0xFFE0F5F5);
-      fg = isDark ? const Color(0xFF80CBC4) : const Color(0xFF009D9D);
+          ? const Color(0xFF4CAF50).withAlpha(30)
+          : const Color(0xFFE8F5E9);
+      fg = isDark ? const Color(0xFF81C784) : const Color(0xFF4CAF50);
       label = JobHelpers.activeLabel;
     } else {
       bg = JobHelpers.statusBgColor(effectiveStatus, brightness);
@@ -160,7 +160,8 @@ class _JobStatusBadgeState extends State<JobStatusBadge>
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: fg.withValues(alpha: 0.3)),
+        borderRadius: BorderRadius.circular(100),
       ),
       child: Text(
         label,

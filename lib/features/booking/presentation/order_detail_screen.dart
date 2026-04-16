@@ -583,12 +583,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     ? Icons.check_circle
                     : isCancelled
                     ? Icons.cancel
+                    : isActive
+                    ? Icons.play_circle_fill
                     : Icons.schedule,
                 size: 18,
                 color: effectivelyCompleted
-                    ? AppColors.success
+                    ? AppColors.teal
                     : isCancelled
                     ? AppColors.coral
+                    : isActive
+                    ? AppColors.success
                     : AppColors.info,
               ),
               const SizedBox(width: 8),
@@ -609,6 +613,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 date: job.date,
                 time: job.time,
                 durationHours: job.durationHours,
+                onPhaseChanged: () {
+                  if (mounted) setState(() {});
+                },
               ),
             ],
           ),

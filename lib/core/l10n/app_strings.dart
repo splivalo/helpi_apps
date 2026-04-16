@@ -263,7 +263,7 @@ class AppStrings {
       'jobSectionSingular': 'Termin',
       'jobsMonthlySubtitle': 'Prikazani termini za tekući mjesec.',
       'jobCompleted': 'Završen',
-      'jobUpcoming': 'Predstojeći',
+      'jobUpcoming': 'Nadolazeći',
       'jobActive': 'Aktivan',
       'jobCancelled': 'Otkazan',
       'cancelJobLabel': 'Otkaži',

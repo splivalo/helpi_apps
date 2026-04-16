@@ -52,12 +52,20 @@ class AppColors {
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
   );
 
-  static final ButtonStyle coralSmallOutlinedStyle = OutlinedButton.styleFrom(
-    foregroundColor: coral,
-    side: const BorderSide(color: coral),
-    padding: const EdgeInsets.symmetric(horizontal: 10),
-    textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-    minimumSize: Size.zero,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-  );
+  static final ButtonStyle coralSmallOutlinedStyle =
+      OutlinedButton.styleFrom(
+        foregroundColor: coral,
+        disabledForegroundColor: Colors.grey,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+        minimumSize: Size.zero,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ).copyWith(
+        side: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return const BorderSide(color: Colors.grey);
+          }
+          return const BorderSide(color: coral);
+        }),
+      );
 }

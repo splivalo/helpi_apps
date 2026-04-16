@@ -18,6 +18,7 @@ class JobStatusBadge extends StatefulWidget {
     this.date,
     this.time,
     this.durationHours,
+    this.onPhaseChanged,
   });
 
   final JobStatus status;
@@ -27,6 +28,9 @@ class JobStatusBadge extends StatefulWidget {
   final DateTime? date;
   final String? time;
   final int? durationHours;
+
+  /// Called when the live phase changes (e.g. upcoming→active→completed).
+  final VoidCallback? onPhaseChanged;
 
   @override
   State<JobStatusBadge> createState() => _JobStatusBadgeState();
@@ -51,6 +55,7 @@ class _JobStatusBadgeState extends State<JobStatusBadge>
     if (state == AppLifecycleState.resumed) {
       _timer?.cancel();
       setState(() => _computeAndSchedule());
+      widget.onPhaseChanged?.call();
     }
   }
 
@@ -114,6 +119,7 @@ class _JobStatusBadgeState extends State<JobStatusBadge>
     _timer = Timer(delay, () {
       if (mounted) {
         setState(() => _computeAndSchedule());
+        widget.onPhaseChanged?.call();
       }
     });
   }
@@ -148,16 +154,16 @@ class _JobStatusBadgeState extends State<JobStatusBadge>
 
     switch (_display) {
       case _DisplayStatus.completed:
-        bg = isDark ? AppColors.success.withAlpha(30) : AppColors.statusGreenBg;
-        fg = isDark ? const Color(0xFF81C784) : AppColors.success;
+        bg = isDark ? AppColors.teal.withAlpha(30) : const Color(0xFFE0F5F5);
+        fg = isDark ? const Color(0xFF80CBC4) : AppColors.teal;
         label = AppStrings.jobCompleted;
       case _DisplayStatus.upcoming:
         bg = isDark ? AppColors.info.withAlpha(30) : AppColors.statusBlueBg;
         fg = isDark ? const Color(0xFF64B5F6) : AppColors.info;
         label = AppStrings.jobUpcoming;
       case _DisplayStatus.active:
-        bg = isDark ? AppColors.teal.withAlpha(30) : const Color(0xFFE0F5F5);
-        fg = isDark ? const Color(0xFF80CBC4) : AppColors.teal;
+        bg = isDark ? AppColors.success.withAlpha(30) : AppColors.statusGreenBg;
+        fg = isDark ? const Color(0xFF81C784) : AppColors.success;
         label = AppStrings.jobActive;
       case _DisplayStatus.cancelled:
         bg = isDark ? AppColors.coral.withAlpha(30) : AppColors.statusRedBg;
@@ -169,7 +175,8 @@ class _JobStatusBadgeState extends State<JobStatusBadge>
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: fg.withValues(alpha: 0.3)),
+        borderRadius: BorderRadius.circular(100),
       ),
       child: Text(
         label,
