@@ -79,10 +79,10 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
 
   // -- Step 3 state --
   final TextEditingController _promoCodeController = TextEditingController();
-  String? _appliedPromoCode;
   bool _promoValidating = false;
-  double? _promoDiscount;
   String? _promoError;
+  List<Map<String, dynamic>> _activeCoupons = [];
+  bool _couponsLoading = false;
 
   // Cards from API
   List<Map<String, dynamic>> _cards = [];
@@ -99,6 +99,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     super.initState();
     _loadCards();
     _loadServiceMappings();
+    _loadActiveCoupons();
   }
 
   Future<void> _loadServiceMappings() async {
@@ -224,6 +225,155 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     return (card['isDummy'] as bool? ?? false) ||
         processorToken == null ||
         processorToken.isEmpty;
+  }
+
+  Future<void> _loadActiveCoupons() async {
+    final seniorId = await _resolveSeniorId();
+    if (seniorId == null || !mounted) return;
+
+    setState(() => _couponsLoading = true);
+    final result = await AppApiService().getMyCoupons(seniorId);
+    if (!mounted) return;
+
+    if (result.success && result.data != null) {
+      setState(() {
+        _activeCoupons = result.data!
+            .map((e) => e as Map<String, dynamic>)
+            .toList();
+        _couponsLoading = false;
+      });
+    } else {
+      setState(() => _couponsLoading = false);
+    }
+  }
+
+  void _deactivateCoupon(int assignmentId) {
+    setState(() {
+      _activeCoupons.removeWhere(
+        (c) => (c['id'] as num?)?.toInt() == assignmentId,
+      );
+    });
+  }
+
+  String _mapCouponErrorCode(String? errorCode) {
+    switch (errorCode) {
+      case 'coupon_not_found':
+        return AppStrings.couponNotFound;
+      case 'coupon_already_active':
+        return AppStrings.couponAlreadyActive;
+      case 'coupon_inactive':
+        return AppStrings.couponInactive;
+      case 'coupon_not_yet_valid':
+        return AppStrings.couponNotYetValid;
+      case 'coupon_expired':
+        return AppStrings.couponExpired;
+      case 'exclusive_coupon_conflict':
+        return AppStrings.couponExclusiveConflict;
+      default:
+        return AppStrings.promoCodeInvalid;
+    }
+  }
+
+  String _couponDescription(Map<String, dynamic> coupon) {
+    final type = (coupon['couponType'] as num?)?.toInt() ?? 0;
+    final value = (coupon['couponValue'] as num?)?.toDouble() ?? 0;
+    final remaining = coupon['remainingValue'] as num?;
+    switch (type) {
+      case 0: // MonthlyHours
+      case 1: // WeeklyHours
+      case 2: // OneTimeHours
+        final hours = remaining?.toStringAsFixed(0) ?? value.toStringAsFixed(0);
+        return AppStrings.couponHoursRemaining(hours);
+      case 3: // Percentage
+        return AppStrings.couponPercentOff(value.toStringAsFixed(0));
+      case 4: // FixedPerSession
+        return AppStrings.couponFixedOff('€${value.toStringAsFixed(2)}');
+      default:
+        return '';
+    }
+  }
+
+  /// Calculates total discount in whole euros from active coupons.
+  /// [totalEuros] = original price, [totalHours] = total session hours.
+  int _calculateCouponDiscount(int totalEuros, int totalHours) {
+    if (_activeCoupons.isEmpty) return 0;
+
+    int remainingEuros = totalEuros;
+    double remainingHours = totalHours.toDouble();
+
+    // Priority: hour-based → percentage → fixed (mirrors backend logic)
+    for (final coupon in _activeCoupons) {
+      final type = (coupon['couponType'] as num?)?.toInt() ?? 0;
+      final value = (coupon['couponValue'] as num?)?.toDouble() ?? 0;
+      final remaining = (coupon['remainingValue'] as num?)?.toDouble();
+
+      switch (type) {
+        case 0: // MonthlyHours
+        case 1: // WeeklyHours
+        case 2: // OneTimeHours
+          if (remainingHours <= 0) break;
+          final available = remaining ?? value;
+          final coveredHours = available < remainingHours
+              ? available
+              : remainingHours;
+          final coveredEuros = (coveredHours * AppPricing.hourlyRate).toInt();
+          final capped = coveredEuros < remainingEuros
+              ? coveredEuros
+              : remainingEuros;
+          remainingEuros -= capped;
+          remainingHours -= coveredHours;
+        case 3: // Percentage
+          if (remainingEuros <= 0) break;
+          final covered = (remainingEuros * value / 100).toInt();
+          remainingEuros -= covered;
+        case 4: // FixedPerSession
+          if (remainingEuros <= 0) break;
+          final covered = value.toInt();
+          final capped = covered < remainingEuros ? covered : remainingEuros;
+          remainingEuros -= capped;
+      }
+    }
+
+    return totalEuros - remainingEuros;
+  }
+
+  /// Builds price text: original crossed out + discounted in teal if a coupon applies.
+  Widget _priceWidget(
+    int priceEuros,
+    int totalHours,
+    TextStyle? style, {
+    bool bold = false,
+  }) {
+    final discount = _calculateCouponDiscount(priceEuros, totalHours);
+    final effectiveStyle = bold == true
+        ? (style ?? const TextStyle()).copyWith(fontWeight: FontWeight.w700)
+        : style ?? const TextStyle();
+
+    if (discount <= 0) {
+      return Text(AppPricing.formatPrice(priceEuros), style: effectiveStyle);
+    }
+
+    final discounted = priceEuros - discount;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          AppPricing.formatPrice(priceEuros),
+          style: effectiveStyle.copyWith(
+            decoration: TextDecoration.lineThrough,
+            color: effectiveStyle.color?.withAlpha(120),
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          AppPricing.formatPrice(discounted),
+          style: effectiveStyle.copyWith(
+            color: AppColors.teal,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
   }
 
   Future<void> _addDummyCard() async {
@@ -1293,11 +1443,14 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                     const Divider(height: 24),
                     SummaryRow(
                       label: AppStrings.orderSummaryPrice,
-                      value: AppPricing.formatPrice(
+                      valueWidget: _priceWidget(
                         AppPricing.priceForDay(
                           _oneTimeDate!.weekday,
                           _oneTimeDuration!,
                         ),
+                        _oneTimeDuration!,
+                        Theme.of(context).textTheme.bodyMedium,
+                        bold: true,
                       ),
                       bold: true,
                     ),
@@ -1376,30 +1529,34 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                   // Weekly total
                   if (_dayEntries.every((e) => e.duration != null)) ...[
                     const Divider(height: 24),
-                    Row(
-                      children: [
-                        Text(
-                          AppStrings.orderSummaryWeeklyTotal,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          AppPricing.formatPrice(
-                            _dayEntries.fold<int>(
-                              0,
-                              (sum, e) =>
-                                  sum +
-                                  AppPricing.priceForDay(e.day, e.duration!),
+                    () {
+                      final totalEuros = _dayEntries.fold<int>(
+                        0,
+                        (sum, e) =>
+                            sum + AppPricing.priceForDay(e.day, e.duration!),
+                      );
+                      final totalHours = _dayEntries.fold<int>(
+                        0,
+                        (sum, e) => sum + e.duration!,
+                      );
+                      return Row(
+                        children: [
+                          Text(
+                            AppStrings.orderSummaryWeeklyTotal,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
+                          const Spacer(),
+                          _priceWidget(
+                            totalEuros,
+                            totalHours,
+                            theme.textTheme.bodyMedium,
+                            bold: true,
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      );
+                    }(),
                   ],
                 ],
 
@@ -1537,7 +1694,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                   ),
                 ),
 
-                // -- Promo code --
+                // -- Kuponi --
                 const Divider(height: 24),
                 Text(
                   AppStrings.promoCode,
@@ -1546,161 +1703,134 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                if (_appliedPromoCode != null)
-                  Container(
-                    padding: const EdgeInsets.symmetric(
+
+                // Active coupons from backend
+                if (_couponsLoading)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 8),
+                    child: SizedBox(
+                      height: 18,
+                      width: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                if (_activeCoupons.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _activeCoupons.map((coupon) {
+                        final code = coupon['couponCode'] as String? ?? '';
+                        final assignmentId =
+                            (coupon['id'] as num?)?.toInt() ?? 0;
+                        return Chip(
+                          avatar: const Icon(
+                            Icons.local_offer,
+                            size: 16,
+                            color: AppColors.teal,
+                          ),
+                          label: Text(
+                            '$code · ${_couponDescription(coupon)}',
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                          deleteIcon: const Icon(Icons.close, size: 16),
+                          onDeleted: () => _deactivateCoupon(assignmentId),
+                          backgroundColor:
+                              theme.colorScheme.surfaceContainerHighest,
+                          side: const BorderSide(color: AppColors.teal),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+
+                // Redeem new coupon
+                TextField(
+                  controller: _promoCodeController,
+                  scrollPadding: const EdgeInsets.only(bottom: 160),
+                  onTap: _scrollStep3ToBottom,
+                  decoration: InputDecoration(
+                    hintText: AppStrings.promoCodeHint,
+                    contentPadding: const EdgeInsets.symmetric(
                       horizontal: 14,
-                      vertical: 10,
+                      vertical: 12,
                     ),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(
-                        color: theme.colorScheme.outlineVariant,
-                      ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.local_offer,
-                          size: 18,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          _appliedPromoCode!,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _appliedPromoCode = null;
-                              _promoDiscount = null;
-                              _promoError = null;
-                              _promoCodeController.clear();
-                            });
-                          },
-                          child: Icon(
-                            Icons.close,
-                            size: 18,
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                else
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _promoCodeController,
-                          scrollPadding: const EdgeInsets.only(bottom: 160),
-                          onTap: _scrollStep3ToBottom,
-                          decoration: InputDecoration(
-                            hintText: AppStrings.promoCodeHint,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 12,
+                    suffixIcon: _promoValidating
+                        ? const Padding(
+                            padding: EdgeInsets.all(12),
+                            child: SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
                             ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                          )
+                        : IconButton(
+                            icon: const Icon(
+                              Icons.arrow_forward_rounded,
+                              color: AppColors.teal,
                             ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      ElevatedButton(
-                        onPressed: _promoValidating
-                            ? null
-                            : () async {
-                                final code = _promoCodeController.text.trim();
-                                if (code.isEmpty) return;
+                            onPressed: () async {
+                              final code = _promoCodeController.text.trim();
+                              if (code.isEmpty) return;
 
+                              setState(() {
+                                _promoValidating = true;
+                                _promoError = null;
+                              });
+
+                              final seniorId = await _resolveSeniorId();
+                              if (!mounted) return;
+
+                              if (seniorId == null) {
                                 setState(() {
-                                  _promoValidating = true;
-                                  _promoError = null;
+                                  _promoValidating = false;
+                                  _promoError = AppStrings.promoCodeInvalid;
                                 });
+                                return;
+                              }
 
-                                final userId = await TokenStorage().getUserId();
-                                if (!mounted) return;
+                              final result = await AppApiService().redeemCoupon(
+                                code: code,
+                                seniorId: seniorId,
+                              );
+                              if (!mounted) return;
 
-                                if (userId == null) {
+                              if (result.success && result.data != null) {
+                                final data = result.data!;
+                                final isValid =
+                                    data['isValid'] as bool? ?? false;
+                                if (isValid) {
                                   setState(() {
+                                    _promoError = null;
                                     _promoValidating = false;
-                                    _promoError = AppStrings.promoCodeInvalid;
+                                    _promoCodeController.clear();
                                   });
-                                  return;
-                                }
-
-                                final result = await AppApiService()
-                                    .validatePromoCode(
-                                      code: code,
-                                      customerId: userId,
-                                      orderTotal: 0,
-                                    );
-                                if (!mounted) return;
-
-                                if (result.success && result.data != null) {
-                                  final data = result.data!;
-                                  final isValid =
-                                      data['isValid'] as bool? ?? false;
-                                  if (isValid) {
-                                    final discount =
-                                        (data['discountAmount'] as num?)
-                                            ?.toDouble();
-                                    setState(() {
-                                      _appliedPromoCode = code;
-                                      _promoDiscount = discount;
-                                      _promoError = null;
-                                      _promoValidating = false;
-                                    });
-                                  } else {
-                                    setState(() {
-                                      _promoError =
-                                          (data['errorMessage'] as String?) ??
-                                          AppStrings.promoCodeInvalid;
-                                      _promoValidating = false;
-                                    });
-                                  }
+                                  await _loadActiveCoupons();
                                 } else {
                                   setState(() {
-                                    _promoError =
-                                        result.error ??
-                                        AppStrings.promoCodeInvalid;
+                                    _promoError = _mapCouponErrorCode(
+                                      data['errorCode'] as String?,
+                                    );
                                     _promoValidating = false;
                                   });
                                 }
-                              },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.teal,
-                          foregroundColor: Colors.white,
-                          minimumSize: Size.zero,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                              } else {
+                                setState(() {
+                                  _promoError =
+                                      result.error ?? AppStrings.couponNotFound;
+                                  _promoValidating = false;
+                                });
+                              }
+                            },
                           ),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 14,
-                          ),
-                        ),
-                        child: _promoValidating
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : Text(AppStrings.promoCodeApply),
-                      ),
-                    ],
                   ),
+                ),
                 if (_promoError != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
@@ -1708,19 +1838,6 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                       _promoError!,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: AppColors.coral,
-                      ),
-                    ),
-                  ),
-                if (_promoDiscount != null && _appliedPromoCode != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Text(
-                      AppStrings.promoCodeDiscount(
-                        '${_promoDiscount!.toStringAsFixed(2)} €',
-                      ),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: AppColors.teal,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -1767,7 +1884,6 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     }
 
     // -- Build API payload --
-    final storage = TokenStorage();
     final seniorId = await _resolveSeniorId();
 
     if (seniorId == null) {
@@ -1842,18 +1958,6 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     if (!mounted) return;
 
     if (result.success && result.data != null) {
-      // Apply promo code if validated
-      if (_appliedPromoCode != null) {
-        final userId = await storage.getUserId();
-        if (userId != null) {
-          await api.applyPromoCode(
-            code: _appliedPromoCode!,
-            orderId: result.data!.id,
-            customerId: userId,
-            orderTotal: 0,
-          );
-        }
-      }
       if (!mounted) return;
       widget.ordersNotifier.addProcessingOrder(result.data!);
       Navigator.pop(context, true);

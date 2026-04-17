@@ -108,9 +108,12 @@ class ApiEndpoints {
   static const String contactInfos = '/api/contact-infos';
   static String contactInfoById(int id) => '/api/contact-infos/$id';
 
-  // Promo Codes
-  static const String promoCodeValidate = '/api/promo-codes/validate';
-  static const String promoCodeApply = '/api/promo-codes/apply';
+  // Coupons
+  static const String couponRedeem = '/api/coupons/redeem';
+  static String myCoupons(int seniorId) =>
+      '/api/coupons/my-coupons?seniorId=$seniorId';
+  static String deactivateCoupon(int assignmentId) =>
+      '/api/coupons/my-assignments/$assignmentId';
 
   // Pricing Configuration
   static const String pricingConfig = '/api/PricingConfiguration/1';

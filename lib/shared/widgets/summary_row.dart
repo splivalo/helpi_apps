@@ -5,12 +5,14 @@ class SummaryRow extends StatelessWidget {
   const SummaryRow({
     super.key,
     required this.label,
-    required this.value,
+    this.value,
+    this.valueWidget,
     this.bold = false,
-  });
+  }) : assert(value != null || valueWidget != null);
 
   final String label;
-  final String value;
+  final String? value;
+  final Widget? valueWidget;
   final bool bold;
 
   @override
@@ -30,12 +32,15 @@ class SummaryRow extends StatelessWidget {
                 ),
         ),
         const Spacer(),
-        Text(
-          value,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
+        if (valueWidget != null)
+          valueWidget!
+        else
+          Text(
+            value!,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
+            ),
           ),
-        ),
       ],
     );
   }

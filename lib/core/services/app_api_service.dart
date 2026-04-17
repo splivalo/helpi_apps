@@ -82,7 +82,7 @@ class AppApiService {
     try {
       await _client.post(
         ApiEndpoints.orderCancel(orderId),
-        data: reason != null ? {'reason': reason} : null,
+        data: {'cancellationReason': reason ?? 'Otkazano od strane seniora'},
       );
       return ApiResult.success(true);
     } catch (e) {
@@ -142,50 +142,47 @@ class AppApiService {
     }
   }
 
-  // PROMO CODES
+  // COUPONS
 
-  /// Validate promo code - returns validation result from backend.
-  Future<ApiResult<Map<String, dynamic>>> validatePromoCode({
+  /// Redeem coupon code — validates and assigns coupon to senior.
+  Future<ApiResult<Map<String, dynamic>>> redeemCoupon({
     required String code,
-    required int customerId,
-    required double orderTotal,
+    required int seniorId,
   }) async {
     try {
       final response = await _client.post(
-        ApiEndpoints.promoCodeValidate,
-        queryParameters: {
-          'code': code,
-          'customerId': customerId,
-          'orderTotal': orderTotal,
-        },
+        ApiEndpoints.couponRedeem,
+        data: {'code': code, 'seniorId': seniorId},
       );
       return ApiResult.success(response.data as Map<String, dynamic>);
     } catch (e) {
-      debugPrint('[AppApiService] validatePromoCode error: $e');
+      debugPrint('[AppApiService] redeemCoupon error: $e');
+      // Try to extract errorCode from response body (backend returns 200 with isValid=false)
+      if (e is DioException && e.response?.data is Map<String, dynamic>) {
+        return ApiResult.success(e.response!.data as Map<String, dynamic>);
+      }
       return ApiResult.failure(friendlyError(e));
     }
   }
 
-  /// Apply promo code to order after creation.
-  Future<ApiResult<Map<String, dynamic>>> applyPromoCode({
-    required String code,
-    required int orderId,
-    required int customerId,
-    required double orderTotal,
-  }) async {
+  /// Get active coupon assignments for a senior.
+  Future<ApiResult<List<dynamic>>> getMyCoupons(int seniorId) async {
     try {
-      final response = await _client.post(
-        ApiEndpoints.promoCodeApply,
-        queryParameters: {
-          'code': code,
-          'orderId': orderId,
-          'customerId': customerId,
-          'orderTotal': orderTotal,
-        },
-      );
-      return ApiResult.success(response.data as Map<String, dynamic>);
+      final response = await _client.get(ApiEndpoints.myCoupons(seniorId));
+      return ApiResult.success(response.data as List<dynamic>);
     } catch (e) {
-      debugPrint('[AppApiService] applyPromoCode error: $e');
+      debugPrint('[AppApiService] getMyCoupons error: $e');
+      return ApiResult.failure(friendlyError(e));
+    }
+  }
+
+  /// Deactivate (remove) a coupon assignment.
+  Future<ApiResult<void>> deactivateCoupon(int assignmentId) async {
+    try {
+      await _client.delete(ApiEndpoints.deactivateCoupon(assignmentId));
+      return ApiResult.success(null);
+    } catch (e) {
+      debugPrint('[AppApiService] deactivateCoupon error: $e');
       return ApiResult.failure(friendlyError(e));
     }
   }
@@ -667,11 +664,10 @@ class AppApiService {
     final schedules = json['schedules'] as List<dynamic>? ?? [];
     final services = json['services'] as List<dynamic>? ?? [];
 
-    // Izvuci imena servisa iz translations
+    // Map each service to its v2 canonical label
     final serviceNames = services.map((s) {
-      final translations = s['translations'] as Map<String, dynamic>? ?? {};
-      final hr = translations['hr'] as Map<String, dynamic>?;
-      return (hr?['name'] as String?) ?? 'Usluga';
+      final sMap = s as Map<String, dynamic>;
+      return _canonicalServiceLabel(sMap);
     }).toList();
 
     // Extract service IDs for repeat order
@@ -930,6 +926,63 @@ class AppApiService {
     final endMin = end.hour * 60 + end.minute;
     final diff = endMin - startMin;
     return diff > 0 ? (diff / 60).round() : 0;
+  }
+
+  // v2 canonical service ID → label mapping (same IDs as admin)
+  static const _serviceIdToLabel = <int, String>{
+    1: 'Društvo',
+    4: 'Šetnja',
+    11: 'Kupovina',
+    21: 'Pomoć u kući',
+    31: 'Pratnja',
+    41: 'Ostalo',
+  };
+
+  /// Map a backend service JSON to its v2 canonical label.
+  /// First tries ID lookup, then falls back to text inference.
+  String _canonicalServiceLabel(Map<String, dynamic> serviceJson) {
+    final id = (serviceJson['id'] as num?)?.toInt();
+    if (id != null && _serviceIdToLabel.containsKey(id)) {
+      return _serviceIdToLabel[id]!;
+    }
+
+    // Text-based fallback for old v1 services
+    final translations =
+        serviceJson['translations'] as Map<String, dynamic>? ?? {};
+    final hr = translations['hr'] as Map<String, dynamic>? ?? {};
+    final en = translations['en'] as Map<String, dynamic>? ?? {};
+    final raw = '${hr['name'] ?? ''} ${en['name'] ?? ''}'.toLowerCase();
+    final text = raw
+        .replaceAll('č', 'c')
+        .replaceAll('ć', 'c')
+        .replaceAll('š', 's')
+        .replaceAll('ž', 'z')
+        .replaceAll('đ', 'd');
+
+    if (text.contains('kup') || text.contains('shop')) return 'Kupovina';
+    if (text.contains('cisc') ||
+        text.contains('clean') ||
+        text.contains('house') ||
+        text.contains('home help')) {
+      return 'Pomoć u kući';
+    }
+    if (text.contains('razgov') ||
+        text.contains('compan') ||
+        text.contains('social') ||
+        text.contains('druze') ||
+        text.contains('drustvo') ||
+        text.contains('slusanj')) {
+      return 'Društvo';
+    }
+    if (text.contains('set') || text.contains('walk')) return 'Šetnja';
+    if (text.contains('prat') ||
+        text.contains('escort') ||
+        text.contains('doctor') ||
+        text.contains('lijec') ||
+        text.contains('posjet')) {
+      return 'Pratnja';
+    }
+    return 'Ostalo';
   }
 
   String _dayName(int weekday) {

@@ -35,6 +35,7 @@ class OrderDetailScreen extends StatefulWidget {
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
   bool _jobsExpanded = false;
   List<schedule_review.ReviewModel> _pendingReviews = [];
+  List<Map<String, dynamic>> _seniorCoupons = [];
 
   @override
   void initState() {
@@ -43,6 +44,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     widget.ordersNotifier.addListener(_onChanged);
     _loadPendingReviews();
     _loadSessions();
+    _loadSeniorCoupons();
   }
 
   /// Fetch sessions from API and populate order.jobs.
@@ -149,8 +151,25 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     }
   }
 
+  Future<void> _loadSeniorCoupons() async {
+    final seniorId = await TokenStorage().getSeniorId();
+    if (seniorId == null || !mounted) return;
+    final result = await AppApiService().getMyCoupons(seniorId);
+    if (!mounted) return;
+    if (result.success && result.data != null) {
+      setState(() {
+        _seniorCoupons = result.data!
+            .whereType<Map<String, dynamic>>()
+            .toList();
+      });
+    }
+  }
+
   void _onChanged() {
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    // Re-fetch sessions when orders are refreshed (e.g. via SignalR)
+    _loadSessions();
+    setState(() {});
   }
 
   @override
@@ -193,6 +212,22 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       minute,
     ).add(Duration(hours: job.durationHours));
     return DateTime.now().isAfter(jobEnd);
+  }
+
+  String _couponLabel(int type, double value, num? remaining) {
+    switch (type) {
+      case 0: // MonthlyHours
+      case 1: // WeeklyHours
+      case 2: // OneTimeHours
+        final h = remaining?.toStringAsFixed(0) ?? value.toStringAsFixed(0);
+        return AppStrings.couponHoursRemaining(h);
+      case 3: // Percentage
+        return AppStrings.couponPercentOff(value.toStringAsFixed(0));
+      case 4: // FixedPerSession
+        return AppStrings.couponFixedOff('€${value.toStringAsFixed(2)}');
+      default:
+        return '';
+    }
   }
 
   /// Check if a specific job can be cancelled (time > cutoff).
@@ -475,6 +510,41 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             const SizedBox(height: 4),
             Text(order.notes, style: theme.textTheme.bodyMedium),
           ],
+
+          // Coupons
+          if (_seniorCoupons.isNotEmpty) ...[
+            const Divider(height: 24),
+            Text(
+              AppStrings.couponActive,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 6,
+              runSpacing: 4,
+              children: _seniorCoupons.map((c) {
+                final code = c['couponCode'] as String? ?? '';
+                final type = (c['couponType'] as num?)?.toInt() ?? 0;
+                final value = (c['couponValue'] as num?)?.toDouble() ?? 0;
+                final remaining = c['remainingValue'] as num?;
+                return Chip(
+                  avatar: Icon(
+                    Icons.local_offer,
+                    size: 14,
+                    color: theme.colorScheme.primary,
+                  ),
+                  label: Text(
+                    '$code · ${_couponLabel(type, value, remaining)}',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
+                );
+              }).toList(),
+            ),
+          ],
         ],
       ),
     );
@@ -566,9 +636,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isCancelled
-            ? theme.colorScheme.surfaceContainerHighest
-            : theme.colorScheme.surface,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
@@ -602,7 +670,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: isCancelled
-                        ? theme.colorScheme.onSurfaceVariant
+                        ? theme.colorScheme.onSurface.withAlpha(150)
                         : theme.colorScheme.onSurface,
                     decoration: isCancelled ? TextDecoration.lineThrough : null,
                   ),
@@ -627,7 +695,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             child: Text(
               '${job.time}  ·  ${job.durationHours}h  ·  ${AppPricing.formatPrice(price)}',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+                color: isCancelled
+                    ? theme.colorScheme.onSurface.withAlpha(120)
+                    : theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -641,12 +711,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: AppColors.teal.withAlpha(25),
+                    color: isCancelled
+                        ? AppColors.teal.withAlpha(12)
+                        : AppColors.teal.withAlpha(25),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.person_outline,
-                    color: AppColors.teal,
+                    color: isCancelled
+                        ? AppColors.teal.withAlpha(100)
+                        : AppColors.teal,
                     size: 18,
                   ),
                 ),
@@ -658,6 +732,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
+                      color: isCancelled
+                          ? theme.colorScheme.onSurface.withAlpha(130)
+                          : null,
                     ),
                   ),
                 ),

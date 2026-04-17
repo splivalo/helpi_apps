@@ -24,6 +24,7 @@ class OrderScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(title: Text(AppStrings.orderTitle)),
       body: SafeArea(
         top: false,

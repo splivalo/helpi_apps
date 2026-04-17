@@ -167,7 +167,7 @@ class _JobStatusBadgeState extends State<JobStatusBadge>
         label = AppStrings.jobActive;
       case _DisplayStatus.cancelled:
         bg = isDark ? AppColors.coral.withAlpha(30) : AppColors.statusRedBg;
-        fg = isDark ? const Color(0xFFEF9A9A) : AppColors.coral;
+        fg = AppColors.coral;
         label = AppStrings.jobCancelled;
     }
 
