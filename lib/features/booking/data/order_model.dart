@@ -95,7 +95,7 @@ class OrderModel {
     this.status = OrderStatus.processing,
     this.notes = '',
     this.serviceNote = '',
-    this.promoCode = '',
+    this.couponCode = '',
     this.paymentMethodId = '',
     this.isOneTime = true,
     this.time = '',
@@ -120,7 +120,7 @@ class OrderModel {
   final String frequency;
   final String notes;
   final String serviceNote;
-  final String promoCode;
+  final String couponCode;
   final String paymentMethodId;
   OrderStatus status;
 

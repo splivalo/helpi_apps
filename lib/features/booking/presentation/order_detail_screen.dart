@@ -221,10 +221,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       case 2: // OneTimeHours
         final h = remaining?.toStringAsFixed(0) ?? value.toStringAsFixed(0);
         return AppStrings.couponHoursRemaining(h);
-      case 3: // Percentage
-        return AppStrings.couponPercentOff(value.toStringAsFixed(0));
-      case 4: // FixedPerSession
-        return AppStrings.couponFixedOff('€${value.toStringAsFixed(2)}');
       default:
         return '';
     }

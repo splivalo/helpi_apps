@@ -279,3 +279,37 @@ Kad Hangfire još nije markirao sesiju kao completed (ali vrijeme je prošlo), f
 - Sve narudžbe (jednokratne i ponavljajuće) koriste `_jobsSection`
 - Jednokratne: naslov "Termin" (singular), po defaultu **expandirane** (`_jobsExpanded = widget.order.isOneTime`)
 - Ponavljajuće: naslov "Termini" (plural), po defaultu collapsed
+
+---
+
+## 2026-04-18 — PromoCode→Coupon sustav ujedinjenje
+
+### Problem
+
+Backend imao **dva odvojena** sustava popusta: PromoCode (% ili fiksni, per-order) i Coupon (sat-based s balanceom, per-assignment). Redundantno i zbunjujuće.
+
+### Rješenje — jedan Coupon sustav
+
+**Backend:**
+
+- Obrisano 8 PromoCode fajlova (entity, DTO, service, repo, controller, interface)
+- `Order.PromoCodeId` → `Order.CouponId` + `Order.Coupon` nav property
+- `CouponType` enum proširen: MonthlyHours, WeeklyHours, OneTimeHours, **Percentage**, **FixedPerSession**
+- Novi endpointi: `POST /api/coupons/validate` + `POST /api/coupons/apply`
+- DB migracija: `20260418073312_RemovePromoCodeSystem` (dropane PromoCodes+PromoCodeUsages tablice)
+- `dotnet build` = 0 errors
+
+**Admin frontend (helpi_admin):**
+
+- API endpointi: promo-codes/_ → coupons/_
+- `OrderModel.promoCode` → `couponCode`
+- AppStrings: promo stringovi uklonjeni (postojeći coupon stringovi dovoljni)
+- `flutter analyze` = 0 issues
+
+**Mobile app (helpi_app):**
+
+- `OrderModel.promoCode` → `couponCode`
+- `_promoCodeController` → `_couponCodeController`, `_promoValidating` → `_couponValidating`, `_promoError` → `_couponError`
+- AppStrings: `promoCode*` → `couponCode*` (HR+EN map + getteri)
+- API endpointi već bili na `/api/coupons/redeem` — nema promjene
+- `flutter analyze` = 0 issues

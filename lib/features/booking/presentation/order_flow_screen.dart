@@ -78,9 +78,9 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
   final TextEditingController _serviceNoteController = TextEditingController();
 
   // -- Step 3 state --
-  final TextEditingController _promoCodeController = TextEditingController();
-  bool _promoValidating = false;
-  String? _promoError;
+  final TextEditingController _couponCodeController = TextEditingController();
+  bool _couponValidating = false;
+  String? _couponError;
   List<Map<String, dynamic>> _activeCoupons = [];
   bool _couponsLoading = false;
 
@@ -247,12 +247,21 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
     }
   }
 
-  void _deactivateCoupon(int assignmentId) {
+  Future<void> _deactivateCoupon(int assignmentId) async {
+    // Optimistic UI removal
     setState(() {
       _activeCoupons.removeWhere(
         (c) => (c['id'] as num?)?.toInt() == assignmentId,
       );
     });
+
+    final result = await AppApiService().deactivateCoupon(assignmentId);
+    if (!mounted) return;
+
+    if (!result.success) {
+      // Rollback: re-fetch from backend
+      await _loadActiveCoupons();
+    }
   }
 
   String _mapCouponErrorCode(String? errorCode) {
@@ -269,8 +278,10 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
         return AppStrings.couponExpired;
       case 'exclusive_coupon_conflict':
         return AppStrings.couponExclusiveConflict;
+      case 'coupon_hours_depleted':
+        return AppStrings.couponHoursDepleted;
       default:
-        return AppStrings.promoCodeInvalid;
+        return AppStrings.couponCodeInvalid;
     }
   }
 
@@ -284,10 +295,6 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
       case 2: // OneTimeHours
         final hours = remaining?.toStringAsFixed(0) ?? value.toStringAsFixed(0);
         return AppStrings.couponHoursRemaining(hours);
-      case 3: // Percentage
-        return AppStrings.couponPercentOff(value.toStringAsFixed(0));
-      case 4: // FixedPerSession
-        return AppStrings.couponFixedOff('€${value.toStringAsFixed(2)}');
       default:
         return '';
     }
@@ -322,15 +329,6 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
               : remainingEuros;
           remainingEuros -= capped;
           remainingHours -= coveredHours;
-        case 3: // Percentage
-          if (remainingEuros <= 0) break;
-          final covered = (remainingEuros * value / 100).toInt();
-          remainingEuros -= covered;
-        case 4: // FixedPerSession
-          if (remainingEuros <= 0) break;
-          final covered = value.toInt();
-          final capped = covered < remainingEuros ? covered : remainingEuros;
-          remainingEuros -= capped;
       }
     }
 
@@ -419,7 +417,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
 
   @override
   void dispose() {
-    _promoCodeController.dispose();
+    _couponCodeController.dispose();
     _serviceNoteController.dispose();
     _step1Scroll.dispose();
     _step3Scroll.dispose();
@@ -1697,7 +1695,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                 // -- Kuponi --
                 const Divider(height: 24),
                 Text(
-                  AppStrings.promoCode,
+                  AppStrings.couponCode,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -1749,11 +1747,11 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
 
                 // Redeem new coupon
                 TextField(
-                  controller: _promoCodeController,
+                  controller: _couponCodeController,
                   scrollPadding: const EdgeInsets.only(bottom: 160),
                   onTap: _scrollStep3ToBottom,
                   decoration: InputDecoration(
-                    hintText: AppStrings.promoCodeHint,
+                    hintText: AppStrings.couponCodeHint,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 14,
                       vertical: 12,
@@ -1761,7 +1759,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    suffixIcon: _promoValidating
+                    suffixIcon: _couponValidating
                         ? const Padding(
                             padding: EdgeInsets.all(12),
                             child: SizedBox(
@@ -1776,12 +1774,12 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                               color: AppColors.teal,
                             ),
                             onPressed: () async {
-                              final code = _promoCodeController.text.trim();
+                              final code = _couponCodeController.text.trim();
                               if (code.isEmpty) return;
 
                               setState(() {
-                                _promoValidating = true;
-                                _promoError = null;
+                                _couponValidating = true;
+                                _couponError = null;
                               });
 
                               final seniorId = await _resolveSeniorId();
@@ -1789,8 +1787,8 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
 
                               if (seniorId == null) {
                                 setState(() {
-                                  _promoValidating = false;
-                                  _promoError = AppStrings.promoCodeInvalid;
+                                  _couponValidating = false;
+                                  _couponError = AppStrings.couponCodeInvalid;
                                 });
                                 return;
                               }
@@ -1807,35 +1805,35 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                                     data['isValid'] as bool? ?? false;
                                 if (isValid) {
                                   setState(() {
-                                    _promoError = null;
-                                    _promoValidating = false;
-                                    _promoCodeController.clear();
+                                    _couponError = null;
+                                    _couponValidating = false;
+                                    _couponCodeController.clear();
                                   });
                                   await _loadActiveCoupons();
                                 } else {
                                   setState(() {
-                                    _promoError = _mapCouponErrorCode(
+                                    _couponError = _mapCouponErrorCode(
                                       data['errorCode'] as String?,
                                     );
-                                    _promoValidating = false;
+                                    _couponValidating = false;
                                   });
                                 }
                               } else {
                                 setState(() {
-                                  _promoError =
+                                  _couponError =
                                       result.error ?? AppStrings.couponNotFound;
-                                  _promoValidating = false;
+                                  _couponValidating = false;
                                 });
                               }
                             },
                           ),
                   ),
                 ),
-                if (_promoError != null)
+                if (_couponError != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 8),
                     child: Text(
-                      _promoError!,
+                      _couponError!,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: AppColors.coral,
                       ),

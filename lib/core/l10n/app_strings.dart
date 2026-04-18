@@ -313,13 +313,13 @@ class AppStrings {
       'creditCards': 'Kreditne kartice',
       'noCards': 'Nemate spremljenih kartica',
       'addCard': 'Dodaj karticu',
-      'promoCode': 'Kupon',
-      'promoCodeHint': 'Unesite kod kupona',
-      'promoCodeApply': 'Primijeni',
-      'promoCodeInvalid': 'Nevažeći kupon',
-      'promoCodeValidating': 'Provjera...',
-      'promoCodeDiscount': 'Popust: {amount}',
-      'promoCodeApplied': 'Kupon primijenjen',
+      'couponCode': 'Kupon',
+      'couponCodeHint': 'Unesite kod kupona',
+      'couponCodeApply': 'Primijeni',
+      'couponCodeInvalid': 'Nevažeći kupon',
+      'couponCodeValidating': 'Provjera...',
+      'couponCodeDiscount': 'Popust: {amount}',
+      'couponCodeApplied': 'Kupon primijenjen',
       'couponNotFound': 'Kupon kod nije pronađen',
       'couponAlreadyActive': 'Ovaj kupon je već aktivan',
       'couponInactive': 'Ovaj kupon više nije aktivan',
@@ -327,11 +327,10 @@ class AppStrings {
       'couponExpired': 'Ovaj kupon je istekao',
       'couponExclusiveConflict':
           'Već imate aktivan ekskluzivni kupon. Kontaktirajte Helpi za pomoć.',
+      'couponHoursDepleted': 'Sati na ovom kuponu su potrošeni',
       'couponRemoved': 'Kupon uklonjen',
       'couponActive': 'Aktivan kupon',
       'couponHoursRemaining': '{hours}h preostalo',
-      'couponPercentOff': '{percent}% popusta',
-      'couponFixedOff': '{amount} po terminu',
       'agreeToTerms': 'Slažem se s ',
       'termsOfUse': 'uvjetima',
       'termsOfUseTitle': 'Uvjeti korištenja',
@@ -756,13 +755,13 @@ class AppStrings {
       'creditCards': 'Credit cards',
       'noCards': 'No saved cards',
       'addCard': 'Add card',
-      'promoCode': 'Coupon',
-      'promoCodeHint': 'Enter coupon code',
-      'promoCodeApply': 'Apply',
-      'promoCodeInvalid': 'Invalid coupon',
-      'promoCodeValidating': 'Validating...',
-      'promoCodeDiscount': 'Discount: {amount}',
-      'promoCodeApplied': 'Coupon applied',
+      'couponCode': 'Coupon',
+      'couponCodeHint': 'Enter coupon code',
+      'couponCodeApply': 'Apply',
+      'couponCodeInvalid': 'Invalid coupon',
+      'couponCodeValidating': 'Validating...',
+      'couponCodeDiscount': 'Discount: {amount}',
+      'couponCodeApplied': 'Coupon applied',
       'couponNotFound': 'Coupon code not found',
       'couponAlreadyActive': 'This coupon is already active',
       'couponInactive': 'This coupon is no longer active',
@@ -770,11 +769,10 @@ class AppStrings {
       'couponExpired': 'This coupon has expired',
       'couponExclusiveConflict':
           'You already have an active exclusive coupon. Contact Helpi for assistance.',
+      'couponHoursDepleted': 'This coupon has no remaining hours',
       'couponRemoved': 'Coupon removed',
       'couponActive': 'Active coupon',
       'couponHoursRemaining': '{hours}h remaining',
-      'couponPercentOff': '{percent}% off',
-      'couponFixedOff': '{amount} per session',
       'agreeToTerms': 'I agree to the ',
       'termsOfUse': 'terms',
       'termsOfUseTitle': 'Terms of use',
@@ -1231,28 +1229,25 @@ class AppStrings {
   static String get creditCards => _t('creditCards');
   static String get noCards => _t('noCards');
   static String get addCard => _t('addCard');
-  static String get promoCode => _t('promoCode');
-  static String get promoCodeHint => _t('promoCodeHint');
-  static String get promoCodeApply => _t('promoCodeApply');
-  static String get promoCodeInvalid => _t('promoCodeInvalid');
-  static String get promoCodeValidating => _t('promoCodeValidating');
-  static String promoCodeDiscount(String amount) =>
-      _t('promoCodeDiscount', params: {'amount': amount});
-  static String get promoCodeApplied => _t('promoCodeApplied');
+  static String get couponCode => _t('couponCode');
+  static String get couponCodeHint => _t('couponCodeHint');
+  static String get couponCodeApply => _t('couponCodeApply');
+  static String get couponCodeInvalid => _t('couponCodeInvalid');
+  static String get couponCodeValidating => _t('couponCodeValidating');
+  static String couponCodeDiscount(String amount) =>
+      _t('couponCodeDiscount', params: {'amount': amount});
+  static String get couponCodeApplied => _t('couponCodeApplied');
   static String get couponNotFound => _t('couponNotFound');
   static String get couponAlreadyActive => _t('couponAlreadyActive');
   static String get couponInactive => _t('couponInactive');
   static String get couponNotYetValid => _t('couponNotYetValid');
   static String get couponExpired => _t('couponExpired');
   static String get couponExclusiveConflict => _t('couponExclusiveConflict');
+  static String get couponHoursDepleted => _t('couponHoursDepleted');
   static String get couponRemoved => _t('couponRemoved');
   static String get couponActive => _t('couponActive');
   static String couponHoursRemaining(String hours) =>
       _t('couponHoursRemaining', params: {'hours': hours});
-  static String couponPercentOff(String percent) =>
-      _t('couponPercentOff', params: {'percent': percent});
-  static String couponFixedOff(String amount) =>
-      _t('couponFixedOff', params: {'amount': amount});
   static String get agreeToTerms => _t('agreeToTerms');
   static String get termsOfUse => _t('termsOfUse');
   static String get byClickingRegister => _t('byClickingRegister');

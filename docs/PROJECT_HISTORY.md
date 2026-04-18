@@ -4,6 +4,14 @@
 
 ---
 
+## 2026-04-18 — CouponType simplifikacija
+
+- **Percentage + FixedPerSession uklonjeni** — Uklonjeni `case 3` i `case 4` iz `_couponDescription` i `_calculateCouponDiscount` u `order_flow_screen.dart`, te `_couponLabel` u `order_detail_screen.dart`. Uklonjeni `couponPercentOff` i `couponFixedOff` stringovi iz `app_strings.dart` (HR/EN + getteri).
+- CouponType sada ima samo 3 sat-based tipa: MonthlyHours(0), WeeklyHours(1), OneTimeHours(2).
+- `flutter analyze` = 0 issues.
+
+---
+
 ## 2026-04-01 — Realtime refresh sužen na relevantne notifikacije
 
 **Problem:** Unified app je radio refresh orders/jobs na svaku SignalR notifikaciju, što je bilo sigurno ali pregrubo i nepotrebno bučno.
