@@ -20,16 +20,18 @@ class StatusChip extends StatelessWidget {
 
     switch (status) {
       case OrderStatus.processing:
-        bg = isDark ? AppColors.info.withAlpha(30) : AppColors.statusBlueBg;
-        fg = isDark ? const Color(0xFF64B5F6) : AppColors.info;
+        bg = isDark
+            ? AppColors.warning.withAlpha(30)
+            : AppColors.statusOrangeBg;
+        fg = isDark ? const Color(0xFFFFB74D) : AppColors.warning;
         label = AppStrings.orderProcessing;
       case OrderStatus.active:
         bg = isDark ? AppColors.success.withAlpha(30) : AppColors.statusGreenBg;
         fg = AppColors.success;
         label = AppStrings.orderActive;
       case OrderStatus.completed:
-        bg = isDark ? AppColors.success.withAlpha(30) : AppColors.statusGreenBg;
-        fg = AppColors.success;
+        bg = isDark ? AppColors.teal.withAlpha(30) : AppColors.statusTealBg;
+        fg = isDark ? const Color(0xFF80CBC4) : AppColors.teal;
         label = AppStrings.orderCompleted;
       case OrderStatus.cancelled:
         bg = isDark ? AppColors.coral.withAlpha(30) : AppColors.statusRedBg;

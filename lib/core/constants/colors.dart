@@ -25,6 +25,11 @@ class AppColors {
   static const Color statusGreenBg = Color(0xFFE8F5E9);
   static const Color statusBlueBg = Color(0xFFE8F1FB);
   static const Color statusRedBg = Color(0xFFFFEBEE);
+  static const Color statusOrangeBg = Color(0xFFFFF3E0);
+  static const Color statusTealBg = Color(0xFFE0F5F5);
+
+  // -- Semantic (additional) --
+  static const Color warning = Color(0xFFF57C00);
 
   // -- Chip / selection --
   static const Color selectedChipBg = Color(0xFFE0F5F5);

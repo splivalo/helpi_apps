@@ -340,38 +340,11 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
-                                  child: Wrap(
-                                    spacing: 8,
-                                    runSpacing: 8,
-                                    children: _job.serviceTypes.map((type) {
-                                      return Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 2,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: theme
-                                              .colorScheme
-                                              .surfaceContainerHighest,
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                          border: Border.all(
-                                            color: theme
-                                                .colorScheme
-                                                .outlineVariant,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          JobHelpers.serviceLabel(type),
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: theme.colorScheme.onSurface,
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
+                                  child: Text(
+                                    _job.serviceTypes
+                                        .map(JobHelpers.serviceLabel)
+                                        .join(', '),
+                                    style: theme.textTheme.bodySmall,
                                   ),
                                 ),
                               ],

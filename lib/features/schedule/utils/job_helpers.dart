@@ -26,9 +26,9 @@ class JobHelpers {
     final isDark = brightness == Brightness.dark;
     switch (status) {
       case JobStatus.scheduled:
-        return isDark ? const Color(0xFF81C784) : const Color(0xFF4CAF50);
+        return isDark ? const Color(0xFF64B5F6) : const Color(0xFF1976D2);
       case JobStatus.completed:
-        return isDark ? const Color(0xFFBDBDBD) : const Color(0xFF757575);
+        return isDark ? const Color(0xFF80CBC4) : const Color(0xFF009D9D);
       case JobStatus.cancelled:
         return isDark ? const Color(0xFFEF9A9A) : const Color(0xFFEF5B5B);
     }
@@ -39,12 +39,12 @@ class JobHelpers {
     switch (status) {
       case JobStatus.scheduled:
         return isDark
-            ? const Color(0xFF1B5E20).withAlpha(80)
-            : const Color(0xFFE8F5E9);
+            ? const Color(0xFF1976D2).withAlpha(30)
+            : const Color(0xFFE3F2FD);
       case JobStatus.completed:
         return isDark
-            ? const Color(0xFF424242).withAlpha(80)
-            : const Color(0xFFF0F0F0);
+            ? const Color(0xFF009D9D).withAlpha(30)
+            : const Color(0xFFE0F5F5);
       case JobStatus.cancelled:
         return isDark
             ? const Color(0xFFB71C1C).withAlpha(80)
