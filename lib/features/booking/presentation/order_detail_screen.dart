@@ -519,7 +519,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             const SizedBox(height: 6),
             Wrap(
               spacing: 6,
-              runSpacing: 4,
+              runSpacing: 0,
               children: _seniorCoupons.map((c) {
                 final code = c['couponCode'] as String? ?? '';
                 final type = (c['couponType'] as num?)?.toInt() ?? 0;
@@ -529,11 +529,18 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   avatar: Icon(
                     Icons.local_offer,
                     size: 14,
-                    color: theme.colorScheme.primary,
+                    color: AppColors.coral,
                   ),
                   label: Text(
                     '$code · ${_couponLabel(type, value, remaining)}',
-                    style: const TextStyle(fontSize: 12),
+                    style: const TextStyle(fontSize: 12, color: Colors.white),
+                  ),
+                  side: BorderSide(
+                    color: theme.colorScheme.outlineVariant,
+                    width: 0.5,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   visualDensity: VisualDensity.compact,

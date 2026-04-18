@@ -1717,7 +1717,7 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                     padding: const EdgeInsets.only(bottom: 12),
                     child: Wrap(
                       spacing: 8,
-                      runSpacing: 8,
+                      runSpacing: 0,
                       children: _activeCoupons.map((coupon) {
                         final code = coupon['couponCode'] as String? ?? '';
                         final assignmentId =
@@ -1726,19 +1726,25 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                           avatar: const Icon(
                             Icons.local_offer,
                             size: 16,
-                            color: AppColors.teal,
+                            color: AppColors.coral,
                           ),
                           label: Text(
                             '$code · ${_couponDescription(coupon)}',
-                            style: const TextStyle(fontSize: 13),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.white,
+                            ),
                           ),
                           deleteIcon: const Icon(Icons.close, size: 16),
                           onDeleted: () => _deactivateCoupon(assignmentId),
                           backgroundColor:
                               theme.colorScheme.surfaceContainerHighest,
-                          side: const BorderSide(color: AppColors.teal),
+                          side: BorderSide(
+                            color: theme.colorScheme.outlineVariant,
+                            width: 0.5,
+                          ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                         );
                       }).toList(),
