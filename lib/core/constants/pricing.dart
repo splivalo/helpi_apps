@@ -16,6 +16,9 @@ class AppPricing {
   static int sundayRate = 21; // €/h Sunday (default, updated from API)
   static int studentCancelCutoffHours = 6; // default, updated from API
   static int seniorCancelCutoffHours = 1; // default, updated from API
+  static bool studentCancelEnabled = true; // default, updated from API
+  static bool availabilityChangeEnabled = true; // default, updated from API
+  static int availabilityChangeCutoffHours = 24; // default, updated from API
 
   /// Cijena za [hours] sati na [weekday] (1=Mon…7=Sun).
   static int priceForDay(int weekday, int hours) {
@@ -37,10 +40,17 @@ class AppPricing {
           (config['studentCancelCutoffHours'] as num?)?.toInt() ?? 6;
       seniorCancelCutoffHours =
           (config['seniorCancelCutoffHours'] as num?)?.toInt() ?? 1;
+      studentCancelEnabled = config['studentCancelEnabled'] as bool? ?? true;
+      availabilityChangeEnabled =
+          config['availabilityChangeEnabled'] as bool? ?? true;
+      availabilityChangeCutoffHours =
+          (config['availabilityChangeCutoffHours'] as num?)?.toInt() ?? 24;
       debugPrint(
         '[AppPricing] loaded: hourly=$hourlyRate, sunday=$sundayRate, '
         'studentCutoff=${studentCancelCutoffHours}h, '
-        'seniorCutoff=${seniorCancelCutoffHours}h',
+        'seniorCutoff=${seniorCancelCutoffHours}h, '
+        'cancelEnabled=$studentCancelEnabled, '
+        'availabilityEnabled=$availabilityChangeEnabled',
       );
     }
   }

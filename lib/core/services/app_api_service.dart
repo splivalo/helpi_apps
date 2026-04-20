@@ -225,11 +225,20 @@ class AppApiService {
 
   /// Fetch sessions for a specific order (used in senior order detail).
   /// Returns raw JSON maps so caller can extract student name etc.
+  /// Optional [from]/[to] filter sessions by scheduled date range.
   Future<ApiResult<List<Map<String, dynamic>>>> getSessionsByOrder(
-    int orderId,
-  ) async {
+    int orderId, {
+    String? from,
+    String? to,
+  }) async {
     try {
-      final response = await _client.get(ApiEndpoints.sessionsByOrder(orderId));
+      final queryParams = <String, dynamic>{};
+      if (from != null) queryParams['from'] = from;
+      if (to != null) queryParams['to'] = to;
+      final response = await _client.get(
+        ApiEndpoints.sessionsByOrder(orderId),
+        queryParameters: queryParams.isNotEmpty ? queryParams : null,
+      );
       final list = response.data as List<dynamic>;
       return ApiResult.success(
         list.map((e) => e as Map<String, dynamic>).toList(),

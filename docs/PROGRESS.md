@@ -313,3 +313,90 @@ Backend imao **dva odvojena** sustava popusta: PromoCode (% ili fiksni, per-orde
 - AppStrings: `promoCode*` → `couponCode*` (HR+EN map + getteri)
 - API endpointi već bili na `/api/coupons/redeem` — nema promjene
 - `flutter analyze` = 0 issues
+
+---
+
+## 2026-04-19 — Student assignment acceptance + cancel/availability toggles
+
+### Nove admin postavke
+
+**Backend (PricingConfiguration):**
+
+- `StudentCancelEnabled` (bool, default true) — ON/OFF za studentsko otkazivanje sesija
+- `AvailabilityChangeEnabled` (bool, default true) — ON/OFF za promjenu dostupnosti
+- `AvailabilityChangeCutoffHours` (int, default 24) — koliko sati prije sesije student može promijeniti dostupnost
+- DB migracija: `20260418210332_AddStudentSettingsAndPendingAcceptance`
+- `dotnet build` = 0 errors, 0 warnings
+
+**Admin (settings_screen.dart):**
+
+- 2 nove sekcije: "Otkazivanje sesije" (toggle + cutoff sati) i "Promjena dostupnosti" (toggle + cutoff sati)
+- `_toggleRow` widget helper (Switch.adaptive)
+- `flutter analyze` = 0 issues
+
+### Student mora prihvatiti narudžbu (force overlay)
+
+**Backend (ScheduleAssignmentService):**
+
+- `AssignmentStatus.PendingAcceptance` — novi enum (assignment čeka odgovor studenta)
+- `AdminDirectAssignAsync` sada kreira assignment kao `PendingAcceptance` (ne `Accepted`)
+- JobInstances se NE generiraju dok student ne prihvati
+- Ako admin reassigna drugog studenta → prethodni dobije `AssignmentRevoked` SignalR notifikaciju
+- Novi endpointi: `POST /{id}/accept`, `POST /{id}/decline`, `GET /pending` (Student role)
+- `AcceptAssignmentAsync` — prihvaća, generira JobInstances, notificira admine
+- `DeclineAssignmentAsync` — odbija, notificira admine
+- `NotificationType`: dodano `AssignmentPending(33)`, `AssignmentAccepted(34)`, `AssignmentDeclined(35)`, `AssignmentRevoked(36)`
+
+**App (helpi_app):**
+
+- `pending_assignments_provider.dart` — PendingAssignment model + PendingAssignmentsNotifier (load/accept/decline)
+- `pending_assignment_overlay.dart` — fullscreen force dialog (barrierDismissible: false) s detaljima narudžbe + Accept/Decline gumbi
+- `student_shell.dart` — na otvaranju app učitava pending assignments, prikazuje overlay, nakon accept/decline prikazuje sljedeći pending
+- `realtime_sync_provider.dart` — SignalR listener za `AssignmentPending` (type 33) i `AssignmentRevoked` (type 36) → auto-reload pending liste
+- 18 novih AppStrings (HR + EN)
+
+### Cancel/Availability enforcement na app strani
+
+- `pricing.dart` — dodano `studentCancelEnabled`, `availabilityChangeEnabled`, `availabilityChangeCutoffHours` (učitavaju se iz API)
+- `job_model.dart` — `canDecline` sada prvo provjerava `AppPricing.studentCancelEnabled`
+- `profile_availability_screen.dart` — `_save()` provjerava `AppPricing.availabilityChangeEnabled` prije spremanja
+- 2 nova AppStrings: `cancelDisabled`, `availabilityChangeDisabled` (HR + EN)
+- `flutter analyze` = 0 issues
+
+---
+
+## 2026-04-20 — Session filtering, UI polish, dead code cleanup, SignalR instant refresh
+
+### Backend — date range filter za sesije
+
+- `GET /api/sessions/order/{orderId}?from=&to=` — opcionalni date range filter
+- Implementirano kroz sve slojeve: IJobInstanceRepository → JobInstanceRepository → IJobInstanceService → JobInstanceService → SessionsController
+- Recurring orderi prikazuju samo tekući mjesec sesija (performance + UX)
+
+### Backend — auto-complete / auto-cancel order kad nema nadolazećih sesija
+
+- `OrderStatusUpdater.Update()` — nova logika:
+  - **One-time order** (IsRecurring=false): ako admin otkaže jedinu sesiju → order automatski postaje **Cancelled**
+  - **Recurring order** (IsRecurring=true): ako su sve sesije otkazane ali nijedna completed → order **OSTAJE Active** (novi termini mogu doći kad student produži ugovor)
+  - Ako je bar jedna sesija completed → order postaje **Completed**
+- Ova logika se okida i kad admin otkaže termine, ne samo senior
+
+### helpi_app — UI polish
+
+- `order_detail_screen.dart`:
+  - Sesije uvijek expandirane (`_jobsExpanded = true`)
+  - Per-session "Otkaži" gumb **sakriven za one-time ordere** (senior koristi samo "Otkaži narudžbu")
+  - Date range filtering: recurring orderi šalju `from`/`to` za tekući mjesec, one-time ne šalju
+  - Razmaci smanjeni: scroll bottom padding 32→4, gap nakon sesija 24→4
+
+### helpi_app — Dead code cleanup
+
+- Obrisano `senior_profile_screen.dart` — stari ProfileScreen, nikad importan, zamijenjen s ProfileMenuScreen
+- Obrisano `review_card.dart` — stari ReviewCard, nikad importan, zamijenjen s ReviewInlineCard
+
+### Admin — instant SignalR refresh za sesije
+
+- `data_providers.dart` — novi `sessionsVersionProvider` (StateProvider<int>)
+- `signalr_notification_service.dart` — `_onEntityChanged()` ispravlja parsiranje Map formata (`{entityType: "Sessions", timestamp: ...}`); bumpa `sessionsVersionProvider` za Sessions/Orders/JobInstances
+- `order_detail_screen.dart` (admin) — sluša `sessionsVersionProvider`, auto re-fetcha sesije bez izlaska iz ekrana
+- Rezultat: kad senior otkaže termin u app-u, admin odmah vidi promjenu u real-time

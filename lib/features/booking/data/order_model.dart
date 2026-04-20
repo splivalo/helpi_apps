@@ -37,6 +37,7 @@ class JobModel {
     this.studentId = '',
     this.status = JobStatus.scheduled,
     this.review,
+    this.isAssignmentPending = false,
   });
 
   /// Backend job instance ID.
@@ -52,6 +53,7 @@ class JobModel {
   final String studentName;
   final String orderId;
   final String studentId;
+  final bool isAssignmentPending;
 
   JobStatus status;
   ReviewModel? review;

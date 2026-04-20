@@ -40,7 +40,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _jobsExpanded = widget.order.isOneTime;
+    _jobsExpanded = true;
     widget.ordersNotifier.addListener(_onChanged);
     _loadPendingReviews();
     _loadSessions();
@@ -50,7 +50,25 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   /// Fetch sessions from API and populate order.jobs.
   Future<void> _loadSessions() async {
     final api = AppApiService();
-    final result = await api.getSessionsByOrder(widget.order.id);
+
+    // For recurring orders, only fetch current month sessions
+    String? from;
+    String? to;
+    if (!widget.order.isOneTime) {
+      final now = DateTime.now();
+      final monthStart = DateTime(now.year, now.month);
+      final monthEnd = DateTime(now.year, now.month + 1, 0);
+      from =
+          '${monthStart.year}-${monthStart.month.toString().padLeft(2, '0')}-${monthStart.day.toString().padLeft(2, '0')}';
+      to =
+          '${monthEnd.year}-${monthEnd.month.toString().padLeft(2, '0')}-${monthEnd.day.toString().padLeft(2, '0')}';
+    }
+
+    final result = await api.getSessionsByOrder(
+      widget.order.id,
+      from: from,
+      to: to,
+    );
 
     if (!mounted) return;
 
@@ -73,9 +91,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         final toM = endParts.length > 1 ? int.tryParse(endParts[1]) ?? 0 : 0;
         final durationHours = ((toH * 60 + toM) - (fromH * 60 + fromM)) ~/ 60;
 
-        // Extract student name from scheduleAssignment.student.contact.fullName
+        // Extract student name and assignment status
         String studentName = '';
         String studentId = '';
+        bool isAssignmentPending = false;
         final assignment = json['scheduleAssignment'] as Map<String, dynamic>?;
         if (assignment != null) {
           final student = assignment['student'] as Map<String, dynamic>?;
@@ -84,6 +103,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             final contact = student['contact'] as Map<String, dynamic>?;
             studentName = contact?['fullName'] as String? ?? '';
           }
+          // AssignmentStatus: 0=PendingAcceptance, 1=Accepted
+          final assignmentStatus = (assignment['status'] as num?)?.toInt();
+          isAssignmentPending = assignmentStatus == 0;
         }
 
         // Map backend status to booking JobStatus
@@ -129,6 +151,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             studentId: studentId,
             status: status,
             review: review,
+            isAssignmentPending: isAssignmentPending,
           ),
         );
       }
@@ -300,7 +323,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -328,35 +351,78 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     _summaryCard(theme, order),
                     const SizedBox(height: 16),
 
-                    // -- Jobs / sessions (all orders, not processing) --
-                    if (order.status != OrderStatus.processing)
-                      _jobsSection(theme, order),
-                    if (order.status != OrderStatus.processing)
-                      const SizedBox(height: 20),
-
-                    // -- Action buttons --
-                    if (_canCancelOrder(order))
-                      OutlinedButton.icon(
-                        onPressed: () {
-                          HapticFeedback.selectionClick();
-                          _cancelOrder(order.id);
-                        },
-                        icon: const Icon(Icons.close, size: 20),
-                        label: Text(AppStrings.cancelOrder),
-                        style: AppColors.coralOutlinedStyle,
+                    // -- Info banner for processing orders --
+                    if (order.status == OrderStatus.processing) ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.info.withAlpha(20),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.info.withAlpha(60),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 20,
+                              color: AppColors.info,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                AppStrings.processingBanner,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: AppColors.info,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    if (order.status == OrderStatus.completed)
-                      OutlinedButton.icon(
-                        onPressed: () => _repeatOrder(order),
-                        icon: const Icon(Icons.refresh, size: 20),
-                        label: Text(AppStrings.repeatOrder),
-                      ),
+                      const SizedBox(height: 16),
+                    ],
 
-                    const SizedBox(height: 24),
+                    // -- Jobs / sessions --
+                    _jobsSection(theme, order),
+
+                    const SizedBox(height: 4),
                   ],
                 ),
               ),
             ),
+
+            // -- Sticky bottom action buttons --
+            if (_canCancelOrder(order))
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      HapticFeedback.selectionClick();
+                      _cancelOrder(order.id);
+                    },
+                    icon: const Icon(Icons.close, size: 20),
+                    label: Text(AppStrings.cancelOrder),
+                    style: AppColors.coralOutlinedStyle,
+                  ),
+                ),
+              ),
+            if (order.status == OrderStatus.completed)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () => _repeatOrder(order),
+                    icon: const Icon(Icons.refresh, size: 20),
+                    label: Text(AppStrings.repeatOrder),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -533,7 +599,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   ),
                   label: Text(
                     '$code · ${_couponLabel(type, value, remaining)}',
-                    style: const TextStyle(fontSize: 12, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurface,
+                    ),
                   ),
                   side: BorderSide(
                     color: theme.colorScheme.outlineVariant,
@@ -705,7 +774,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             ),
           ),
 
-          // Row 3: student name with avatar
+          // Row 3: student name with avatar + assignment status
           Padding(
             padding: const EdgeInsets.only(left: 26, top: 4),
             child: Row(
@@ -716,29 +785,54 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   decoration: BoxDecoration(
                     color: isCancelled
                         ? AppColors.teal.withAlpha(12)
+                        : job.isAssignmentPending
+                        ? AppColors.info.withAlpha(25)
                         : AppColors.teal.withAlpha(25),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    Icons.person_outline,
+                    job.studentName.isEmpty
+                        ? Icons.person_off_outlined
+                        : job.isAssignmentPending
+                        ? Icons.hourglass_top
+                        : Icons.person_outline,
                     color: isCancelled
                         ? AppColors.teal.withAlpha(100)
+                        : job.isAssignmentPending
+                        ? AppColors.info
                         : AppColors.teal,
                     size: 18,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(
-                    job.studentName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: isCancelled
-                          ? theme.colorScheme.onSurface.withAlpha(130)
-                          : null,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        job.studentName.isEmpty
+                            ? AppStrings.noStudentAssigned
+                            : job.studentName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: isCancelled
+                              ? theme.colorScheme.onSurface.withAlpha(130)
+                              : job.studentName.isEmpty
+                              ? theme.colorScheme.onSurfaceVariant
+                              : null,
+                        ),
+                      ),
+                      if (job.isAssignmentPending && job.studentName.isNotEmpty)
+                        Text(
+                          AppStrings.awaitingConfirmation,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: AppColors.info,
+                            fontSize: 10,
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ],
@@ -769,7 +863,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   ],
 
                   // Cancel button (upcoming or active-disabled)
-                  if ((isUpcoming && _canCancelJob(job)) || isActive) ...[
+                  // Hidden for one-time orders — use "Otkaži narudžbu" instead.
+                  if (!widget.order.isOneTime &&
+                      ((isUpcoming && _canCancelJob(job)) || isActive)) ...[
                     const Spacer(),
                     SizedBox(
                       height: 30,

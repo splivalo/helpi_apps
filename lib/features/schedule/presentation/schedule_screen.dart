@@ -178,7 +178,7 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
                 : ListView.separated(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     itemCount: todayJobs.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 12),
+                    separatorBuilder: (_, _) => const SizedBox(height: 16),
                     itemBuilder: (context, index) {
                       final job = todayJobs[index];
                       return _JobCard(

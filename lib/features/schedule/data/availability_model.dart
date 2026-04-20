@@ -60,7 +60,7 @@ class AvailabilityNotifier extends ValueNotifier<List<DayAvailability>> {
   ];
 
   /// Day key -> DayOfWeek (1=Pon, 2=Uto, ... 7=Ned).
-  static int _dayKeyToWeekday(String dayKey) {
+  static int dayKeyToWeekday(String dayKey) {
     switch (dayKey) {
       case 'dayMonFull':
         return 1;
@@ -141,7 +141,7 @@ class AvailabilityNotifier extends ValueNotifier<List<DayAvailability>> {
         .map(
           (d) => {
             'studentId': studentId,
-            'dayOfWeek': _dayKeyToWeekday(d.dayKey),
+            'dayOfWeek': dayKeyToWeekday(d.dayKey),
             'startTime':
                 '${d.from.hour.toString().padLeft(2, '0')}:${d.from.minute.toString().padLeft(2, '0')}:00',
             'endTime':

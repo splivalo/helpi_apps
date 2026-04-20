@@ -268,6 +268,11 @@ class AppStrings {
       'jobCancelled': 'Otkazan',
       'cancelJobLabel': 'Otkaži',
       'cancelJobConfirm': 'Jeste li sigurni da želite otkazati ovaj termin?',
+      'cancelDisabled': 'Otkazivanje termina trenutno nije dozvoljeno.',
+      'availabilityChangeDisabled':
+          'Promjena dostupnosti nije moguća jer imate zakazanu sesiju. Kontaktirajte nas telefonom.',
+      'availabilityChangeCutoff':
+          'Ne možete mijenjati dostupnost manje od {hours} sati prije zakazane sesije.',
       'jobStudent': 'Student',
       'assignedSince': 'Dolazi od',
       'rateStudent': 'Ocijeni',
@@ -277,6 +282,10 @@ class AppStrings {
       'reviewNotReady': 'Termin se još obrađuje, pokušajte za minutu.',
       'yourReviews': 'Vaše ocjene',
       'noStudentsYet': 'Još nema dodijeljenih studenata',
+      'processingBanner':
+          'Vaša narudžba se obrađuje — čekamo potvrdu studenata.',
+      'awaitingConfirmation': 'Čeka potvrdu',
+      'noStudentAssigned': 'Nije dodijeljen',
       'logout': 'Odjava',
       'deleteAccount': 'Izbriši račun',
       'deleteAccountConfirmTitle': 'Izbriši račun',
@@ -458,6 +467,27 @@ class AppStrings {
           'Nije moguće spojiti se na server. Provjerite internetsku vezu i pokušajte ponovo.',
       'serverUnavailableRetrying': 'Pokušavam ponovo...',
       'serverUnavailableRetry': 'Pokušaj ponovo',
+
+      // -- Pending Assignment --
+      'pendingAssignmentTitle': 'Nova narudžba',
+      'pendingAssignmentSubtitle':
+          'Dodijeljena vam je nova narudžba. Pregledajte detalje i prihvatite ili odbijte.',
+      'pendingAssignmentSenior': 'Senior',
+      'pendingAssignmentServices': 'Usluge',
+      'pendingAssignmentAddress': 'Adresa',
+      'pendingAssignmentStart': 'Početak',
+      'pendingAssignmentEnd': 'Završetak',
+      'pendingAssignmentSchedule': 'Raspored',
+      'pendingAssignmentNoEnd': 'Bez završetka',
+      'pendingAccept': 'Prihvati',
+      'pendingDecline': 'Odbij',
+      'pendingDeclineConfirm':
+          'Jeste li sigurni da želite odbiti ovu narudžbu?',
+      'pendingAccepted': 'Narudžba prihvaćena',
+      'pendingDeclined': 'Narudžba odbijena',
+      'pendingSummary': 'Prihvaćeno: {accepted}, odbijeno: {declined}',
+      'pendingRevoked': 'Narudžba je dodijeljena drugom studentu.',
+      'pendingError': 'Greška pri obradi zahtjeva.',
     },
     'en': {
       // -- App --
@@ -709,6 +739,11 @@ class AppStrings {
       'jobCancelled': 'Cancelled',
       'cancelJobLabel': 'Cancel',
       'cancelJobConfirm': 'Are you sure you want to cancel this session?',
+      'cancelDisabled': 'Session cancellation is currently not allowed.',
+      'availabilityChangeDisabled':
+          'Availability change is not possible because you have a scheduled session. Please contact us by phone.',
+      'availabilityChangeCutoff':
+          'You cannot change availability less than {hours} hours before a scheduled session.',
       'jobStudent': 'Student',
       'assignedSince': 'Assigned since',
       'rateStudent': 'Rate',
@@ -719,6 +754,10 @@ class AppStrings {
           'Session is still being processed, try again in a minute.',
       'yourReviews': 'Your reviews',
       'noStudentsYet': 'No students assigned yet',
+      'processingBanner':
+          'Your order is being processed — waiting for student confirmation.',
+      'awaitingConfirmation': 'Awaiting confirmation',
+      'noStudentAssigned': 'Not assigned',
       'logout': 'Log out',
       'deleteAccount': 'Delete Account',
       'deleteAccountConfirmTitle': 'Delete Account',
@@ -902,6 +941,26 @@ class AppStrings {
           'Unable to connect to server. Please check your internet connection and try again.',
       'serverUnavailableRetrying': 'Retrying...',
       'serverUnavailableRetry': 'Retry',
+
+      // -- Pending Assignment --
+      'pendingAssignmentTitle': 'New Order',
+      'pendingAssignmentSubtitle':
+          'You have been assigned a new order. Review the details and accept or decline.',
+      'pendingAssignmentSenior': 'Senior',
+      'pendingAssignmentServices': 'Services',
+      'pendingAssignmentAddress': 'Address',
+      'pendingAssignmentStart': 'Start',
+      'pendingAssignmentEnd': 'End',
+      'pendingAssignmentSchedule': 'Schedule',
+      'pendingAssignmentNoEnd': 'No end date',
+      'pendingAccept': 'Accept',
+      'pendingDecline': 'Decline',
+      'pendingDeclineConfirm': 'Are you sure you want to decline this order?',
+      'pendingAccepted': 'Order accepted',
+      'pendingDeclined': 'Order declined',
+      'pendingSummary': 'Accepted: {accepted}, declined: {declined}',
+      'pendingRevoked': 'The order has been assigned to another student.',
+      'pendingError': 'Error processing request.',
     },
   };
 
@@ -1183,6 +1242,11 @@ class AppStrings {
   static String get jobCancelled => _t('jobCancelled');
   static String get cancelJobLabel => _t('cancelJobLabel');
   static String get cancelJobConfirm => _t('cancelJobConfirm');
+  static String get cancelDisabled => _t('cancelDisabled');
+  static String get availabilityChangeDisabled =>
+      _t('availabilityChangeDisabled');
+  static String availabilityChangeCutoff(int hours) =>
+      _t('availabilityChangeCutoff', params: {'hours': '$hours'});
   static String get jobStudent => _t('jobStudent');
   static String get assignedSince => _t('assignedSince');
   static String get rateStudent => _t('rateStudent');
@@ -1192,6 +1256,9 @@ class AppStrings {
   static String get reviewNotReady => _t('reviewNotReady');
   static String get yourReviews => _t('yourReviews');
   static String get noStudentsYet => _t('noStudentsYet');
+  static String get processingBanner => _t('processingBanner');
+  static String get awaitingConfirmation => _t('awaitingConfirmation');
+  static String get noStudentAssigned => _t('noStudentAssigned');
   static String get logout => _t('logout');
   static String get deleteAccount => _t('deleteAccount');
   static String get deleteAccountConfirmTitle =>
@@ -1373,4 +1440,29 @@ class AppStrings {
   static String get serverUnavailableRetrying =>
       _t('serverUnavailableRetrying');
   static String get serverUnavailableRetry => _t('serverUnavailableRetry');
+
+  // -- Pending Assignment --
+  static String get pendingAssignmentTitle => _t('pendingAssignmentTitle');
+  static String get pendingAssignmentSubtitle =>
+      _t('pendingAssignmentSubtitle');
+  static String get pendingAssignmentSenior => _t('pendingAssignmentSenior');
+  static String get pendingAssignmentServices =>
+      _t('pendingAssignmentServices');
+  static String get pendingAssignmentAddress => _t('pendingAssignmentAddress');
+  static String get pendingAssignmentStart => _t('pendingAssignmentStart');
+  static String get pendingAssignmentEnd => _t('pendingAssignmentEnd');
+  static String get pendingAssignmentSchedule =>
+      _t('pendingAssignmentSchedule');
+  static String get pendingAssignmentNoEnd => _t('pendingAssignmentNoEnd');
+  static String get pendingAccept => _t('pendingAccept');
+  static String get pendingDecline => _t('pendingDecline');
+  static String get pendingDeclineConfirm => _t('pendingDeclineConfirm');
+  static String get pendingAccepted => _t('pendingAccepted');
+  static String get pendingDeclined => _t('pendingDeclined');
+  static String pendingSummary(int accepted, int declined) => _t(
+    'pendingSummary',
+    params: {'accepted': accepted.toString(), 'declined': declined.toString()},
+  );
+  static String get pendingRevoked => _t('pendingRevoked');
+  static String get pendingError => _t('pendingError');
 }

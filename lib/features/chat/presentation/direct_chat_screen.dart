@@ -42,13 +42,14 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen> {
     final rooms = ref.read(chatRoomsProvider).rooms;
     if (rooms.isNotEmpty) {
       _room = rooms.first;
-      ref.read(chatMessagesProvider.notifier).loadMessages(_room!.id);
       ref.read(chatRoomsProvider.notifier).clearUnread(_room!.id);
-      // Reset badge immediately, then confirm with server
       ref.read(chatUnreadCountProvider.notifier).state = 0;
+      await ref.read(chatMessagesProvider.notifier).loadMessages(_room!.id);
+      if (!mounted) return;
       await ref.read(chatMessagesProvider.notifier).markAsRead();
       if (!mounted) return;
-      refreshChatUnreadCount(ref);
+      await refreshChatUnreadCount(ref);
+      if (!mounted) return;
     } else {
       _error = AppStrings.chatLoadError;
     }
@@ -101,7 +102,6 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen> {
   void dispose() {
     _controller.dispose();
     _scrollController.dispose();
-    ref.read(chatMessagesProvider.notifier).clear();
     super.dispose();
   }
 

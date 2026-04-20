@@ -96,31 +96,24 @@ class _ServerUnavailableScreenState extends State<ServerUnavailableScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
-                if (_isRetrying)
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        AppStrings.serverUnavailableRetrying,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withAlpha(153),
-                        ),
-                      ),
-                    ],
-                  )
-                else
-                  const SizedBox(height: 16),
-                const SizedBox(height: 16),
-                OutlinedButton.icon(
-                  onPressed: _isRetrying ? null : _checkHealth,
-                  icon: const Icon(Icons.refresh),
-                  label: Text(AppStrings.serverUnavailableRetry),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    onPressed: _isRetrying ? null : _checkHealth,
+                    icon: _isRetrying
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.refresh),
+                    label: Text(
+                      _isRetrying
+                          ? AppStrings.serverUnavailableRetrying
+                          : AppStrings.serverUnavailableRetry,
+                    ),
+                  ),
                 ),
               ],
             ),

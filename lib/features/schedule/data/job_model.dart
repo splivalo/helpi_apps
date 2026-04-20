@@ -54,6 +54,7 @@ class Job {
   /// Može li student otkazati ovaj posao?
   /// Preferira backend-computed `canCancel`; fallback na lokalnu provjeru.
   bool get canDecline {
+    if (!AppPricing.studentCancelEnabled) return false;
     if (canCancel != null) return canCancel!;
     if (status != JobStatus.scheduled) return false;
     final jobStart = DateTime(

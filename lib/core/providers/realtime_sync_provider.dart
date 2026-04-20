@@ -7,6 +7,7 @@ import 'package:helpi_app/core/constants/pricing.dart';
 import 'package:helpi_app/core/network/token_storage.dart';
 import 'package:helpi_app/core/providers/auth_provider.dart';
 import 'package:helpi_app/core/providers/jobs_provider.dart';
+import 'package:helpi_app/core/providers/pending_assignments_provider.dart';
 import 'package:helpi_app/core/providers/signalr_provider.dart';
 import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/features/chat/data/chat_api_service.dart';
@@ -67,6 +68,7 @@ class RealTimeSyncService {
 
     signalR.on('ReceiveNotification', (args) {
       debugPrint('[RealTimeSync] ReceiveNotification: $args');
+      _handleAssignmentNotification(args);
       if (_shouldRefreshForNotification(args)) {
         _refreshData();
       }
@@ -146,6 +148,23 @@ class RealTimeSyncService {
     signalR.on('ChatMessagesRead', (args) {
       debugPrint('[RealTimeSync] ChatMessagesRead: $args');
     });
+  }
+
+  // ── Assignment notification types ──
+  static const _assignmentPending = 33;
+  static const _assignmentRevoked = 36;
+
+  void _handleAssignmentNotification(List<Object?>? args) {
+    final type = _extractNotificationType(args);
+    if (type == null) return;
+
+    if (type == _assignmentPending) {
+      debugPrint('[RealTimeSync] AssignmentPending — reloading pending list');
+      _ref.read(pendingAssignmentsProvider.notifier).load();
+    } else if (type == _assignmentRevoked) {
+      debugPrint('[RealTimeSync] AssignmentRevoked — reloading pending list');
+      _ref.read(pendingAssignmentsProvider.notifier).load();
+    }
   }
 
   bool _shouldRefreshForNotification(List<Object?>? args) {

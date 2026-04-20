@@ -483,7 +483,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
                   // -- Can't attend button (for assigned, >cutoff hours) --
                   if (_job.canDecline) ...[

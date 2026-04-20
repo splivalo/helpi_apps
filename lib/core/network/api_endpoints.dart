@@ -118,6 +118,13 @@ class ApiEndpoints {
   // Pricing Configuration
   static const String pricingConfig = '/api/PricingConfiguration/1';
 
+  // Schedule Assignments
+  static const String pendingAssignments = '/api/schedule-assignments/pending';
+  static String acceptAssignment(int id) =>
+      '/api/schedule-assignments/$id/accept';
+  static String declineAssignment(int id) =>
+      '/api/schedule-assignments/$id/decline';
+
   // Sponsors
   static const String sponsorsActive = '/api/Sponsors/active';
 }

@@ -1730,9 +1730,9 @@ class _OrderFlowScreenState extends State<OrderFlowScreen> {
                           ),
                           label: Text(
                             '$code · ${_couponDescription(coupon)}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
-                              color: Colors.white,
+                              color: theme.colorScheme.onSurface,
                             ),
                           ),
                           deleteIcon: const Icon(Icons.close, size: 16),
