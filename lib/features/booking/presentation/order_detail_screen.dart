@@ -290,10 +290,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
     // Recurring order — check nearest upcoming scheduled job.
     // Exclude sessions effectively done (time passed, Hangfire not yet run).
-    final upcoming = order.jobs
-        .where((j) => j.status == JobStatus.scheduled && !_isSessionDone(j))
-        .toList()
-      ..sort((a, b) => a.date.compareTo(b.date));
+    final upcoming =
+        order.jobs
+            .where((j) => j.status == JobStatus.scheduled && !_isSessionDone(j))
+            .toList()
+          ..sort((a, b) => a.date.compareTo(b.date));
     if (upcoming.isEmpty) return false;
     return _canCancelJob(upcoming.first);
   }

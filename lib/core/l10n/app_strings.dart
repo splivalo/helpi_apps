@@ -223,6 +223,7 @@ class AppStrings {
       'notificationsLoadError': 'Greška pri dohvaćanju obavijesti.',
       'notificationsMarkedAllRead': 'Sve obavijesti su označene kao pročitane.',
       'notificationsTryAgain': 'Pokušaj ponovno',
+      'notificationsDeleteError': 'Greška pri brisanju obavijesti.',
       'dashboardTitle': 'Pregled',
       'dashboardNoData': 'Podaci pregleda trenutno nisu dostupni.',
       'dashboardActiveOrders': 'Aktivne narudžbe',
@@ -694,6 +695,7 @@ class AppStrings {
       'notificationsLoadError': 'Failed to load notifications.',
       'notificationsMarkedAllRead': 'All notifications were marked as read.',
       'notificationsTryAgain': 'Try again',
+      'notificationsDeleteError': 'Failed to delete notification.',
       'dashboardTitle': 'Overview',
       'dashboardNoData': 'Overview data is currently unavailable.',
       'dashboardActiveOrders': 'Active orders',
@@ -1193,6 +1195,7 @@ class AppStrings {
   static String get notificationsMarkedAllRead =>
       _t('notificationsMarkedAllRead');
   static String get notificationsTryAgain => _t('notificationsTryAgain');
+  static String get notificationsDeleteError => _t('notificationsDeleteError');
   static String get dashboardTitle => _t('dashboardTitle');
   static String get dashboardNoData => _t('dashboardNoData');
   static String get dashboardActiveOrders => _t('dashboardActiveOrders');

@@ -482,6 +482,17 @@ class AppApiService {
     }
   }
 
+  /// Delete a notification permanently.
+  Future<ApiResult<bool>> deleteNotification(int notificationId) async {
+    try {
+      await _client.delete('/api/HNotifications/$notificationId');
+      return ApiResult.success(true);
+    } catch (e) {
+      debugPrint('[AppApiService] deleteNotification error: $e');
+      return ApiResult.failure(friendlyError(e));
+    }
+  }
+
   // LOOKUPS
 
   /// Fetch all cities.
