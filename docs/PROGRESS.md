@@ -365,7 +365,26 @@ Backend imao **dva odvojena** sustava popusta: PromoCode (% ili fiksni, per-orde
 
 ---
 
-## 2026-04-20 — Session filtering, UI polish, dead code cleanup, SignalR instant refresh
+## 2026-04-20 — Student settings permissions, PendingAcceptance potvrda posla, canCancel, session filtering, UI polish, dead code cleanup, SignalR instant refresh
+
+### Student settings — dozvole iz PricingConfiguration
+
+- `AppPricing.studentCancelEnabled` — boolean loaded iz backendbendi; ako `false`, student ne može otkazati nijedan termin
+- `AppPricing.availabilityChangeEnabled` — boolean; ako `false`, student ne može mijenjati raspored dostupnosti
+- `AppPricing.availabilityChangeCutoffHours` — cutoff u satima; student ne smije mijenjati dostupnost unutar tog roka
+- `pricing.dart` — `updateFromConfig()` parsira oba nova boolean polja iz `GET /api/PricingConfiguration`
+- `profile_availability_screen.dart` — provjerava `AppPricing.availabilityChangeEnabled` i cutoff prije dozvole promjene; prikazuje locked banner ako nije omogućeno
+- `job_model.dart` — `canCancelByStudent()` preferira backend-computed `canCancel` polje nad lokalnom logikom; lokalna logika pada nazad na `AppPricing.studentCancelEnabled`
+- `app_api_service.dart` — parsira `canCancel: bool?` iz SessionDto JSON-a
+
+### Student — PendingAcceptance potvrda posla (višestruki modali)
+
+- `AssignmentStatus.PendingAcceptance` — novi backend status: dodjela čeka potvrdu studenta
+- `PendingAssignment` model + `PendingAssignmentsNotifier` (`StateNotifier`) — prati popis dodjela na čekanju
+- `pending_assignments_provider.dart` — `load()` poziva `GET /api/schedule-assignments/pending`, parsira assignmentId + orderId + seniorName + address + scheduleItems (raspored po danima)
+- `student_shell.dart` — u `initState` poziva `_loadPendingAssignments()`; sluša promjenu providera i prikazuje modal za svaku PendingAssignment jednu po jednu (niz modala ako ima više posla)
+- `pending_assignment_overlay.dart` — fullscreen modal kartice s detaljima posla (senior, adresa, raspored dana), gumbi Prihvati / Odbij; po potvrdi/odbijanju briše dodjelu iz statea i prikazuje sljedeći modal ako postoji
+- Rezultat: student po loginu (ili kad dobije novi posao via SignalR) vidi kartice za svaki posao koji mora potvrditi, jednu po jednu
 
 ### Backend — date range filter za sesije
 
