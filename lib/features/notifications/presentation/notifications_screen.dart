@@ -24,7 +24,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   int _selectedTab = 0;
   bool _isLoading = true;
-  bool _isMarkingAll = false;
   String? _loadError;
   int _unreadCount = 0;
   List<Map<String, dynamic>> _allNotifications = [];
@@ -75,35 +74,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       _allNotifications = allResult.data ?? [];
       _unreadCount = _unreadNotifications.length;
     });
-  }
-
-  Future<void> _markAllAsRead() async {
-    final userId = await _storage.getUserId();
-    if (userId == null) {
-      return;
-    }
-
-    setState(() => _isMarkingAll = true);
-    final result = await _api.markAllNotificationsAsRead(userId);
-    if (!mounted) return;
-
-    setState(() => _isMarkingAll = false);
-
-    if (!result.success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.error ?? AppStrings.notificationsLoadError),
-        ),
-      );
-      return;
-    }
-
-    await _loadNotifications();
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppStrings.notificationsMarkedAllRead)),
-    );
   }
 
   Future<void> _markAsRead(Map<String, dynamic> notification) async {
@@ -198,22 +168,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppStrings.notificationsTitle),
-        actions: [
-          if (_unreadCount > 0)
-            TextButton(
-              onPressed: _isMarkingAll ? null : _markAllAsRead,
-              child: _isMarkingAll
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(AppStrings.notificationsMarkAllRead),
-            ),
-        ],
-      ),
+      appBar: AppBar(title: Text(AppStrings.notificationsTitle)),
       body: Column(
         children: [
           Padding(
@@ -314,15 +269,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isRead
-                ? theme.colorScheme.surface
-                : theme.colorScheme.secondaryContainer,
+            color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(
-              color: isRead
-                  ? AppColors.border
-                  : theme.colorScheme.secondary.withAlpha(60),
-            ),
+            border: Border.all(color: AppColors.border),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,

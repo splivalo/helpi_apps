@@ -116,11 +116,16 @@ class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
         actions: [
           IconButton(
             onPressed: () {
+              ref.read(notificationsUnreadProvider.notifier).state = 0;
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const NotificationsScreen()),
               );
             },
-            icon: const Icon(Icons.notifications_outlined),
+            icon: Badge(
+              isLabelVisible: ref.watch(notificationsUnreadProvider) > 0,
+              label: Text('${ref.watch(notificationsUnreadProvider)}'),
+              child: const Icon(Icons.notifications_outlined),
+            ),
             tooltip: AppStrings.notificationsTitle,
           ),
         ],
