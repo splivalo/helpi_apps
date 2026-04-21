@@ -116,7 +116,6 @@ class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              ref.read(notificationsUnreadProvider.notifier).state = 0;
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const NotificationsScreen()),
               );

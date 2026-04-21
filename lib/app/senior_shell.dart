@@ -90,7 +90,6 @@ class _SeniorShellState extends ConsumerState<SeniorShell> {
             HapticFeedback.selectionClick();
             setState(() => _currentIndex = index);
             if (index == 2) _clearChatBadge();
-            if (index == 3) _clearNotifBadge();
           },
           items: [
             BottomNavigationBarItem(
@@ -141,9 +140,5 @@ class _SeniorShellState extends ConsumerState<SeniorShell> {
       ref.read(chatMessagesProvider.notifier).markAsRead();
       ChatApiService().markAsRead(roomId);
     }
-  }
-
-  void _clearNotifBadge() {
-    ref.read(notificationsUnreadProvider.notifier).state = 0;
   }
 }

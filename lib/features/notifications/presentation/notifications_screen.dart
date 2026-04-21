@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:helpi_app/core/constants/colors.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/core/providers/realtime_sync_provider.dart';
 import 'package:helpi_app/shared/widgets/helpi_empty_state.dart';
 import 'package:helpi_app/core/network/token_storage.dart';
 import 'package:helpi_app/core/services/app_api_service.dart';
@@ -11,14 +13,15 @@ import 'package:helpi_app/shared/widgets/tab_bar_selector.dart';
 // TODO(firebase): Tapping a 'reviewRequest' notification should open
 // the order/job detail screen (OrderDetailScreen or JobDetailScreen)
 // instead of just marking it as read. Payload must contain orderId/jobId.
-class NotificationsScreen extends StatefulWidget {
+class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
-  State<NotificationsScreen> createState() => _NotificationsScreenState();
+  ConsumerState<NotificationsScreen> createState() =>
+      _NotificationsScreenState();
 }
 
-class _NotificationsScreenState extends State<NotificationsScreen> {
+class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   final _api = AppApiService();
   final _storage = TokenStorage();
 
@@ -32,6 +35,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   void initState() {
     super.initState();
+    // Clear the in-app unread badge as soon as the screen opens.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(notificationsUnreadProvider.notifier).state = 0;
+    });
     _loadNotifications();
   }
 

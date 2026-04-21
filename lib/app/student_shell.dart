@@ -188,7 +188,6 @@ class _StudentShellState extends ConsumerState<StudentShell> {
     HapticFeedback.selectionClick();
     setState(() => _selectedIndex = index);
     if (index == 1) _clearChatBadge();
-    if (index == 3) _clearNotifBadge();
   }
 
   @override
@@ -299,9 +298,5 @@ class _StudentShellState extends ConsumerState<StudentShell> {
       ref.read(chatMessagesProvider.notifier).markAsRead();
       ChatApiService().markAsRead(roomId);
     }
-  }
-
-  void _clearNotifBadge() {
-    ref.read(notificationsUnreadProvider.notifier).state = 0;
   }
 }
