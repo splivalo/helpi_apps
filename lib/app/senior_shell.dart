@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/core/providers/realtime_sync_provider.dart';
+import 'package:helpi_app/core/utils/snackbar_helper.dart';
 import 'package:helpi_app/features/chat/providers/chat_provider.dart';
 import 'package:helpi_app/features/chat/data/chat_api_service.dart';
 import 'package:helpi_app/core/l10n/locale_notifier.dart';
@@ -57,6 +59,18 @@ class _SeniorShellState extends ConsumerState<SeniorShell> {
 
   @override
   Widget build(BuildContext context) {
+    // Show in-app banner when a notification arrives via SignalR.
+    ref.listen<Map<String, dynamic>?>(inAppNotificationProvider, (prev, next) {
+      if (next == null) return;
+      final title = next['title'] as String? ?? '';
+      final body = next['body'] as String? ?? '';
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) return;
+        showHelpiSnackBar(context, '$title\n$body');
+        ref.read(inAppNotificationProvider.notifier).state = null;
+      });
+    });
+
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _screens),
       bottomNavigationBar: Container(
@@ -76,6 +90,7 @@ class _SeniorShellState extends ConsumerState<SeniorShell> {
             HapticFeedback.selectionClick();
             setState(() => _currentIndex = index);
             if (index == 2) _clearChatBadge();
+            if (index == 3) _clearNotifBadge();
           },
           items: [
             BottomNavigationBarItem(
@@ -91,7 +106,7 @@ class _SeniorShellState extends ConsumerState<SeniorShell> {
               label: AppStrings.navMessages,
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.account_circle_outlined, size: 28),
+              icon: _notifBadgedIcon(Icons.account_circle_outlined, 28),
               label: AppStrings.navProfile,
             ),
           ],
@@ -109,6 +124,15 @@ class _SeniorShellState extends ConsumerState<SeniorShell> {
     );
   }
 
+  Widget _notifBadgedIcon(IconData icon, double size) {
+    final count = ref.watch(notificationsUnreadProvider);
+    return Badge(
+      isLabelVisible: count > 0,
+      label: Text(count > 9 ? '9+' : '$count'),
+      child: Icon(icon, size: size),
+    );
+  }
+
   void _clearChatBadge() {
     ref.read(chatUnreadCountProvider.notifier).state = 0;
     final roomId = ref.read(chatMessagesProvider.notifier).currentRoomId;
@@ -117,5 +141,9 @@ class _SeniorShellState extends ConsumerState<SeniorShell> {
       ref.read(chatMessagesProvider.notifier).markAsRead();
       ChatApiService().markAsRead(roomId);
     }
+  }
+
+  void _clearNotifBadge() {
+    ref.read(notificationsUnreadProvider.notifier).state = 0;
   }
 }

@@ -69,6 +69,7 @@ class RealTimeSyncService {
     signalR.on('ReceiveNotification', (args) {
       debugPrint('[RealTimeSync] ReceiveNotification: $args');
       _handleAssignmentNotification(args);
+      _handleInAppNotification(args);
       if (_shouldRefreshForNotification(args)) {
         _refreshData();
       }
@@ -148,6 +149,37 @@ class RealTimeSyncService {
     signalR.on('ChatMessagesRead', (args) {
       debugPrint('[RealTimeSync] ChatMessagesRead: $args');
     });
+  }
+
+  // ── In-app notification banner ──
+
+  Map<String, dynamic>? _extractNotificationData(List<Object?>? args) {
+    if (args == null || args.isEmpty) return null;
+    final raw = args.first;
+    if (raw is Map<Object?, Object?>) {
+      return Map<String, dynamic>.from(raw);
+    }
+    if (raw is String) {
+      try {
+        final decoded = jsonDecode(raw);
+        if (decoded is Map<String, dynamic>) return decoded;
+      } catch (_) {}
+    }
+    return null;
+  }
+
+  void _handleInAppNotification(List<Object?>? args) {
+    final data = _extractNotificationData(args);
+    if (data == null) return;
+    final title = data['title'] as String?;
+    final body = data['body'] as String?;
+    if (title == null || body == null) return;
+    _ref.read(inAppNotificationProvider.notifier).state = {
+      'title': title,
+      'body': body,
+      'type': data['type'],
+    };
+    _ref.read(notificationsUnreadProvider.notifier).update((s) => s + 1);
   }
 
   // ── Assignment notification types ──
@@ -263,6 +295,16 @@ class RealTimeSyncService {
 /// Bumped when backend sends EntityChanged for contact/senior data.
 /// Profile screens watch this to auto-reload.
 final profileVersionProvider = StateProvider<int>((ref) => 0);
+
+/// Unread in-app notification count. Incremented by RealTimeSyncService on each
+/// incoming notification. Reset to 0 when the user opens the Profile tab.
+final notificationsUnreadProvider = StateProvider<int>((ref) => 0);
+
+/// Last received in-app notification payload (title + body + type).
+/// Shells watch this via ref.listen to show a banner, then reset to null.
+final inAppNotificationProvider = StateProvider<Map<String, dynamic>?>(
+  (ref) => null,
+);
 
 /// Eager provider - initializes as soon as someone reads it.
 final realTimeSyncProvider = Provider<RealTimeSyncService>((ref) {

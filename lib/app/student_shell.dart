@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/providers/pending_assignments_provider.dart';
+import 'package:helpi_app/core/providers/realtime_sync_provider.dart';
 import 'package:helpi_app/core/utils/snackbar_helper.dart';
 import 'package:helpi_app/features/chat/providers/chat_provider.dart';
 import 'package:helpi_app/features/chat/data/chat_api_service.dart';
@@ -187,11 +188,24 @@ class _StudentShellState extends ConsumerState<StudentShell> {
     HapticFeedback.selectionClick();
     setState(() => _selectedIndex = index);
     if (index == 1) _clearChatBadge();
+    if (index == 3) _clearNotifBadge();
   }
 
   @override
   Widget build(BuildContext context) {
     final pending = ref.watch(pendingAssignmentsProvider);
+
+    // Show in-app banner when a notification arrives via SignalR.
+    ref.listen<Map<String, dynamic>?>(inAppNotificationProvider, (prev, next) {
+      if (next == null) return;
+      final title = next['title'] as String? ?? '';
+      final body = next['body'] as String? ?? '';
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) return;
+        showHelpiSnackBar(context, '$title\n$body');
+        ref.read(inAppNotificationProvider.notifier).state = null;
+      });
+    });
 
     // Dismiss overlay if admin revoked (replaced) the assignment while dialog
     // is showing — the SignalR handler calls load() which empties the state.
@@ -249,8 +263,8 @@ class _StudentShellState extends ConsumerState<StudentShell> {
               label: AppStrings.navStatistics,
             ),
             BottomNavigationBarItem(
-              icon: const Icon(Icons.person_outline),
-              activeIcon: const Icon(Icons.person),
+              icon: _notifBadgedIcon(Icons.person_outline),
+              activeIcon: _notifBadgedIcon(Icons.person),
               label: AppStrings.navProfile,
             ),
           ],
@@ -268,6 +282,15 @@ class _StudentShellState extends ConsumerState<StudentShell> {
     );
   }
 
+  Widget _notifBadgedIcon(IconData icon) {
+    final count = ref.watch(notificationsUnreadProvider);
+    return Badge(
+      isLabelVisible: count > 0,
+      label: Text(count > 9 ? '9+' : '$count'),
+      child: Icon(icon),
+    );
+  }
+
   void _clearChatBadge() {
     ref.read(chatUnreadCountProvider.notifier).state = 0;
     final roomId = ref.read(chatMessagesProvider.notifier).currentRoomId;
@@ -276,5 +299,9 @@ class _StudentShellState extends ConsumerState<StudentShell> {
       ref.read(chatMessagesProvider.notifier).markAsRead();
       ChatApiService().markAsRead(roomId);
     }
+  }
+
+  void _clearNotifBadge() {
+    ref.read(notificationsUnreadProvider.notifier).state = 0;
   }
 }
