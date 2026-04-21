@@ -252,6 +252,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   /// Check if a specific job can be cancelled (time > cutoff).
   bool _canCancelJob(JobModel job) {
     if (job.status != JobStatus.scheduled) return false;
+    // Exclude sessions that are effectively done (time passed) even if the
+    // backend hasn't marked them Completed yet (Hangfire delay).
+    if (_isSessionDone(job)) return false;
     final timeParts = job.time.split(':');
     final hour = int.tryParse(timeParts[0]) ?? 0;
     final minute = timeParts.length > 1 ? int.tryParse(timeParts[1]) ?? 0 : 0;
@@ -286,9 +289,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     }
 
     // Recurring order — check nearest upcoming scheduled job.
-    final upcoming =
-        order.jobs.where((j) => j.status == JobStatus.scheduled).toList()
-          ..sort((a, b) => a.date.compareTo(b.date));
+    // Exclude sessions effectively done (time passed, Hangfire not yet run).
+    final upcoming = order.jobs
+        .where((j) => j.status == JobStatus.scheduled && !_isSessionDone(j))
+        .toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
     if (upcoming.isEmpty) return false;
     return _canCancelJob(upcoming.first);
   }
