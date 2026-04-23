@@ -100,6 +100,11 @@ class _HelpiAppState extends ConsumerState<HelpiApp>
   Widget _buildHome(AuthState auth) {
     final authNotifier = ref.read(authProvider.notifier);
 
+    // -1. Provjera sessiona u tijeku -> splash/loading
+    if (auth.isCheckingSession) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     // 0. Suspendiran -> SuspendedScreen
     if (auth.isSuspended) {
       return SuspendedScreen(

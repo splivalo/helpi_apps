@@ -11,6 +11,7 @@ import 'package:helpi_app/features/schedule/data/availability_model.dart';
 class AuthState {
   const AuthState({
     this.isLoggedIn = false,
+    this.isCheckingSession = true,
     this.userType,
     this.isSuspended = false,
     this.suspendReason,
@@ -22,6 +23,7 @@ class AuthState {
   });
 
   final bool isLoggedIn;
+  final bool isCheckingSession;
   final String? userType;
   final bool isSuspended;
   final String? suspendReason;
@@ -35,6 +37,7 @@ class AuthState {
 
   AuthState copyWith({
     bool? isLoggedIn,
+    bool? isCheckingSession,
     String? userType,
     bool? isSuspended,
     String? suspendReason,
@@ -50,6 +53,7 @@ class AuthState {
   }) {
     return AuthState(
       isLoggedIn: isLoggedIn ?? this.isLoggedIn,
+      isCheckingSession: isCheckingSession ?? this.isCheckingSession,
       userType: clearUserType ? null : (userType ?? this.userType),
       isSuspended: isSuspended ?? this.isSuspended,
       suspendReason: clearSuspendReason
@@ -86,14 +90,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> _checkExistingSession() async {
     try {
       final loggedIn = await _authService.isLoggedIn();
-      if (!loggedIn) return;
+      if (!loggedIn) {
+        state = state.copyWith(isCheckingSession: false);
+        return;
+      }
 
       final userType = await _authService.getCurrentUserType();
-      state = state.copyWith(isLoggedIn: true, userType: userType);
+      state = state.copyWith(
+        isLoggedIn: true,
+        isCheckingSession: false,
+        userType: userType,
+      );
 
       _loadDataForUser(userType);
     } catch (e) {
       debugPrint('[AuthNotifier] checkExistingSession error: $e');
+      state = state.copyWith(isCheckingSession: false);
     }
   }
 
