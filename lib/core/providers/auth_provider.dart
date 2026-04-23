@@ -117,15 +117,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   /// Fetches active sponsor and stores it synchronously in [activeSponsorProvider].
   /// Never throws — failure is silently ignored (sponsor is non-critical).
+  /// Hard 3-second timeout so login is never blocked by a slow sponsor API.
   Future<void> _fetchSponsor() async {
     try {
-      final result = await AppApiService().getActiveSponsor();
+      final result = await AppApiService()
+          .getActiveSponsor()
+          .timeout(const Duration(seconds: 3));
       if (result.success && result.data != null) {
         _ref.read(activeSponsorProvider.notifier).state =
             parseSponsor(result.data!);
       }
     } catch (e) {
-      debugPrint('[AuthNotifier] sponsor fetch error: $e');
+      debugPrint('[AuthNotifier] sponsor fetch error/timeout: $e');
     }
   }
 
