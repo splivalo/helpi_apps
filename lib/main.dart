@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,6 +15,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load();
+
+  // Pre-warm SVG asset bytes (fire-and-forget — must NOT await before runApp
+  // or Flutter Web hot-reload triggers "disposed EngineFlutterView" errors)
+  Future.wait([
+    rootBundle.load('assets/images/illustration.svg'),
+    rootBundle.load('assets/images/h_logo.svg'),
+  ]).ignore();
 
   runApp(const ProviderScope(child: HelpiApp()));
 }

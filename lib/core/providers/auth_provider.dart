@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:helpi_app/core/network/api_client.dart';
+import 'package:helpi_app/core/providers/sponsor_provider.dart';
+import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/core/services/auth_service.dart';
 import 'package:helpi_app/core/services/data_loader.dart';
 import 'package:helpi_app/features/booking/data/order_model.dart';
@@ -74,12 +76,13 @@ class AuthState {
 }
 
 class AuthNotifier extends StateNotifier<AuthState> {
-  AuthNotifier(this._authService) : super(const AuthState()) {
+  AuthNotifier(this._authService, this._ref) : super(const AuthState()) {
     ApiClient.onSuspended = _handleSuspension;
     _checkExistingSession();
   }
 
   final AuthService _authService;
+  final Ref _ref;
   final OrdersNotifier ordersNotifier = OrdersNotifier();
   final AvailabilityNotifier availabilityNotifier = AvailabilityNotifier();
 
@@ -96,6 +99,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
       }
 
       final userType = await _authService.getCurrentUserType();
+      // Fetch sponsor while still behind the spinner so home screen
+      // renders with sponsor data already available — no layout shift.
+      await _fetchSponsor();
       state = state.copyWith(
         isLoggedIn: true,
         isCheckingSession: false,
@@ -106,6 +112,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       debugPrint('[AuthNotifier] checkExistingSession error: $e');
       state = state.copyWith(isCheckingSession: false);
+    }
+  }
+
+  /// Fetches active sponsor and stores it synchronously in [activeSponsorProvider].
+  /// Never throws — failure is silently ignored (sponsor is non-critical).
+  Future<void> _fetchSponsor() async {
+    try {
+      final result = await AppApiService().getActiveSponsor();
+      if (result.success && result.data != null) {
+        _ref.read(activeSponsorProvider.notifier).state =
+            parseSponsor(result.data!);
+      }
+    } catch (e) {
+      debugPrint('[AuthNotifier] sponsor fetch error: $e');
     }
   }
 
@@ -123,6 +143,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Called after successful login.
   Future<void> handleLoginSuccess() async {
     final userType = await _authService.getCurrentUserType();
+    // Await sponsor so home screen opens with banner already populated.
+    await _fetchSponsor();
     state = state.copyWith(isLoggedIn: true, userType: userType);
     _loadDataForUser(userType);
   }
@@ -211,5 +233,5 @@ class AuthNotifier extends StateNotifier<AuthState> {
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  return AuthNotifier(AuthService());
+  return AuthNotifier(AuthService(), ref);
 });

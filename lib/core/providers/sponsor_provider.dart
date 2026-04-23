@@ -1,7 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:helpi_app/core/services/app_api_service.dart';
-
 /// Active sponsor data from backend.
 class SponsorData {
   const SponsorData({
@@ -22,17 +20,11 @@ class SponsorData {
   String label(String locale) => labelMap[locale] ?? labelMap['hr'] ?? '';
 }
 
-/// Fetches the first active sponsor once and caches it for the app lifetime.
-final activeSponsorProvider = FutureProvider<SponsorData?>((ref) async {
-  final api = AppApiService();
-  final result = await api.getActiveSponsor();
-  if (!result.success || result.data == null) return null;
-
-  final json = result.data!;
+/// Parses a sponsor JSON map into [SponsorData]. Returns null if invalid.
+SponsorData? parseSponsor(Map<String, dynamic> json) {
   final logoUrl = json['logoUrl'] as String? ?? '';
   if (logoUrl.isEmpty) return null;
 
-  // Label is a JSON map: {"hr": "Uz podršku", "en": "Supported by"}
   final Map<String, String> labelMap = {};
   final rawLabel = json['label'];
   if (rawLabel is Map) {
@@ -50,4 +42,8 @@ final activeSponsorProvider = FutureProvider<SponsorData?>((ref) async {
     linkUrl: json['linkUrl'] as String?,
     labelMap: labelMap,
   );
-});
+}
+
+/// Synchronous provider — populated by DataLoader at login.
+/// No loading state = no layout shift.
+final activeSponsorProvider = StateProvider<SponsorData?>((ref) => null);

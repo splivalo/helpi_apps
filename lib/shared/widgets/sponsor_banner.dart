@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,16 +15,9 @@ class SponsorBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncSponsor = ref.watch(activeSponsorProvider);
-
-    return asyncSponsor.when(
-      data: (sponsor) {
-        if (sponsor == null) return const SizedBox.shrink();
-        return _buildBanner(context, sponsor);
-      },
-      loading: () => const SizedBox.shrink(),
-      error: (_, _) => const SizedBox.shrink(),
-    );
+    final sponsor = ref.watch(activeSponsorProvider);
+    if (sponsor == null) return const SizedBox.shrink();
+    return _buildBanner(context, sponsor);
   }
 
   Widget _buildBanner(BuildContext context, SponsorData sponsor) {
@@ -58,12 +52,13 @@ class SponsorBanner extends ConsumerWidget {
                     placeholderBuilder: (_) =>
                         const SizedBox(width: 24, height: 24),
                   )
-                : Image.network(
-                    fullUrl,
+                : CachedNetworkImage(
+                    imageUrl: fullUrl,
                     height: 24,
                     fit: BoxFit.contain,
-                    errorBuilder: (_, _, _) =>
-                        const SizedBox(width: 24, height: 24),
+                    fadeInDuration: const Duration(milliseconds: 150),
+                    placeholder: (_, _) => const SizedBox(width: 24, height: 24),
+                    errorWidget: (_, _, _) => const SizedBox(width: 24, height: 24),
                   ),
             if (localLabel.isNotEmpty) ...[
               const SizedBox(height: 4),
