@@ -31,50 +31,63 @@ class OrderScreen extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 32,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SvgPicture.asset(
-                        'assets/images/illustration.svg',
-                        width: 220,
-                      ),
-                      const SizedBox(height: 32),
-                      Text(
-                        AppStrings.orderSubtitle,
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.onSurface.withAlpha(153),
+              child: LayoutBuilder(
+                builder: (context, constraints) => SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 32,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 32),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () async {
-                            HapticFeedback.selectionClick();
-                            final created = await Navigator.of(context)
-                                .push<bool>(
-                                  MaterialPageRoute<bool>(
-                                    builder: (_) => OrderFlowScreen(
-                                      ordersNotifier: ordersNotifier,
-                                    ),
-                                  ),
-                                );
-                            if (created == true) {
-                              onOrderCreated?.call();
-                            }
-                          },
-                          icon: const Icon(Icons.add_circle_outline, size: 22),
-                          label: Text(AppStrings.newOrder),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/images/illustration.svg',
+                              width: 220,
+                            ),
+                            const SizedBox(height: 32),
+                            Text(
+                              AppStrings.orderSubtitle,
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color:
+                                    theme.colorScheme.onSurface.withAlpha(153),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 32),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: () async {
+                                  HapticFeedback.selectionClick();
+                                  final created = await Navigator.of(context)
+                                      .push<bool>(
+                                        MaterialPageRoute<bool>(
+                                          builder: (_) => OrderFlowScreen(
+                                            ordersNotifier: ordersNotifier,
+                                          ),
+                                        ),
+                                      );
+                                  if (created == true) {
+                                    onOrderCreated?.call();
+                                  }
+                                },
+                                icon: const Icon(
+                                  Icons.add_circle_outline,
+                                  size: 22,
+                                ),
+                                label: Text(AppStrings.newOrder),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
