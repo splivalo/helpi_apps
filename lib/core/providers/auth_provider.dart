@@ -231,7 +231,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await _authService.logout();
     availabilityNotifier.reset();
     DataLoader.reset();
-    state = const AuthState();
+    _ref.read(activeSponsorProvider.notifier).state = null;
+    state = const AuthState(isCheckingSession: false);
   }
 }
 
