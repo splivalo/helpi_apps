@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/core/providers/realtime_sync_provider.dart';
+import 'package:helpi_app/features/notifications/presentation/notifications_screen.dart';
 import 'package:helpi_app/shared/widgets/helpi_empty_state.dart';
 import 'package:helpi_app/core/providers/jobs_provider.dart';
 import 'package:helpi_app/features/schedule/data/job_model.dart';
@@ -126,7 +128,10 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
 
     if (jobsState.isLoading) {
       return Scaffold(
-        appBar: AppBar(title: Text(AppStrings.scheduleTitle)),
+        appBar: AppBar(
+          title: Text(AppStrings.scheduleTitle),
+          actions: [_NotifBell(ref: ref)],
+        ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -141,7 +146,10 @@ class _ScheduleScreenState extends ConsumerState<ScheduleScreen> {
     final todayJobs = _jobsForDate(_selectedDate, jobs);
 
     return Scaffold(
-      appBar: AppBar(title: Text(AppStrings.scheduleTitle)),
+      appBar: AppBar(
+        title: Text(AppStrings.scheduleTitle),
+        actions: [_NotifBell(ref: ref)],
+      ),
       body: Column(
         children: [
           // -- Weekly strip --
@@ -497,6 +505,29 @@ class _JobCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Reusable notification bell icon for AppBar actions.
+class _NotifBell extends ConsumerWidget {
+  const _NotifBell({required this.ref});
+
+  final WidgetRef ref;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final count = ref.watch(notificationsUnreadProvider);
+    return IconButton(
+      onPressed: () => Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+      icon: Badge(
+        isLabelVisible: count > 0,
+        label: Text(count > 9 ? '9+' : '$count'),
+        child: const Icon(Icons.notifications_outlined),
+      ),
+      tooltip: AppStrings.notificationsTitle,
     );
   }
 }

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/core/providers/realtime_sync_provider.dart';
+import 'package:helpi_app/features/notifications/presentation/notifications_screen.dart';
 import 'package:helpi_app/shared/widgets/helpi_empty_state.dart';
 import 'package:helpi_app/core/utils/formatters.dart';
 import 'package:helpi_app/features/booking/data/order_model.dart';
@@ -50,7 +53,29 @@ class _OrdersScreenState extends State<OrdersScreen> {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: Text(AppStrings.myOrders)),
+      appBar: AppBar(
+        title: Text(AppStrings.myOrders),
+        actions: [
+          Consumer(
+            builder: (context, ref, _) {
+              final count = ref.watch(notificationsUnreadProvider);
+              return IconButton(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const NotificationsScreen(),
+                  ),
+                ),
+                icon: Badge(
+                  isLabelVisible: count > 0,
+                  label: Text(count > 9 ? '9+' : '$count'),
+                  child: const Icon(Icons.notifications_outlined),
+                ),
+                tooltip: AppStrings.notificationsTitle,
+              );
+            },
+          ),
+        ],
+      ),
       body: Column(
         children: [
           // -- Custom tab bar (coral underline, no black line) --

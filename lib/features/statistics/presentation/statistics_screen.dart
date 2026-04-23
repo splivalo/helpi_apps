@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:helpi_app/app/theme.dart';
 import 'package:helpi_app/core/l10n/app_strings.dart';
+import 'package:helpi_app/core/providers/realtime_sync_provider.dart';
+import 'package:helpi_app/features/notifications/presentation/notifications_screen.dart';
 import 'package:helpi_app/core/providers/jobs_provider.dart';
 import 'package:helpi_app/features/schedule/data/job_model.dart';
 import 'package:helpi_app/features/schedule/utils/formatters.dart';
@@ -173,6 +175,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
           centerTitle: true,
           surfaceTintColor: Colors.transparent,
           elevation: 0,
+          actions: [_NotifBell(ref: ref)],
         ),
         body: const Center(child: CircularProgressIndicator()),
       );
@@ -191,6 +194,7 @@ class _StatisticsScreenState extends ConsumerState<StatisticsScreen> {
         centerTitle: true,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
+        actions: [_NotifBell(ref: ref)],
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
@@ -549,4 +553,27 @@ class _WeekRange {
   final DateTime from;
   final DateTime to;
   final double hours;
+}
+
+/// Reusable notification bell icon for AppBar actions.
+class _NotifBell extends ConsumerWidget {
+  const _NotifBell({required this.ref});
+
+  final WidgetRef ref;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final count = ref.watch(notificationsUnreadProvider);
+    return IconButton(
+      onPressed: () => Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+      icon: Badge(
+        isLabelVisible: count > 0,
+        label: Text(count > 9 ? '9+' : '$count'),
+        child: const Icon(Icons.notifications_outlined),
+      ),
+      tooltip: AppStrings.notificationsTitle,
+    );
+  }
 }

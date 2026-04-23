@@ -262,8 +262,8 @@ class _StudentShellState extends ConsumerState<StudentShell> {
               label: AppStrings.navStatistics,
             ),
             BottomNavigationBarItem(
-              icon: _notifBadgedIcon(Icons.person_outline),
-              activeIcon: _notifBadgedIcon(Icons.person),
+              icon: const Icon(Icons.person_outline),
+              activeIcon: const Icon(Icons.person),
               label: AppStrings.navProfile,
             ),
           ],
@@ -277,15 +277,6 @@ class _StudentShellState extends ConsumerState<StudentShell> {
     return Badge(
       isLabelVisible: count > 0,
       label: Text('$count'),
-      child: Icon(icon),
-    );
-  }
-
-  Widget _notifBadgedIcon(IconData icon) {
-    final count = ref.watch(notificationsUnreadProvider);
-    return Badge(
-      isLabelVisible: count > 0,
-      label: Text(count > 9 ? '9+' : '$count'),
       child: Icon(icon),
     );
   }

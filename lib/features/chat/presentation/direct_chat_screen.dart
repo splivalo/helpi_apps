@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/network/token_storage.dart';
+import 'package:helpi_app/core/providers/realtime_sync_provider.dart';
 import 'package:helpi_app/features/chat/data/chat_models.dart';
 import 'package:helpi_app/features/chat/providers/chat_provider.dart';
+import 'package:helpi_app/features/notifications/presentation/notifications_screen.dart';
 
 /// Direct chat screen — skips room list, opens conversation with Helpi.
 /// Used by both Student and Senior chat tabs.
@@ -111,14 +113,20 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen> {
 
     if (_isLoadingRoom) {
       return Scaffold(
-        appBar: AppBar(title: Text(AppStrings.chatRooms)),
+        appBar: AppBar(
+          title: Text(AppStrings.chatRooms),
+          actions: [_NotifBell(ref: ref)],
+        ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     if (_error != null || _room == null || _myUserId == null) {
       return Scaffold(
-        appBar: AppBar(title: Text(AppStrings.chatRooms)),
+        appBar: AppBar(
+          title: Text(AppStrings.chatRooms),
+          actions: [_NotifBell(ref: ref)],
+        ),
         body: Center(
           child: Text(
             _error ?? AppStrings.chatLoadError,
@@ -143,7 +151,10 @@ class _DirectChatScreenState extends ConsumerState<DirectChatScreen> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: AppBar(title: Text(AppStrings.chatRooms)),
+        appBar: AppBar(
+          title: Text(AppStrings.chatRooms),
+          actions: [_NotifBell(ref: ref)],
+        ),
         body: SafeArea(
           top: false,
           child: Column(
@@ -321,6 +332,29 @@ class _ChatBubble extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Reusable notification bell icon for AppBar actions.
+class _NotifBell extends ConsumerWidget {
+  const _NotifBell({required this.ref});
+
+  final WidgetRef ref;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final count = ref.watch(notificationsUnreadProvider);
+    return IconButton(
+      onPressed: () => Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+      icon: Badge(
+        isLabelVisible: count > 0,
+        label: Text(count > 9 ? '9+' : '$count'),
+        child: const Icon(Icons.notifications_outlined),
+      ),
+      tooltip: AppStrings.notificationsTitle,
     );
   }
 }

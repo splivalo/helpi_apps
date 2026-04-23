@@ -53,7 +53,7 @@ class _ProfileCredentialsScreenState extends State<ProfileCredentialsScreen> {
             keyboardType: TextInputType.emailAddress,
             enabled: false,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           OutlinedButton.icon(
             onPressed: _showChangePasswordDialog,
             icon: const Icon(Icons.lock_outline, size: 20),

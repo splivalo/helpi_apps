@@ -105,7 +105,15 @@ class _StudentMenuScreenState extends ConsumerState<StudentMenuScreen> {
                 MaterialPageRoute(builder: (_) => const NotificationsScreen()),
               );
             },
-            icon: const Icon(Icons.notifications_outlined),
+            icon: Badge(
+              isLabelVisible: ref.watch(notificationsUnreadProvider) > 0,
+              label: Text(
+                ref.watch(notificationsUnreadProvider) > 9
+                    ? '9+'
+                    : '${ref.watch(notificationsUnreadProvider)}',
+              ),
+              child: const Icon(Icons.notifications_outlined),
+            ),
             tooltip: AppStrings.notificationsTitle,
           ),
         ],

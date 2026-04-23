@@ -105,7 +105,7 @@ class _SeniorShellState extends ConsumerState<SeniorShell> {
               label: AppStrings.navMessages,
             ),
             BottomNavigationBarItem(
-              icon: _notifBadgedIcon(Icons.account_circle_outlined, 28),
+              icon: const Icon(Icons.account_circle_outlined, size: 28),
               label: AppStrings.navProfile,
             ),
           ],
@@ -119,15 +119,6 @@ class _SeniorShellState extends ConsumerState<SeniorShell> {
     return Badge(
       isLabelVisible: count > 0,
       label: Text('$count'),
-      child: Icon(icon, size: size),
-    );
-  }
-
-  Widget _notifBadgedIcon(IconData icon, double size) {
-    final count = ref.watch(notificationsUnreadProvider);
-    return Badge(
-      isLabelVisible: count > 0,
-      label: Text(count > 9 ? '9+' : '$count'),
       child: Icon(icon, size: size),
     );
   }

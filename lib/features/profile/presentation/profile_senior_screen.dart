@@ -93,7 +93,10 @@ class _ProfileSeniorScreenState extends State<ProfileSeniorScreen> {
     );
 
     if (!mounted) return;
-    setState(() => _isSaving = false);
+    setState(() {
+      _isSaving = false;
+      if (result.success) _isEditing = false;
+    });
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -112,26 +115,7 @@ class _ProfileSeniorScreenState extends State<ProfileSeniorScreen> {
       appBar: AppBar(
         title: Text(AppStrings.seniorData),
         actions: [
-          if (_isSaving)
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            )
-          else if (_isEditing)
-            IconButton(
-              onPressed: () async {
-                await _save();
-                if (!mounted) return;
-                setState(() => _isEditing = false);
-              },
-              icon: const Icon(Icons.check),
-              tooltip: AppStrings.save,
-            )
-          else
+          if (!_isEditing)
             IconButton(
               onPressed: () => setState(() => _isEditing = true),
               icon: const Icon(Icons.edit_outlined),
@@ -139,46 +123,80 @@ class _ProfileSeniorScreenState extends State<ProfileSeniorScreen> {
             ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
+      body: Column(
         children: [
-          HelpiTextField(
-            label: AppStrings.firstName,
-            controller: _firstNameCtrl,
-            enabled: _isEditing,
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+              children: [
+                HelpiTextField(
+                  label: AppStrings.firstName,
+                  controller: _firstNameCtrl,
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 16),
+                HelpiTextField(
+                  label: AppStrings.lastName,
+                  controller: _lastNameCtrl,
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 16),
+                HelpiGenderPicker(
+                  value: _gender,
+                  onChanged: (v) => setState(() => _gender = v),
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 16),
+                HelpiDatePicker(
+                  label: AppStrings.dateOfBirth,
+                  date: _dob,
+                  onChanged: (d) => setState(() => _dob = d),
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 16),
+                HelpiTextField(
+                  label: AppStrings.address,
+                  controller: _addressCtrl,
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 16),
+                HelpiTextField(
+                  label: AppStrings.phone,
+                  controller: _phoneCtrl,
+                  keyboardType: TextInputType.phone,
+                  enabled: _isEditing,
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
-          HelpiTextField(
-            label: AppStrings.lastName,
-            controller: _lastNameCtrl,
-            enabled: _isEditing,
-          ),
-          const SizedBox(height: 16),
-          HelpiGenderPicker(
-            value: _gender,
-            onChanged: (v) => setState(() => _gender = v),
-            enabled: _isEditing,
-          ),
-          const SizedBox(height: 16),
-          HelpiDatePicker(
-            label: AppStrings.dateOfBirth,
-            date: _dob,
-            onChanged: (d) => setState(() => _dob = d),
-            enabled: _isEditing,
-          ),
-          const SizedBox(height: 16),
-          HelpiTextField(
-            label: AppStrings.address,
-            controller: _addressCtrl,
-            enabled: _isEditing,
-          ),
-          const SizedBox(height: 16),
-          HelpiTextField(
-            label: AppStrings.phone,
-            controller: _phoneCtrl,
-            keyboardType: TextInputType.phone,
-            enabled: _isEditing,
-          ),
+          if (_isEditing)
+            SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ElevatedButton(
+                      onPressed: _isSaving ? null : _save,
+                      child: _isSaving
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Text(AppStrings.save),
+                    ),
+                    const SizedBox(height: 4),
+                    TextButton(
+                      onPressed: () => setState(() => _isEditing = false),
+                      child: Text(AppStrings.cancel),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );
