@@ -51,13 +51,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Future<void> _loadSessions() async {
     final api = AppApiService();
 
-    // For recurring orders, only fetch current month sessions
+    // For recurring orders, fetch sessions for the relevant month.
+    // If the order starts in the future (e.g. next month), use that month
+    // so sessions are visible as soon as the student is assigned.
     String? from;
     String? to;
     if (!widget.order.isOneTime) {
       final now = DateTime.now();
-      final monthStart = DateTime(now.year, now.month);
-      final monthEnd = DateTime(now.year, now.month + 1, 0);
+      final ref = widget.order.date.isAfter(now) ? widget.order.date : now;
+      final monthStart = DateTime(ref.year, ref.month);
+      final monthEnd = DateTime(ref.year, ref.month + 1, 0);
       from =
           '${monthStart.year}-${monthStart.month.toString().padLeft(2, '0')}-${monthStart.day.toString().padLeft(2, '0')}';
       to =
@@ -671,7 +674,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           if (!order.isOneTime) ...[
             const SizedBox(height: 6),
             Text(
-              AppStrings.jobsMonthlySubtitle,
+              () {
+                final now = DateTime.now();
+                final ref = order.date.isAfter(now) ? order.date : now;
+                return AppStrings.jobsMonthlySubtitle(
+                  AppStrings.monthName(ref.month),
+                  ref.year,
+                );
+              }(),
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),

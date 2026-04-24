@@ -722,12 +722,9 @@ class AppApiService {
     // Frequency string
     String frequency;
     if (!isRecurring) {
-      frequency = 'Jednom';
-    } else if (endDate != null) {
-      frequency =
-          'Do ${endDate.day.toString().padLeft(2, '0')}.${endDate.month.toString().padLeft(2, '0')}.${endDate.year}';
+      frequency = AppStrings.oneTime;
     } else {
-      frequency = 'Ponavljajuce';
+      frequency = AppStrings.recurringNoEnd;
     }
 
     // First schedule za time/weekday/duration

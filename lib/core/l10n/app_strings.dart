@@ -262,7 +262,7 @@ class AppStrings {
       'studentsSection': 'Studenti',
       'jobsSection': 'Termini',
       'jobSectionSingular': 'Termin',
-      'jobsMonthlySubtitle': 'Prikazani termini za tekući mjesec.',
+      'jobsMonthlySubtitle': 'Prikazani termini za {month} {year}.',
       'jobCompleted': 'Završen',
       'jobUpcoming': 'Nadolazeći',
       'jobActive': 'Aktivan',
@@ -734,7 +734,7 @@ class AppStrings {
       'studentsSection': 'Students',
       'jobsSection': 'Sessions',
       'jobSectionSingular': 'Session',
-      'jobsMonthlySubtitle': 'Showing sessions for the current month.',
+      'jobsMonthlySubtitle': 'Showing sessions for {month} {year}.',
       'jobCompleted': 'Completed',
       'jobUpcoming': 'Upcoming',
       'jobActive': 'Active',
@@ -1238,7 +1238,8 @@ class AppStrings {
   static String get studentsSection => _t('studentsSection');
   static String get jobsSection => _t('jobsSection');
   static String get jobSectionSingular => _t('jobSectionSingular');
-  static String get jobsMonthlySubtitle => _t('jobsMonthlySubtitle');
+  static String jobsMonthlySubtitle(String month, int year) =>
+      _t('jobsMonthlySubtitle', params: {'month': month, 'year': '$year'});
   static String get jobCompleted => _t('jobCompleted');
   static String get jobUpcoming => _t('jobUpcoming');
   static String get jobActive => _t('jobActive');
