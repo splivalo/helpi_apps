@@ -4,7 +4,7 @@
 
 ## Status: Backend-Connected App (API-first + fallback cache)
 
-**Datum:** 15.04.2026.  
+**Datum:** 24.04.2026.  
 **Analyze:** 0 errors, 0 warnings  
 **Fajlovi:** 64 .dart files  
 **State mgmt:** Riverpod (flutter_riverpod ^2.6.1)  
@@ -419,3 +419,22 @@ Backend imao **dva odvojena** sustava popusta: PromoCode (% ili fiksni, per-orde
 - `signalr_notification_service.dart` — `_onEntityChanged()` ispravlja parsiranje Map formata (`{entityType: "Sessions", timestamp: ...}`); bumpa `sessionsVersionProvider` za Sessions/Orders/JobInstances
 - `order_detail_screen.dart` (admin) — sluša `sessionsVersionProvider`, auto re-fetcha sesije bez izlaska iz ekrana
 - Rezultat: kad senior otkaže termin u app-u, admin odmah vidi promjenu u real-time
+
+
+---
+
+## 2026-04-24 — Coordinate (lat/lng) bug fix u profile ekranima
+
+### Problem
+
+Korisnici (npr. Stipe Splivalo) imali 0,0 koordinate u bazi jer profile edit ekrani koristili plain HelpiTextField za adresu — tekst se updejtao ali koordinate nikad.
+
+### Rješenje
+
+Isti pattern kao na registraciji — McAddressField u edit modu, disabled HelpiTextField u view modu.
+
+- [x] **`profile_student_data_screen.dart`** — Dodani `SelectedAddressInfo? _selectedAddress`, McAddressField kada je editMode=true, čita lat/lng iz API responsea pri loadu, prosljeđuje koordinate u updateContactInfo
+- [x] **`profile_senior_screen.dart`** — Isti fix
+- [x] **`app_api_service.dart`** — `updateContactInfo` sada prima `lat` i `lng` optional params (default 0.0), šalje kao `latitude`/`longitude` u PUT body
+- [x] **`registration_data_screen.dart`** — Ispravljena validacija: `||` → `&&` za "obje koordinate moraju biti non-zero" (`_selectedAddress!.lat != 0.0 && _selectedAddress!.lng != 0.0`)
+- [x] flutter analyze: 0 issues

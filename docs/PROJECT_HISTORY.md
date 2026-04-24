@@ -4,6 +4,21 @@
 
 ---
 
+## 2026-04-24 — Coordinate (lat/lng) bug fix u profile ekranima
+
+**Problem:** Korisnici (npr. Stipe Splivalo) imali 0,0 koordinate u bazi jer profile edit ekrani koristili plain `HelpiTextField` za adresu — tekst se updejtao ali koordinate nikad.
+
+**Odluka:** Isti pattern kao na registraciji — `McAddressField` u edit modu, disabled `HelpiTextField` u view modu.
+
+1. `profile_student_data_screen.dart` — Dodani `SelectedAddressInfo? _selectedAddress`, McAddressField kada je editMode=true, čita lat/lng iz API responsea pri loadu, prosljeđuje koordinate u updateContactInfo
+2. `profile_senior_screen.dart` — Isti fix
+3. `app_api_service.dart` — `updateContactInfo` sada prima `lat` i `lng` optional params (default 0.0), šalje kao `latitude`/`longitude` u PUT body
+4. `registration_data_screen.dart` — Ispravljena validacija: `||` → `&&` za "obje koordinate moraju biti non-zero"
+
+**Rezultat:** `flutter analyze` = 0 issues.
+
+---
+
 ## 2026-04-18 — CouponType simplifikacija
 
 - **Percentage + FixedPerSession uklonjeni** — Uklonjeni `case 3` i `case 4` iz `_couponDescription` i `_calculateCouponDiscount` u `order_flow_screen.dart`, te `_couponLabel` u `order_detail_screen.dart`. Uklonjeni `couponPercentOff` i `couponFixedOff` stringovi iz `app_strings.dart` (HR/EN + getteri).
