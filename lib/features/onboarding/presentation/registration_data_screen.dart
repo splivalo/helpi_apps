@@ -85,7 +85,7 @@ class _RegistrationDataScreenState extends State<RegistrationDataScreen> {
       _lastNameCtrl.text.trim().isNotEmpty &&
       _phoneCtrl.text.trim().isNotEmpty &&
       _selectedAddress != null &&
-      (_selectedAddress!.lat != 0.0 || _selectedAddress!.lng != 0.0) &&
+      (_selectedAddress!.lat != 0.0 && _selectedAddress!.lng != 0.0) &&
       _selectedFaculty != null &&
       _dob != null;
 
