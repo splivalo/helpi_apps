@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:helpi_app/core/l10n/app_strings.dart';
 import 'package:helpi_app/core/services/app_api_service.dart';
+import 'package:helpi_app/shared/models/selected_address_info.dart';
 import 'package:helpi_app/shared/widgets/helpi_form_fields.dart';
+import 'package:helpi_app/shared/widgets/mc_address_field.dart';
 
 /// Sub-screen: senior (korisnik) personal data with auto-save.
 class ProfileSeniorScreen extends StatefulWidget {
@@ -25,6 +27,7 @@ class _ProfileSeniorScreenState extends State<ProfileSeniorScreen> {
   int? _contactId;
   String _email = '';
   String _googlePlaceId = 'app-manual-entry';
+  SelectedAddressInfo? _selectedAddress;
   bool _isEditing = false;
   bool _isSaving = false;
 
@@ -49,7 +52,16 @@ class _ProfileSeniorScreenState extends State<ProfileSeniorScreen> {
       _firstNameCtrl.text = parts.isNotEmpty ? parts.first : '';
       _lastNameCtrl.text = parts.length > 1 ? parts.sublist(1).join(' ') : '';
       _phoneCtrl.text = contact['phone'] as String? ?? '';
-      _addressCtrl.text = contact['fullAddress'] as String? ?? '';
+      final fullAddress = contact['fullAddress'] as String? ?? '';
+      _addressCtrl.text = fullAddress;
+      final lat = (contact['latitude'] as num?)?.toDouble() ?? 0.0;
+      final lng = (contact['longitude'] as num?)?.toDouble() ?? 0.0;
+      _selectedAddress = SelectedAddressInfo(
+        placeId: _googlePlaceId,
+        fullAddress: fullAddress,
+        lat: lat,
+        lng: lng,
+      );
 
       final genderVal = contact['gender'];
       _gender = (genderVal == 0 || genderVal == 'Male') ? 'M' : 'F';
@@ -89,7 +101,9 @@ class _ProfileSeniorScreenState extends State<ProfileSeniorScreen> {
           : _addressCtrl.text.trim(),
       gender: _gender == 'M' ? 0 : 1,
       dateOfBirth: fmtDate,
-      googlePlaceId: _googlePlaceId,
+      googlePlaceId: _selectedAddress?.placeId ?? _googlePlaceId,
+      lat: _selectedAddress?.lat ?? 0.0,
+      lng: _selectedAddress?.lng ?? 0.0,
     );
 
     if (!mounted) return;
@@ -154,11 +168,19 @@ class _ProfileSeniorScreenState extends State<ProfileSeniorScreen> {
                   enabled: _isEditing,
                 ),
                 const SizedBox(height: 16),
-                HelpiTextField(
-                  label: AppStrings.address,
-                  controller: _addressCtrl,
-                  enabled: _isEditing,
-                ),
+                if (_isEditing)
+                  McAddressField(
+                    controller: _addressCtrl,
+                    onAddressSelected: (info) {
+                      setState(() => _selectedAddress = info);
+                    },
+                  )
+                else
+                  HelpiTextField(
+                    label: AppStrings.address,
+                    controller: _addressCtrl,
+                    enabled: false,
+                  ),
                 const SizedBox(height: 16),
                 HelpiTextField(
                   label: AppStrings.phone,
