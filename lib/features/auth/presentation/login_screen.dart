@@ -727,6 +727,7 @@ class _LoginScreenState extends State<LoginScreen> {
         lastName.isEmpty ||
         phone.isEmpty ||
         _selectedAddress == null ||
+        (_selectedAddress!.lat == 0.0 && _selectedAddress!.lng == 0.0) ||
         _ordDob == null) {
       setState(() => _errorMessage = AppStrings.fillAllFields);
       return;

@@ -5,7 +5,9 @@ import 'package:helpi_app/core/network/api_client.dart';
 import 'package:helpi_app/core/network/api_endpoints.dart';
 import 'package:helpi_app/core/services/app_api_service.dart';
 import 'package:helpi_app/shared/models/faculty.dart';
+import 'package:helpi_app/shared/models/selected_address_info.dart';
 import 'package:helpi_app/shared/widgets/helpi_form_fields.dart';
+import 'package:helpi_app/shared/widgets/mc_address_field.dart';
 import 'package:helpi_app/features/schedule/widgets/faculty_picker.dart';
 
 /// Sub-screen: student personal data (name, phone, address, gender, DOB, faculty).
@@ -32,6 +34,7 @@ class _ProfileStudentDataScreenState extends State<ProfileStudentDataScreen> {
   Faculty? _selectedFaculty;
   String _gender = 'F';
   DateTime _dob = DateTime(2002, 1, 1);
+  SelectedAddressInfo? _selectedAddress;
 
   String _email = '';
   bool _isEditing = false;
@@ -67,7 +70,16 @@ class _ProfileStudentDataScreenState extends State<ProfileStudentDataScreen> {
         ? nameParts.sublist(1).join(' ')
         : '';
     _phoneCtrl.text = contact['phone'] as String? ?? '';
-    _addressCtrl.text = contact['fullAddress'] as String? ?? '';
+    final fullAddress = contact['fullAddress'] as String? ?? '';
+    _addressCtrl.text = fullAddress;
+    final lat = (contact['latitude'] as num?)?.toDouble() ?? 0.0;
+    final lng = (contact['longitude'] as num?)?.toDouble() ?? 0.0;
+    _selectedAddress = SelectedAddressInfo(
+      placeId: contact['googlePlaceId'] as String? ?? '',
+      fullAddress: fullAddress,
+      lat: lat,
+      lng: lng,
+    );
 
     final genderVal = contact['gender'];
     _gender = (genderVal == 0 || genderVal == 'Male') ? 'M' : 'F';
@@ -125,6 +137,9 @@ class _ProfileStudentDataScreenState extends State<ProfileStudentDataScreen> {
       fullAddress: _addressCtrl.text.trim(),
       gender: _gender == 'M' ? 0 : 1,
       dateOfBirth: fmtDate(_dob),
+      googlePlaceId: _selectedAddress?.placeId ?? 'app-manual-entry',
+      lat: _selectedAddress?.lat ?? 0.0,
+      lng: _selectedAddress?.lng ?? 0.0,
     );
 
     if (!mounted) return;
@@ -204,11 +219,19 @@ class _ProfileStudentDataScreenState extends State<ProfileStudentDataScreen> {
                         enabled: _isEditing,
                       ),
                       const SizedBox(height: 16),
-                      HelpiTextField(
-                        label: AppStrings.address,
-                        controller: _addressCtrl,
-                        enabled: _isEditing,
-                      ),
+                      if (_isEditing)
+                        McAddressField(
+                          controller: _addressCtrl,
+                          onAddressSelected: (info) {
+                            setState(() => _selectedAddress = info);
+                          },
+                        )
+                      else
+                        HelpiTextField(
+                          label: AppStrings.address,
+                          controller: _addressCtrl,
+                          enabled: false,
+                        ),
                       const SizedBox(height: 16),
                       _buildFacultyField(theme),
                       const SizedBox(height: 20),

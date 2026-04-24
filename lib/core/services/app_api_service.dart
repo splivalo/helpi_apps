@@ -636,6 +636,8 @@ class AppApiService {
     required String dateOfBirth,
     String googlePlaceId = 'app-manual-entry',
     int cityId = 1,
+    double lat = 0.0,
+    double lng = 0.0,
   }) async {
     try {
       await _client.put(
@@ -651,6 +653,8 @@ class AppApiService {
           'languageCode': 'hr',
           'country': 'Croatia',
           'cityId': cityId,
+          'latitude': lat,
+          'longitude': lng,
         },
       );
       return ApiResult.success(true);
