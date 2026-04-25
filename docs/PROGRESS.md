@@ -1,6 +1,6 @@
 ﻿# Helpi App - Progress
 
-> Last updated: 2026-04-24
+> Last updated: 2026-05-13
 
 ## Current Status
 
@@ -21,6 +21,12 @@
 - Notifications screen with backend data
 - Chat integration with backend and unread count
 - Localization support (HR/EN)
+
+## 2026-05-13 - Student Availability Refresh
+
+- ✅ **Availability not syncing from admin**: `ProfileAvailabilityScreen` now calls `_refreshFromBackend()` in `initState` to fetch fresh availability from backend (`GET /api/student-availability-slots/student/{id}`) — ensures admin changes are immediately visible without app restart
+- ✅ **LinearProgressIndicator** added during refresh for user feedback
+- ✅ **0 errors → 0 errors maintained**
 
 ## 2026-04-24 Update
 

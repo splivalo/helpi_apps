@@ -29,6 +29,7 @@ class ProfileAvailabilityScreen extends StatefulWidget {
 class _ProfileAvailabilityScreenState extends State<ProfileAvailabilityScreen> {
   bool _isEditing = false;
   bool _isSaving = false;
+  bool _isRefreshing = false;
 
   /// Snapshot of availability before editing (to detect harmful changes).
   Map<int, _DaySnap> _oldAvail = {};
@@ -37,6 +38,25 @@ class _ProfileAvailabilityScreenState extends State<ProfileAvailabilityScreen> {
   List<Job> _cachedSessions = [];
 
   List<DayAvailability> get _availability => widget.availabilityNotifier.value;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshFromBackend();
+  }
+
+  /// Fetches fresh availability from backend so any admin changes are visible.
+  Future<void> _refreshFromBackend() async {
+    final userId = widget.studentUserId ?? await TokenStorage().getUserId();
+    if (userId == null || !mounted) return;
+    setState(() => _isRefreshing = true);
+    final result = await AppApiService().getStudentAvailability(userId);
+    if (!mounted) return;
+    if (result.success && result.data != null) {
+      widget.availabilityNotifier.loadFromBackend(result.data!);
+    }
+    setState(() => _isRefreshing = false);
+  }
 
   Future<void> _startEditing() async {
     // Capture current state before user edits
@@ -268,59 +288,66 @@ class _ProfileAvailabilityScreenState extends State<ProfileAvailabilityScreen> {
             ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
+      body: Column(
         children: [
-          Text(
-            AppStrings.availabilityDescription,
-            style: theme.textTheme.bodySmall,
-          ),
-          const SizedBox(height: 16),
-          ..._availability.map(
-            (day) => AvailabilityDayRow(
-              day: day,
-              enabled: _isEditing,
-              onEnabledChanged: (v) {
-                final prev = day.enabled;
-                day.enabled = v;
-                if (_hasConflictOnDay(day)) {
-                  day.enabled = prev;
-                  showHelpiSnackBar(
-                    context,
-                    AppStrings.availabilityChangeDisabled,
-                    isError: true,
-                  );
-                  return;
-                }
-                setState(() {});
-                widget.availabilityNotifier.notify();
-              },
-              onPickFrom: () => _pickTime(day: day, isFrom: true),
-              onPickTo: () => _pickTime(day: day, isFrom: false),
-            ),
-          ),
-          const SizedBox(height: 24),
+          if (_isRefreshing) const LinearProgressIndicator(),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(20),
+              children: [
+                Text(
+                  AppStrings.availabilityDescription,
+                  style: theme.textTheme.bodySmall,
+                ),
+                const SizedBox(height: 16),
+                ..._availability.map(
+                  (day) => AvailabilityDayRow(
+                    day: day,
+                    enabled: _isEditing,
+                    onEnabledChanged: (v) {
+                      final prev = day.enabled;
+                      day.enabled = v;
+                      if (_hasConflictOnDay(day)) {
+                        day.enabled = prev;
+                        showHelpiSnackBar(
+                          context,
+                          AppStrings.availabilityChangeDisabled,
+                          isError: true,
+                        );
+                        return;
+                      }
+                      setState(() {});
+                      widget.availabilityNotifier.notify();
+                    },
+                    onPickFrom: () => _pickTime(day: day, isFrom: true),
+                    onPickTo: () => _pickTime(day: day, isFrom: false),
+                  ),
+                ),
+                const SizedBox(height: 24),
 
-          if (_isEditing) ...[
-            ElevatedButton(
-              onPressed: _isSaving ? null : _save,
-              child: _isSaving
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(AppStrings.save),
+                if (_isEditing) ...[
+                  ElevatedButton(
+                    onPressed: _isSaving ? null : _save,
+                    child: _isSaving
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(AppStrings.save),
+                  ),
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: () {
+                      _restoreOldAvail();
+                      setState(() => _isEditing = false);
+                    },
+                    child: Text(AppStrings.cancel),
+                  ),
+                ],
+              ],
             ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () {
-                _restoreOldAvail();
-                setState(() => _isEditing = false);
-              },
-              child: Text(AppStrings.cancel),
-            ),
-          ],
+          ),
         ],
       ),
     );
