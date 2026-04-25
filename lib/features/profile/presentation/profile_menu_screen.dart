@@ -202,7 +202,7 @@ class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
                 _MenuItem(
                   icon: Icons.email_outlined,
                   label: AppStrings.accessData,
-                  onTap: () => _push(
+                  onTap: () => _pushNoReload(
                     ProfileCredentialsScreen(profileData: _profileData),
                   ),
                 ),
@@ -226,7 +226,7 @@ class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
                 _MenuItem(
                   icon: Icons.credit_card_outlined,
                   label: AppStrings.creditCards,
-                  onTap: () => _push(
+                  onTap: () => _pushNoReload(
                     ProfileCardsScreen(
                       cards: _cards,
                       onCardsChanged: (cards) => _cards = cards,
@@ -237,7 +237,7 @@ class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
                 _MenuItem(
                   icon: Icons.tune_outlined,
                   label: AppStrings.settings,
-                  onTap: () => _push(
+                  onTap: () => _pushNoReload(
                     ProfileSettingsScreen(
                       localeNotifier: widget.localeNotifier,
                       themeNotifier: widget.themeNotifier,
@@ -375,16 +375,25 @@ class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
     }
   }
 
+  /// Used for sub-screens that may change name (Orderer, Senior).
+  /// Triggers a reload of profile data on return so the avatar/name
+  /// in the menu reflects any change.
   Future<void> _push(Widget screen) async {
     await Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
     if (!mounted) return;
-    // Reload profile data after returning from sub-screen
     setState(() => _isLoading = true);
     await _loadBasicInfo();
   }
 
+  /// Used for sub-screens that don't affect name/avatar shown in the menu
+  /// (Credentials, Cards, Settings, Terms). Skips the post-return reload
+  /// so back navigation is instant.
+  Future<void> _pushNoReload(Widget screen) async {
+    await Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
+  }
+
   void _openTerms() {
-    _push(const TermsScreen());
+    _pushNoReload(const TermsScreen());
   }
 
   Future<void> _confirmLogout() async {
