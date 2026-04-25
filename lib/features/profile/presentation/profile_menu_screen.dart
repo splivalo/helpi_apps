@@ -45,6 +45,7 @@ class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
 
   // Profile data cache – loaded once, passed to sub-screens
   Map<String, dynamic>? _profileData;
+  // Note: _cards is no longer loaded in _loadBasicInfo(), lazy-loaded in ProfileCardsScreen
   List<Map<String, dynamic>> _cards = [];
 
   @override
@@ -206,10 +207,11 @@ class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
                   _MenuItem(
                     icon: Icons.person_outline,
                     label: AppStrings.ordererData,
-                    onTap: () =>
-                        _push(ProfileOrdererScreen(profileData: _profileData)),
+                  onTap: () => _pushNoReload(
+                    ProfileOrdererScreen(profileData: _profileData),
                   ),
-                  const Divider(height: 1, indent: 20, endIndent: 20),
+                ),
+                const Divider(height: 1, indent: 20, endIndent: 20),
                 ],
                 _MenuItem(
                   icon: Icons.elderly,
