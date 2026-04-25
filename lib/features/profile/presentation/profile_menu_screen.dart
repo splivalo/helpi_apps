@@ -207,11 +207,11 @@ class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
                   _MenuItem(
                     icon: Icons.person_outline,
                     label: AppStrings.ordererData,
-                  onTap: () => _pushNoReload(
-                    ProfileOrdererScreen(profileData: _profileData),
+                    onTap: () => _pushNoReload(
+                      ProfileOrdererScreen(profileData: _profileData),
+                    ),
                   ),
-                ),
-                const Divider(height: 1, indent: 20, endIndent: 20),
+                  const Divider(height: 1, indent: 20, endIndent: 20),
                 ],
                 _MenuItem(
                   icon: Icons.elderly,
