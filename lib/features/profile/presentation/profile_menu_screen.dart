@@ -87,12 +87,7 @@ class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
       }
     }
 
-    final cardsResult = await api.getPaymentMethods(userId);
-    if (!mounted) return;
-    if (cardsResult.success && cardsResult.data != null) {
-      _cards = cardsResult.data!;
-    }
-
+    // Removed payment methods loading - now lazy-loaded in ProfileCardsScreen
     setState(() => _isLoading = false);
   }
 
@@ -228,7 +223,6 @@ class _ProfileMenuScreenState extends ConsumerState<ProfileMenuScreen> {
                   label: AppStrings.creditCards,
                   onTap: () => _pushNoReload(
                     ProfileCardsScreen(
-                      cards: _cards,
                       onCardsChanged: (cards) => _cards = cards,
                     ),
                   ),

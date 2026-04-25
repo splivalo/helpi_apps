@@ -8,11 +8,11 @@ import 'package:helpi_app/core/network/token_storage.dart';
 class ProfileCardsScreen extends StatefulWidget {
   const ProfileCardsScreen({
     super.key,
-    required this.cards,
+    this.cards,
     required this.onCardsChanged,
   });
 
-  final List<Map<String, dynamic>> cards;
+  final List<Map<String, dynamic>>? cards;
   final ValueChanged<List<Map<String, dynamic>>> onCardsChanged;
 
   @override
@@ -24,11 +24,36 @@ class _ProfileCardsScreenState extends State<ProfileCardsScreen> {
 
   late List<Map<String, dynamic>> _cards;
   bool _isSavingCard = false;
+  bool _isLoadingCards = false;
 
   @override
   void initState() {
     super.initState();
-    _cards = List.of(widget.cards);
+    if (widget.cards != null) {
+      _cards = List.of(widget.cards!);
+    } else {
+      _cards = [];
+      _loadCards();
+    }
+  }
+
+  Future<void> _loadCards() async {
+    setState(() => _isLoadingCards = true);
+
+    final userId = await TokenStorage().getUserId();
+    if (userId == null || !mounted) return;
+
+    final result = await AppApiService().getPaymentMethods(userId);
+    if (!mounted) return;
+
+    if (result.success && result.data != null) {
+      setState(() {
+        _cards = result.data!;
+        widget.onCardsChanged(_cards);
+      });
+    }
+
+    setState(() => _isLoadingCards = false);
   }
 
   Future<void> _addDummyCard() async {
@@ -92,80 +117,82 @@ class _ProfileCardsScreenState extends State<ProfileCardsScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(AppStrings.creditCards)),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          if (_cards.isEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.credit_card_off,
-                    size: 20,
-                    color: theme.colorScheme.onSurface.withAlpha(120),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    AppStrings.noCards,
-                    style: TextStyle(
-                      color: theme.colorScheme.onSurface.withAlpha(153),
-                      fontSize: 15,
+      body: _isLoadingCards
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              padding: const EdgeInsets.all(20),
+              children: [
+                if (_cards.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.credit_card_off,
+                          size: 20,
+                          color: theme.colorScheme.onSurface.withAlpha(120),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          AppStrings.noCards,
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface.withAlpha(153),
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            )
-          else
-            ..._cards.map((card) {
-              final brand = card['brand'] as String? ?? '';
-              final last4 = card['last4'] as String? ?? '****';
-              final display = brand.isNotEmpty
-                  ? '$brand **** $last4'
-                  : '**** $last4';
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: InputDecorator(
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: theme.colorScheme.surface,
-                    prefixIcon: Icon(
-                      Icons.credit_card,
-                      color: theme.colorScheme.secondary,
-                    ),
-                    suffixIcon: GestureDetector(
-                      onTap: () => _deleteCard(card),
-                      child: Icon(
-                        Icons.delete_outline,
-                        color: theme.colorScheme.error,
-                        size: 22,
-                      ),
-                    ),
-                  ),
-                  child: Text(
-                    display,
-                    style: TextStyle(
-                      color: theme.colorScheme.onSurface,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              );
-            }),
-          const SizedBox(height: 8),
-          OutlinedButton.icon(
-            onPressed: _isSavingCard ? null : _addDummyCard,
-            icon: _isSavingCard
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Icon(Icons.add, size: 20),
-            label: Text(AppStrings.addCard),
-          ),
-        ],
-      ),
+                else
+                  ..._cards.map((card) {
+                    final brand = card['brand'] as String? ?? '';
+                    final last4 = card['last4'] as String? ?? '****';
+                    final display = brand.isNotEmpty
+                        ? '$brand **** $last4'
+                        : '**** $last4';
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: theme.colorScheme.surface,
+                          prefixIcon: Icon(
+                            Icons.credit_card,
+                            color: theme.colorScheme.secondary,
+                          ),
+                          suffixIcon: GestureDetector(
+                            onTap: () => _deleteCard(card),
+                            child: Icon(
+                              Icons.delete_outline,
+                              color: theme.colorScheme.error,
+                              size: 22,
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          display,
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: _isSavingCard ? null : _addDummyCard,
+                  icon: _isSavingCard
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.add, size: 20),
+                  label: Text(AppStrings.addCard),
+                ),
+              ],
+            ),
     );
   }
 }
