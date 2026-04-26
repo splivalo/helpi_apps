@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:helpi_app/core/network/api_client.dart';
@@ -61,19 +62,42 @@ class ChatApiService {
     }
   }
 
-  /// Pošalji poruku (REST fallback).
+  /// Pošalji poruku s retry mehanizmom (max 3 pokušaja, exponential backoff).
   Future<ApiResult<ChatMessage>> sendMessage(int roomId, String content) async {
-    try {
-      final response = await _client.post(
-        ApiEndpoints.chatMessages(roomId),
-        data: {'content': content},
-      );
-      final msg = ChatMessage.fromJson(response.data as Map<String, dynamic>);
-      return ApiResult.success(msg);
-    } catch (e) {
-      debugPrint('[ChatApi] sendMessage error: $e');
-      return ApiResult.failure(AppApiService.friendlyError(e));
+    const maxRetries = 3;
+    for (var attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        final response = await _client.post(
+          ApiEndpoints.chatMessages(roomId),
+          data: {'content': content},
+        );
+        final msg = ChatMessage.fromJson(response.data as Map<String, dynamic>);
+        return ApiResult.success(msg);
+      } catch (e) {
+        final isNetworkError =
+            e is DioException &&
+            (e.type == DioExceptionType.connectionTimeout ||
+                e.type == DioExceptionType.connectionError ||
+                e.type == DioExceptionType.receiveTimeout ||
+                e.type == DioExceptionType.sendTimeout);
+
+        debugPrint(
+          '[ChatApi] sendMessage attempt $attempt/$maxRetries failed: $e',
+        );
+
+        // Only retry on network errors, not on 4xx/5xx
+        if (!isNetworkError || attempt == maxRetries) {
+          return ApiResult.failure(AppApiService.friendlyError(e));
+        }
+
+        // Exponential backoff: 1s, 2s, 4s
+        await Future<void>.delayed(Duration(seconds: 1 << (attempt - 1)));
+      }
     }
+    // Unreachable, but satisfies the analyzer
+    return ApiResult.failure(
+      AppApiService.friendlyError(Exception('Retry exhausted')),
+    );
   }
 
   /// Označi poruke u sobi kao pročitane.

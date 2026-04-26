@@ -83,6 +83,7 @@ class SignalRService {
       debugPrint('[SignalR] stop error: $e');
     }
     _connection = null;
+    _handlers.clear();
   }
 
   /// Registriraj handler za backend event (npr. "ReceiveNotification").
