@@ -250,6 +250,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       case 22:
         return Icons.event_repeat_outlined;
       case 23:
+      case 37:
         return Icons.event_available_outlined;
       // Contract
       case 13:
@@ -283,6 +284,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       case 15:
       case 23:
       case 34:
+      case 37:
         return AppColors.teal;
       // Coral = error / cancelled / bad
       case 2:
