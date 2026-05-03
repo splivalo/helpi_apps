@@ -33,9 +33,6 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(notificationsUnreadProvider.notifier).state = 0;
-    });
     _loadNotifications();
   }
 
@@ -67,10 +64,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     }
 
     final all = result.data ?? [];
+    final unread = all.where((n) => n['isRead'] != true).length;
+    if (mounted) {
+      ref.read(notificationsUnreadProvider.notifier).state = unread;
+    }
     setState(() {
       _isLoading = false;
       _notifications = all;
-      _unreadCount = all.where((n) => n['isRead'] != true).length;
+      _unreadCount = unread;
     });
   }
 
@@ -86,6 +87,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       }).toList();
       _unreadCount = _notifications.where((n) => n['isRead'] != true).length;
     });
+    ref.read(notificationsUnreadProvider.notifier).state = _unreadCount;
 
     final result = await _api.markNotificationAsRead(id);
     if (!mounted) return;
@@ -98,6 +100,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         }).toList();
         _unreadCount = _notifications.where((n) => n['isRead'] != true).length;
       });
+      ref.read(notificationsUnreadProvider.notifier).state = _unreadCount;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result.error ?? AppStrings.notificationsLoadError),
@@ -107,7 +110,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   }
 
   // -- Types that warrant navigation (have a destination screen) --
-  static const _seniorNavigableTypes = {1, 2, 7, 8, 9, 12, 21, 22, 23, 32};
+  static const _seniorNavigableTypes = {1, 2, 7, 8, 9, 12, 21, 22, 23, 32, 37};
   static const _studentNavigableTypes = {
     5,
     7,
@@ -120,6 +123,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     34,
     35,
     36,
+    37,
   };
 
   Future<void> _onNotificationTap(Map<String, dynamic> notification) async {
