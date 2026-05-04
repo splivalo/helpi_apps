@@ -193,8 +193,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   void _onChanged() {
     if (!mounted) return;
-    // Re-fetch sessions when orders are refreshed (e.g. via SignalR)
+    // Re-fetch sessions and coupons when orders are refreshed (e.g. via SignalR)
     _loadSessions();
+    _loadSeniorCoupons();
     setState(() {});
   }
 
