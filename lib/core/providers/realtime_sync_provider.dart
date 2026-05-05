@@ -171,6 +171,9 @@ class RealTimeSyncService {
   void _handleInAppNotification(List<Object?>? args) {
     final data = _extractNotificationData(args);
     if (data == null) return;
+    // Assignment-specific types are handled via the modal overlay — skip snackbar.
+    final type = _extractNotificationType(args);
+    if (type == _assignmentPending || type == _assignmentRevoked) return;
     final title = data['title'] as String?;
     final body = data['body'] as String?;
     if (title == null || body == null) return;
