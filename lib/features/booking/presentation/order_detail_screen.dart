@@ -803,7 +803,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     color: isCancelled
                         ? AppColors.teal.withAlpha(12)
                         : job.isAssignmentPending
-                        ? AppColors.info.withAlpha(25)
+                        ? AppColors.warning.withAlpha(25)
                         : AppColors.teal.withAlpha(25),
                     shape: BoxShape.circle,
                   ),
@@ -816,7 +816,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     color: isCancelled
                         ? AppColors.teal.withAlpha(100)
                         : job.isAssignmentPending
-                        ? AppColors.info
+                        ? AppColors.warning
                         : AppColors.teal,
                     size: 18,
                   ),
@@ -845,7 +845,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         Text(
                           AppStrings.awaitingConfirmation,
                           style: theme.textTheme.labelSmall?.copyWith(
-                            color: AppColors.info,
+                            color: AppColors.warning,
                             fontSize: 10,
                           ),
                         ),
