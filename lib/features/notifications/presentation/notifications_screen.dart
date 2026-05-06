@@ -240,6 +240,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       case 7:
         return Icons.check_circle_outline;
       case 8:
+      case 10:
       case 12:
       case 35:
         return Icons.cancel_outlined;
@@ -289,6 +290,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       // Coral = error / cancelled / bad
       case 2:
       case 8:
+      case 10:
       case 12:
       case 14:
       case 35:
