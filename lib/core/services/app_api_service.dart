@@ -32,6 +32,15 @@ class AppApiService {
       final statusCode = e.response?.statusCode;
       if (statusCode == 403) return AppStrings.suspendedMessage;
       if (statusCode == 404) return AppStrings.error;
+      if (statusCode == 400) {
+        // Try to extract backend domain error message
+        final data = e.response?.data;
+        if (data is Map<String, dynamic>) {
+          final msg = data['message'] as String?;
+          if (msg != null && msg.isNotEmpty) return msg;
+        }
+        return AppStrings.error;
+      }
       if (statusCode != null && statusCode >= 500) {
         return AppStrings.serverError;
       }
